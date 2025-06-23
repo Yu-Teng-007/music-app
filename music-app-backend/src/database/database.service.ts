@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Song } from '../entities/song.entity'
-import { seedSongs } from '../seeds/songs.seed'
 
 @Injectable()
 export class DatabaseService implements OnModuleInit {
@@ -12,24 +11,17 @@ export class DatabaseService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.seedDatabase()
+    await this.initializeDatabase()
   }
 
-  private async seedDatabase() {
+  private async initializeDatabase() {
     try {
-      // 检查是否已有数据
+      // 检查数据库连接
       const songCount = await this.songRepository.count()
+      console.log(`数据库连接成功，当前歌曲数量: ${songCount}`)
 
       if (songCount === 0) {
-        console.log('正在初始化数据库数据...')
-
-        // 插入种子歌曲数据
-        for (const songData of seedSongs) {
-          const song = this.songRepository.create(songData)
-          await this.songRepository.save(song)
-        }
-
-        console.log(`已成功插入 ${seedSongs.length} 首歌曲数据`)
+        console.log('数据库为空，请使用爬虫服务获取歌曲数据')
       }
     } catch (error) {
       console.error('数据库初始化失败:', error)
