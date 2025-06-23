@@ -1,22 +1,22 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Put, 
-  Body, 
-  UseGuards, 
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Body,
+  UseGuards,
   Request,
   HttpCode,
-  HttpStatus 
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { 
-  LoginDto, 
-  RegisterDto, 
-  UpdateProfileDto, 
+import {
+  LoginDto,
+  RegisterDto,
+  UpdateProfileDto,
   ChangePasswordDto,
-  RefreshTokenDto 
+  RefreshTokenDto,
 } from '../dto/auth.dto';
 
 @Controller('auth')
@@ -72,7 +72,10 @@ export class AuthController {
     @Request() req,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    const result = await this.authService.updateProfile(req.user.id, updateProfileDto);
+    const result = await this.authService.updateProfile(
+      req.user.id,
+      updateProfileDto,
+    );
     return {
       success: true,
       data: result,
@@ -86,7 +89,10 @@ export class AuthController {
     @Request() req,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    const result = await this.authService.changePassword(req.user.id, changePasswordDto);
+    const result = await this.authService.changePassword(
+      req.user.id,
+      changePasswordDto,
+    );
     return {
       success: true,
       data: result,
@@ -109,20 +115,27 @@ export class AuthController {
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body('email') email: string) {
-    // TODO: 实现忘记密码功能
+    const result = await this.authService.forgotPassword(email);
     return {
       success: true,
-      message: '重置密码邮件已发送',
+      data: result,
+      message: result.message,
     };
   }
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordDto: any) {
-    // TODO: 实现重置密码功能
+  async resetPassword(
+    @Body() resetPasswordDto: { token: string; password: string },
+  ) {
+    const result = await this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.password,
+    );
     return {
       success: true,
-      message: '密码重置成功',
+      data: result,
+      message: result.message,
     };
   }
 }

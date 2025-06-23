@@ -30,11 +30,11 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: true })
-  resetPasswordToken: string;
+  @Column({ nullable: true, type: 'varchar', length: 255 })
+  resetPasswordToken: string | null;
 
-  @Column({ nullable: true })
-  resetPasswordExpires: Date;
+  @Column({ nullable: true, type: 'datetime' })
+  resetPasswordExpires: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

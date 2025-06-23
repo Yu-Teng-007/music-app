@@ -236,4 +236,72 @@ export class AuthService {
 
     return user;
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (!user || !user.isActive) {
+      // 为了安全，即使用户不存在也返回成功消息
+      return { message: '如果该邮箱存在，重置密码邮件已发送' };
+    }
+
+    // 生成重置令牌
+    const resetToken = this.generateResetToken();
+    const resetTokenExpires = new Date(Date.now() + 3600000); // 1小时后过期
+
+    // 保存重置令牌到数据库
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpires;
+    await this.userRepository.save(user);
+
+    // TODO: 发送邮件
+    // 在实际应用中，这里应该发送包含重置链接的邮件
+    console.log(`重置密码令牌: ${resetToken}`);
+    console.log(
+      `重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`,
+    );
+
+    return { message: '重置密码邮件已发送' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        resetPasswordToken: token,
+      },
+    });
+
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
+      throw new UnauthorizedException('重置令牌无效或已过期');
+    }
+
+    // 加密新密码
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // 更新密码并清除重置令牌
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await this.userRepository.save(user);
+
+    return { message: '密码重置成功' };
+  }
+
+  private generateResetToken(): string {
+    // 生成32位随机字符串
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 32; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
 }

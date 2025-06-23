@@ -11,6 +11,7 @@ import { SongsModule } from './songs/songs.module';
 import { PlaylistsModule } from './playlists/playlists.module';
 import { UploadModule } from './upload/upload.module';
 import { DatabaseModule } from './database/database.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { DatabaseModule } from './database/database.module';
     AuthModule,
     SongsModule,
     PlaylistsModule,
+    FavoritesModule,
     UploadModule,
     DatabaseModule,
   ],
