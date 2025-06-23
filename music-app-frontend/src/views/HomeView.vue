@@ -2,41 +2,24 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
+import { useAuthStore } from '@/stores/auth'
 import type { Song } from '@/stores/music'
 import { Play, Heart, MoreHorizontal } from 'lucide-vue-next'
 
 const router = useRouter()
 const musicStore = useMusicStore()
+const authStore = useAuthStore()
 
 // 用户信息
 const userInfo = ref({
-  name: 'Kiki',
+  name: '音乐爱好者',
   avatar: 'https://picsum.photos/60/60?random=100',
   greeting: '戴上耳机好好听',
   subGreeting: '今日榜单上歌曲的准备吧！',
 })
 
 // 最近播放的歌曲
-const recentSongs = ref<Song[]>([
-  {
-    id: '1',
-    title: 'Dawn of us',
-    artist: '王嘉尔',
-    album: 'Dawn of us',
-    duration: 210,
-    coverUrl: 'https://picsum.photos/300/300?random=20',
-    audioUrl: '/demo-audio1.mp3',
-  },
-  {
-    id: '2',
-    title: 'Eyes Closed',
-    artist: 'Halsey',
-    album: 'Eyes Closed',
-    duration: 195,
-    coverUrl: 'https://picsum.photos/300/300?random=21',
-    audioUrl: '/demo-audio2.mp3',
-  },
-])
+const recentSongs = ref<Song[]>([])
 
 // 排行榜类型
 const chartTypes = ref([
@@ -60,6 +43,9 @@ const chartTypes = ref([
   },
 ])
 
+// 加载状态
+const isLoading = ref(false)
+
 const playSong = (song: Song) => {
   musicStore.setCurrentSong(song)
   musicStore.addToPlaylist(song)
@@ -76,19 +62,62 @@ const handleImageError = (event: Event) => {
   img.src = 'https://picsum.photos/300/300?random=104'
 }
 
-onMounted(() => {
-  // 初始化默认播放列表（如果还没有歌曲的话）
-  if (!musicStore.currentSong) {
-    musicStore.initializeDefaultPlaylist()
-    if (musicStore.playlist.length > 0) {
-      // 设置当前歌曲为第一首默认歌曲，但不自动播放
-      musicStore.setCurrentSong(musicStore.playlist[0])
+// 加载用户信息
+const loadUserInfo = async () => {
+  if (authStore.isAuthenticated) {
+    try {
+      const profile = await authStore.getUserProfile()
+      userInfo.value = {
+        name: profile.name,
+        avatar: profile.avatar || 'https://picsum.photos/60/60?random=100',
+        greeting: profile.greeting,
+        subGreeting: profile.subGreeting,
+      }
+    } catch (error) {
+      console.error('Failed to load user profile:', error)
+      // 使用默认信息
+      if (authStore.user) {
+        userInfo.value = {
+          name: authStore.user.name,
+          avatar: authStore.user.avatar || 'https://picsum.photos/60/60?random=100',
+          greeting: '戴上耳机好好听',
+          subGreeting: '今日榜单上歌曲的准备吧！',
+        }
+      }
     }
   }
+}
 
-  // 如果用户还没有播放列表，则设置推荐歌曲
-  if (musicStore.playlist.length === 0) {
-    musicStore.setPlaylist(recentSongs.value)
+// 加载最近播放歌曲
+const loadRecentSongs = async () => {
+  try {
+    isLoading.value = true
+    // 获取推荐歌曲作为最近播放（实际项目中应该是用户的播放历史）
+    const songs = await musicStore.loadRecommendedSongs(2)
+    recentSongs.value = songs
+  } catch (error) {
+    console.error('Failed to load recent songs:', error)
+    // 如果加载失败，使用默认数据
+    recentSongs.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(async () => {
+  // 加载用户信息
+  await loadUserInfo()
+
+  // 加载最近播放歌曲
+  await loadRecentSongs()
+
+  // 初始化播放列表（如果还没有歌曲的话）
+  if (!musicStore.currentSong) {
+    await musicStore.initializePlaylist()
+    if (musicStore.playlist.length > 0) {
+      // 设置当前歌曲为第一首歌曲，但不自动播放
+      musicStore.setCurrentSong(musicStore.playlist[0])
+    }
   }
 })
 </script>
@@ -112,7 +141,11 @@ onMounted(() => {
     <!-- 最近播放 -->
     <div class="section">
       <h2>最近播放</h2>
-      <div class="recent-songs">
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+      <div v-else-if="recentSongs.length > 0" class="recent-songs">
         <div v-for="song in recentSongs" :key="song.id" class="recent-card" @click="playSong(song)">
           <img
             :src="song.coverUrl || 'https://picsum.photos/300/300?random=105'"
@@ -131,6 +164,9 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+      <div v-else class="empty-state">
+        <p>暂无最近播放的歌曲</p>
       </div>
     </div>
 
@@ -384,6 +420,46 @@ onMounted(() => {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 /* 响应式设计 */

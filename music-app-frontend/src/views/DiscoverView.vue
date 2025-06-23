@@ -26,26 +26,35 @@
 
         <div class="results-content">
           <div v-if="activeTab === 'songs'" class="song-results">
-            <div
-              v-for="song in filteredSongs"
-              :key="song.id"
-              class="song-item"
-              @click="playSong(song)"
-            >
-              <div class="song-cover">
-                <img
-                  :src="song.coverUrl || 'https://picsum.photos/300/300?random=128'"
-                  :alt="song.title"
-                  @error="handleImageError"
-                />
+            <div v-if="isSearching" class="loading-container">
+              <div class="loading-spinner"></div>
+              <p>搜索中...</p>
+            </div>
+            <div v-else-if="filteredSongs.length > 0">
+              <div
+                v-for="song in filteredSongs"
+                :key="song.id"
+                class="song-item"
+                @click="playSong(song)"
+              >
+                <div class="song-cover">
+                  <img
+                    :src="song.coverUrl || 'https://picsum.photos/300/300?random=128'"
+                    :alt="song.title"
+                    @error="handleImageError"
+                  />
+                </div>
+                <div class="song-info">
+                  <h3 class="song-title">{{ song.title }}</h3>
+                  <p class="song-artist">{{ song.artist }}</p>
+                </div>
+                <button class="play-btn">
+                  <Play :size="16" />
+                </button>
               </div>
-              <div class="song-info">
-                <h3 class="song-title">{{ song.title }}</h3>
-                <p class="song-artist">{{ song.artist }}</p>
-              </div>
-              <button class="play-btn">
-                <Play :size="16" />
-              </button>
+            </div>
+            <div v-else class="empty-state">
+              <p>未找到相关歌曲</p>
             </div>
           </div>
         </div>
@@ -71,7 +80,11 @@
         <!-- 推荐歌曲 -->
         <div class="section">
           <h2>推荐歌曲</h2>
-          <div class="song-grid">
+          <div v-if="isLoading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>加载中...</p>
+          </div>
+          <div v-else-if="recommendedSongs.length > 0" class="song-grid">
             <div
               v-for="song in recommendedSongs"
               :key="song.id"
@@ -92,6 +105,9 @@
               <p class="song-artist">{{ song.artist }}</p>
             </div>
           </div>
+          <div v-else class="empty-state">
+            <p>暂无推荐歌曲</p>
+          </div>
         </div>
       </div>
     </div>
@@ -99,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useMusicStore } from '@/stores/music'
 import type { Song } from '@/stores/music'
 import { Search, Play } from 'lucide-vue-next'
@@ -124,72 +140,64 @@ const categories = [
   { id: 6, name: '民谣', color: '#DDA0DD' },
 ]
 
-const recommendedSongs = ref<Song[]>([
-  {
-    id: '1',
-    title: '偏爱',
-    artist: '张芸京',
-    album: '偏爱',
-    duration: 240,
-    coverUrl: 'https://picsum.photos/300/300?random=130',
-    audioUrl: '/demo-audio1.mp3',
-  },
-  {
-    id: '2',
-    title: '当爱在靠近',
-    artist: '张佰芝',
-    album: '当爱在靠近',
-    duration: 220,
-    coverUrl: 'https://picsum.photos/300/300?random=131',
-    audioUrl: '/demo-audio2.mp3',
-  },
-  {
-    id: '3',
-    title: '如果这都不算爱',
-    artist: '张学友',
-    album: '如果这都不算爱',
-    duration: 260,
-    coverUrl: 'https://picsum.photos/300/300?random=132',
-    audioUrl: '/demo-audio3.mp3',
-  },
-  {
-    id: '4',
-    title: '真的爱你 (Truly Love You)',
-    artist: 'Beyond',
-    album: '真的爱你',
-    duration: 280,
-    coverUrl: 'https://picsum.photos/300/300?random=133',
-    audioUrl: '/demo-audio4.mp3',
-  },
-  {
-    id: '5',
-    title: '只是因为太爱你',
-    artist: '张敬轩',
-    album: '只是因为太爱你',
-    duration: 200,
-    coverUrl: 'https://picsum.photos/300/300?random=134',
-    audioUrl: '/demo-audio5.mp3',
-  },
-  {
-    id: '6',
-    title: '不得不爱',
-    artist: '潘玮柏',
-    album: '不得不爱',
-    duration: 210,
-    coverUrl: 'https://picsum.photos/300/300?random=135',
-    audioUrl: '/demo-audio6.mp3',
-  },
-])
+// 推荐歌曲和搜索结果
+const recommendedSongs = ref<Song[]>([])
+const searchResults = ref<Song[]>([])
+
+// 加载状态
+const isLoading = ref(false)
+const isSearching = ref(false)
 
 const filteredSongs = computed(() => {
   if (!searchQuery.value) return []
-
-  return recommendedSongs.value.filter(
-    song =>
-      song.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      song.artist.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  return searchResults.value
 })
+
+// 加载推荐歌曲
+const loadRecommendedSongs = async () => {
+  try {
+    isLoading.value = true
+    const songs = await musicStore.loadRecommendedSongs(6)
+    recommendedSongs.value = songs
+  } catch (error) {
+    console.error('Failed to load recommended songs:', error)
+    recommendedSongs.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 搜索歌曲
+const searchSongs = async (keyword: string) => {
+  if (!keyword.trim()) {
+    searchResults.value = []
+    return
+  }
+
+  try {
+    isSearching.value = true
+    const songs = await musicStore.searchSongs(keyword, 20)
+    searchResults.value = songs
+  } catch (error) {
+    console.error('Failed to search songs:', error)
+    searchResults.value = []
+  } finally {
+    isSearching.value = false
+  }
+}
+
+// 监听搜索查询变化
+watch(
+  searchQuery,
+  newQuery => {
+    if (newQuery.trim()) {
+      searchSongs(newQuery)
+    } else {
+      searchResults.value = []
+    }
+  },
+  { debounce: 300 }
+)
 
 const playSong = (song: Song) => {
   musicStore.setCurrentSong(song)
@@ -201,6 +209,10 @@ const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = 'https://picsum.photos/300/300?random=136'
 }
+
+onMounted(() => {
+  loadRecommendedSongs()
+})
 </script>
 
 <style scoped>
@@ -511,6 +523,46 @@ const handleImageError = (event: Event) => {
 
 .song-card .song-artist {
   font-size: 0.75rem;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 /* 响应式设计 */

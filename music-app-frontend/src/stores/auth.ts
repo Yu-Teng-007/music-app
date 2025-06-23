@@ -193,6 +193,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // 获取用户档案（包含个性化信息）
+  const getUserProfile = async () => {
+    if (!isAuthenticated.value) {
+      throw new Error('用户未登录')
+    }
+
+    try {
+      return await authApi.getUserProfile()
+    } catch (error: any) {
+      console.error('Failed to get user profile:', error)
+      // 如果获取用户档案失败，可能token已过期
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        clearAuth()
+      }
+      throw error
+    }
+  }
+
   // 更新用户资料
   const updateProfile = async (userData: Partial<User>): Promise<void> => {
     setLoading(true)
@@ -319,6 +337,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     refreshUserInfo,
+    getUserProfile,
     updateProfile,
     changePassword,
     forgotPassword,

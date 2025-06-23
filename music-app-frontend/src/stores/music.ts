@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { musicApi } from '@/services/music-api'
 
 export interface Song {
   id: string
@@ -15,19 +16,6 @@ export interface PlayMode {
   shuffle: boolean
   repeat: 'none' | 'one' | 'all'
 }
-
-// 默认音乐列表
-const defaultSongs: Song[] = [
-  {
-    id: 'default-1',
-    title: '夜曲',
-    artist: '周杰伦',
-    album: '十一月的萧邦',
-    duration: 237, // 3分57秒
-    coverUrl: 'https://picsum.photos/300/300?random=201',
-    audioUrl: '/music/夜曲.mp3',
-  },
-]
 
 export const useMusicStore = defineStore('music', () => {
   // 当前播放的歌曲
@@ -50,6 +38,10 @@ export const useMusicStore = defineStore('music', () => {
 
   // 当前歌曲在播放列表中的索引
   const currentIndex = ref(0)
+
+  // 加载状态
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
 
   // 计算属性
   const progress = computed(() => {
@@ -157,16 +149,75 @@ export const useMusicStore = defineStore('music', () => {
     // 不自动设置当前歌曲，让用户主动选择
   }
 
-  // 初始化默认播放列表
-  function initializeDefaultPlaylist() {
-    if (playlist.value.length === 0) {
-      playlist.value = [...defaultSongs]
+  // API数据加载方法
+  async function loadSongs(params?: any) {
+    try {
+      isLoading.value = true
+      error.value = null
+      const response = await musicApi.getSongs(params)
+      return response.data || []
+    } catch (err: any) {
+      error.value = err.message || '加载歌曲失败'
+      console.error('Failed to load songs:', err)
+      return []
+    } finally {
+      isLoading.value = false
     }
   }
 
-  // 获取默认歌曲列表
-  function getDefaultSongs() {
-    return defaultSongs
+  async function loadRecommendedSongs(limit?: number) {
+    try {
+      isLoading.value = true
+      error.value = null
+      const response = await musicApi.getRecommendedSongs(limit)
+      return response.data || []
+    } catch (err: any) {
+      error.value = err.message || '加载推荐歌曲失败'
+      console.error('Failed to load recommended songs:', err)
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function loadPopularSongs(limit?: number) {
+    try {
+      isLoading.value = true
+      error.value = null
+      const response = await musicApi.getPopularSongs(limit)
+      return response.data || []
+    } catch (err: any) {
+      error.value = err.message || '加载热门歌曲失败'
+      console.error('Failed to load popular songs:', err)
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function searchSongs(keyword: string, limit?: number) {
+    try {
+      isLoading.value = true
+      error.value = null
+      const response = await musicApi.searchSongs(keyword, limit)
+      return response.data || []
+    } catch (err: any) {
+      error.value = err.message || '搜索歌曲失败'
+      console.error('Failed to search songs:', err)
+      return []
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  // 初始化播放列表（从API加载）
+  async function initializePlaylist() {
+    if (playlist.value.length === 0) {
+      const songs = await loadRecommendedSongs(10)
+      if (songs.length > 0) {
+        playlist.value = songs
+      }
+    }
   }
 
   return {
@@ -179,6 +230,8 @@ export const useMusicStore = defineStore('music', () => {
     volume,
     playMode,
     currentIndex,
+    isLoading,
+    error,
 
     // 计算属性
     progress,
@@ -199,8 +252,11 @@ export const useMusicStore = defineStore('music', () => {
     addToPlaylist,
     removeFromPlaylist,
     setPlaylist,
-    initializeDefaultPlaylist,
-    getDefaultSongs,
+    initializePlaylist,
+    loadSongs,
+    loadRecommendedSongs,
+    loadPopularSongs,
+    searchSongs,
     formatTime,
   }
 })

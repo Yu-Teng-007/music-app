@@ -20,55 +20,69 @@
     </div>
 
     <div class="content">
-      <!-- 我的歌单 -->
-      <div class="section" v-if="filteredMyPlaylists.length > 0">
-        <h2>我的歌单</h2>
-        <div class="playlist-grid">
-          <div
-            v-for="playlist in filteredMyPlaylists"
-            :key="playlist.id"
-            class="playlist-item"
-            @click="openPlaylist(playlist)"
-          >
-            <div class="playlist-cover">
-              <img
-                :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=118'"
-                :alt="playlist.name"
-                @error="handleImageError"
-              />
-              <div class="playlist-overlay">
-                <Play :size="24" />
-              </div>
-            </div>
-            <h3 class="playlist-name">{{ playlist.name }}</h3>
-            <p class="playlist-info">{{ playlist.songCount }}首歌曲</p>
-          </div>
-        </div>
+      <!-- 加载状态 -->
+      <div v-if="isLoading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
       </div>
 
-      <!-- 推荐歌单 -->
-      <div class="section" v-if="filteredRecommendedPlaylists.length > 0">
-        <h2>推荐歌单</h2>
-        <div class="playlist-grid">
-          <div
-            v-for="playlist in filteredRecommendedPlaylists"
-            :key="playlist.id"
-            class="playlist-item"
-            @click="openPlaylist(playlist)"
-          >
-            <div class="playlist-cover">
-              <img
-                :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=119'"
-                :alt="playlist.name"
-                @error="handleImageError"
-              />
-              <div class="playlist-overlay">
-                <Play :size="24" />
+      <div v-else>
+        <!-- 我的歌单 -->
+        <div class="section" v-if="authStore.isAuthenticated && filteredMyPlaylists.length > 0">
+          <h2>我的歌单</h2>
+          <div class="playlist-grid">
+            <div
+              v-for="playlist in filteredMyPlaylists"
+              :key="playlist.id"
+              class="playlist-item"
+              @click="openPlaylist(playlist)"
+            >
+              <div class="playlist-cover">
+                <img
+                  :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=118'"
+                  :alt="playlist.name"
+                  @error="handleImageError"
+                />
+                <div class="playlist-overlay">
+                  <Play :size="24" />
+                </div>
               </div>
+              <h3 class="playlist-name">{{ playlist.name }}</h3>
+              <p class="playlist-info">{{ playlist.songCount }}首歌曲</p>
             </div>
-            <h3 class="playlist-name">{{ playlist.name }}</h3>
-            <p class="playlist-info">by {{ playlist.creator }}</p>
           </div>
+        </div>
+
+        <!-- 推荐歌单 -->
+        <div class="section" v-if="filteredRecommendedPlaylists.length > 0">
+          <h2>推荐歌单</h2>
+          <div class="playlist-grid">
+            <div
+              v-for="playlist in filteredRecommendedPlaylists"
+              :key="playlist.id"
+              class="playlist-item"
+              @click="openPlaylist(playlist)"
+            >
+              <div class="playlist-cover">
+                <img
+                  :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=119'"
+                  :alt="playlist.name"
+                  @error="handleImageError"
+                />
+                <div class="playlist-overlay">
+                  <Play :size="24" />
+                </div>
+              </div>
+              <h3 class="playlist-name">{{ playlist.name }}</h3>
+              <p class="playlist-info">by {{ playlist.creator }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 空状态 -->
+        <div v-if="!authStore.isAuthenticated" class="empty-state">
+          <h3>请先登录</h3>
+          <p>登录后可以查看和创建您的歌单</p>
         </div>
       </div>
 
@@ -168,8 +182,12 @@
         <!-- 模态框底部 -->
         <div class="modal-footer">
           <button @click="showCreateModal = false" class="cancel-btn">取消</button>
-          <button @click="createPlaylist" class="confirm-btn" :disabled="!newPlaylistName.trim()">
-            创建歌单
+          <button
+            @click="createPlaylist"
+            class="confirm-btn"
+            :disabled="!newPlaylistName.trim() || isCreating"
+          >
+            {{ isCreating ? '创建中...' : '创建歌单' }}
           </button>
         </div>
       </div>
@@ -178,8 +196,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { playlistApi } from '@/services/playlist-api'
 import { Plus, Play, Search, X, Camera } from 'lucide-vue-next'
 
 interface Playlist {
@@ -191,12 +211,17 @@ interface Playlist {
 }
 
 const router = useRouter()
+const authStore = useAuthStore()
 const showCreateModal = ref(false)
 const newPlaylistName = ref('')
 const newPlaylistDescription = ref('')
 const isPrivate = ref(false)
 const selectedCover = ref('')
 const searchQuery = ref('')
+
+// 加载状态
+const isLoading = ref(false)
+const isCreating = ref(false)
 
 // 封面选项
 const coverOptions = ref([
@@ -208,47 +233,52 @@ const coverOptions = ref([
   { id: 6, url: 'https://picsum.photos/300/300?random=206' },
 ])
 
-const myPlaylists = ref<Playlist[]>([
-  {
-    id: '1',
-    name: '我喜欢的音乐',
-    coverUrl: 'https://picsum.photos/300/300?random=120',
-    songCount: 25,
-  },
-  {
-    id: '2',
-    name: '最近播放',
-    coverUrl: 'https://picsum.photos/300/300?random=121',
-    songCount: 12,
-  },
-])
+// 播放列表数据
+const myPlaylists = ref<Playlist[]>([])
+const recommendedPlaylists = ref<Playlist[]>([])
 
-const recommendedPlaylists = ref<Playlist[]>([
-  {
-    id: '3',
-    name: 'Pink Floyd',
-    coverUrl: 'https://picsum.photos/300/300?random=122',
-    creator: 'Rizkimulyawan',
-  },
-  {
-    id: '4',
-    name: 'Best of GOT7',
-    coverUrl: 'https://picsum.photos/300/300?random=123',
-    creator: 'Rizkimulyawan',
-  },
-  {
-    id: '5',
-    name: '华语经典',
-    coverUrl: 'https://picsum.photos/300/300?random=124',
-    creator: '音乐推荐',
-  },
-  {
-    id: '6',
-    name: '欧美流行',
-    coverUrl: 'https://picsum.photos/300/300?random=125',
-    creator: '音乐推荐',
-  },
-])
+// 加载我的播放列表
+const loadMyPlaylists = async () => {
+  if (!authStore.isAuthenticated) {
+    myPlaylists.value = []
+    return
+  }
+
+  try {
+    isLoading.value = true
+    const playlists = await playlistApi.getMyPlaylists()
+    myPlaylists.value = playlists.map((playlist: any) => ({
+      id: playlist.id,
+      name: playlist.name,
+      coverUrl: playlist.coverUrl || 'https://picsum.photos/300/300?random=120',
+      songCount: playlist.songCount || 0,
+    }))
+  } catch (error) {
+    console.error('Failed to load my playlists:', error)
+    myPlaylists.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 加载推荐播放列表
+const loadRecommendedPlaylists = async () => {
+  try {
+    isLoading.value = true
+    const playlists = await playlistApi.getPublicPlaylists(6)
+    recommendedPlaylists.value = playlists.map((playlist: any) => ({
+      id: playlist.id,
+      name: playlist.name,
+      coverUrl: playlist.coverUrl || 'https://picsum.photos/300/300?random=122',
+      creator: playlist.creator?.name || '未知用户',
+    }))
+  } catch (error) {
+    console.error('Failed to load recommended playlists:', error)
+    recommendedPlaylists.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
 
 // 搜索过滤计算属性
 const filteredMyPlaylists = computed(() => {
@@ -275,16 +305,29 @@ const openPlaylist = (playlist: Playlist) => {
   router.push(`/playlist/${playlist.id}`)
 }
 
-const createPlaylist = () => {
-  if (newPlaylistName.value.trim()) {
-    const newPlaylist: Playlist = {
-      id: Date.now().toString(),
+const createPlaylist = async () => {
+  if (!newPlaylistName.value.trim() || !authStore.isAuthenticated) {
+    return
+  }
+
+  try {
+    isCreating.value = true
+    const playlistData = {
       name: newPlaylistName.value.trim(),
+      description: newPlaylistDescription.value.trim(),
       coverUrl: selectedCover.value || 'https://picsum.photos/300/300?random=200',
-      songCount: 0,
+      isPrivate: isPrivate.value,
     }
 
-    myPlaylists.value.push(newPlaylist)
+    const newPlaylist = await playlistApi.createPlaylist(playlistData)
+
+    // 添加到我的播放列表
+    myPlaylists.value.unshift({
+      id: newPlaylist.id,
+      name: newPlaylist.name,
+      coverUrl: newPlaylist.coverUrl,
+      songCount: 0,
+    })
 
     // 重置表单
     newPlaylistName.value = ''
@@ -292,6 +335,11 @@ const createPlaylist = () => {
     isPrivate.value = false
     selectedCover.value = ''
     showCreateModal.value = false
+  } catch (error) {
+    console.error('Failed to create playlist:', error)
+    // 这里可以添加错误提示
+  } finally {
+    isCreating.value = false
   }
 }
 
@@ -303,6 +351,11 @@ const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = 'https://picsum.photos/300/300?random=127'
 }
+
+onMounted(() => {
+  loadMyPlaylists()
+  loadRecommendedPlaylists()
+})
 </script>
 
 <style scoped>
@@ -502,6 +555,54 @@ const handleImageError = (event: Event) => {
 }
 
 .no-results p {
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: white;
+}
+
+.empty-state p {
   font-size: 0.875rem;
   margin: 0;
   opacity: 0.8;

@@ -52,6 +52,17 @@ export const authApi = {
     }
   },
 
+  // 获取用户档案（包含个性化信息）
+  async getUserProfile(): Promise<User & { greeting: string; subGreeting: string }> {
+    try {
+      const response: AxiosResponse<ApiResponse<User & { greeting: string; subGreeting: string }>> =
+        await apiClient.get('/auth/profile')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '获取用户档案失败')
+    }
+  },
+
   // 用户登出
   async logout(): Promise<void> {
     try {
