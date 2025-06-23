@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import BottomNavigation from './components/BottomNavigation.vue'
 import MiniPlayer from './components/MiniPlayer.vue'
 import AudioPlayer from './components/AudioPlayer.vue'
+import ErrorBoundary from './components/ErrorBoundary.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -30,11 +31,13 @@ onMounted(() => {
 
 <template>
   <div id="app">
-    <RouterView />
-    <MiniPlayer v-if="showMiniPlayer" />
-    <BottomNavigation v-if="showBottomNav" />
-    <!-- 全局音频播放器 -->
-    <AudioPlayer />
+    <ErrorBoundary>
+      <RouterView />
+      <MiniPlayer v-if="showMiniPlayer" />
+      <BottomNavigation v-if="showBottomNav" />
+      <!-- 全局音频播放器 -->
+      <AudioPlayer />
+    </ErrorBoundary>
   </div>
 </template>
 
