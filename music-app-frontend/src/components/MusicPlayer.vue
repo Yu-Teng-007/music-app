@@ -306,11 +306,11 @@ const handleImageError = (event: Event) => {
 }
 
 // 生命周期
-onMounted(() => {
+onMounted(async () => {
   // 初始化默认播放列表
   if (!currentSong.value) {
     // 使用默认音源
-    musicStore.initializeDefaultPlaylist()
+    await musicStore.initializePlaylist()
     if (musicStore.playlist.length > 0) {
       // 设置当前歌曲为第一首默认歌曲
       musicStore.setCurrentSong(musicStore.playlist[0])

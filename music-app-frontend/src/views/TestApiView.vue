@@ -224,8 +224,10 @@ const testGetPlaylists = async () => {
 const testRegister = async () => {
   try {
     const randomEmail = `test${Date.now()}@example.com`
+    const randomUsername = `testuser${Date.now()}`
     const data = await authApi.register({
       email: randomEmail,
+      username: randomUsername,
       name: '测试用户',
       password: '123456',
       confirmPassword: '123456',
@@ -249,8 +251,10 @@ const testLogin = async () => {
   try {
     // 先注册一个用户
     const randomEmail = `test${Date.now()}@example.com`
+    const randomUsername = `testuser${Date.now()}`
     await authApi.register({
       email: randomEmail,
+      username: randomUsername,
       name: '测试用户',
       password: '123456',
       confirmPassword: '123456',
@@ -258,14 +262,14 @@ const testLogin = async () => {
 
     // 然后登录
     const data = await authApi.login({
-      email: randomEmail,
+      username: randomUsername,
       password: '123456',
     })
 
     addResult({
       name: '用户登录',
       success: true,
-      message: `登录成功: ${randomEmail}`,
+      message: `登录成功: ${randomUsername}`,
       data: { user: data.user },
     })
   } catch (error: any) {

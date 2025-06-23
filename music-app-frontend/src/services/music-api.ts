@@ -7,7 +7,7 @@ export const musicApi = {
   async getSongs(params?: SongQueryParams) {
     try {
       const response = await apiClient.get('/songs', { params })
-      return response.data
+      return response.data.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || '获取歌曲列表失败')
     }

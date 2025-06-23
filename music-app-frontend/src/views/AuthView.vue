@@ -37,18 +37,18 @@
         <!-- 登录表单 -->
         <form v-if="isLogin" @submit.prevent="handleLogin" class="auth-form">
           <div class="form-group">
-            <label for="login-email" class="form-label">邮箱</label>
+            <label for="login-username" class="form-label">用户名</label>
             <input
-              id="login-email"
-              v-model="loginForm.email"
-              type="email"
+              id="login-username"
+              v-model="loginForm.username"
+              type="text"
               class="form-input"
-              :class="{ error: loginErrors.email }"
-              placeholder="请输入您的邮箱"
-              autocomplete="email"
+              :class="{ error: loginErrors.username }"
+              placeholder="请输入您的用户名"
+              autocomplete="username"
               required
             />
-            <span v-if="loginErrors.email" class="field-error">{{ loginErrors.email }}</span>
+            <span v-if="loginErrors.username" class="field-error">{{ loginErrors.username }}</span>
           </div>
 
           <div class="form-group">
@@ -106,6 +106,23 @@
               required
             />
             <span v-if="registerErrors.name" class="field-error">{{ registerErrors.name }}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="register-username" class="form-label">用户名</label>
+            <input
+              id="register-username"
+              v-model="registerForm.username"
+              type="text"
+              class="form-input"
+              :class="{ error: registerErrors.username }"
+              placeholder="请输入您的用户名"
+              autocomplete="username"
+              required
+            />
+            <span v-if="registerErrors.username" class="field-error">{{
+              registerErrors.username
+            }}</span>
           </div>
 
           <div class="form-group">
@@ -251,6 +268,7 @@ import {
   validateEmail,
   validatePassword,
   validateName,
+  validateUsername,
   validateConfirmPassword,
 } from '@/utils/validators'
 import type { LoginCredentials, RegisterCredentials } from '@/stores/auth'
@@ -271,13 +289,14 @@ const showConfirmPassword = ref(false)
 
 // 表单数据
 const loginForm = reactive<LoginCredentials>({
-  email: '',
+  username: '',
   password: '',
 })
 
 const registerForm = reactive<RegisterCredentials>({
   name: '',
   email: '',
+  username: '',
   password: '',
   confirmPassword: '',
 })
@@ -289,13 +308,14 @@ const forgotPasswordEmail = ref('')
 
 // 表单验证错误
 const loginErrors = reactive({
-  email: '',
+  username: '',
   password: '',
 })
 
 const registerErrors = reactive({
   name: '',
   email: '',
+  username: '',
   password: '',
   confirmPassword: '',
 })
@@ -328,9 +348,9 @@ const validateLoginForm = (): boolean => {
   clearErrors()
   let isValid = true
 
-  const emailError = validateEmail(loginForm.email)
-  if (emailError) {
-    loginErrors.email = emailError
+  const usernameError = validateUsername(loginForm.username)
+  if (usernameError) {
+    loginErrors.username = usernameError
     isValid = false
   }
 
@@ -351,6 +371,12 @@ const validateRegisterForm = (): boolean => {
   const nameError = validateName(registerForm.name)
   if (nameError) {
     registerErrors.name = nameError
+    isValid = false
+  }
+
+  const usernameError = validateUsername(registerForm.username)
+  if (usernameError) {
+    registerErrors.username = usernameError
     isValid = false
   }
 

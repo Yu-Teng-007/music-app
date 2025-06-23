@@ -75,7 +75,7 @@
             <p><strong>错误代码:</strong> 404</p>
             <p><strong>请求路径:</strong> {{ $route.fullPath }}</p>
             <p><strong>时间:</strong> {{ new Date().toLocaleString() }}</p>
-            <p><strong>用户代理:</strong> {{ navigator.userAgent }}</p>
+            <p><strong>用户代理:</strong> {{ getUserAgent() }}</p>
           </div>
         </details>
         <button @click="reportError" class="report-btn">
@@ -131,6 +131,10 @@ const goToDiscover = () => {
 const reportError = () => {
   // TODO: 实现错误报告功能
   alert('感谢您的反馈！我们会尽快处理这个问题。')
+}
+
+const getUserAgent = () => {
+  return typeof window !== 'undefined' ? window.navigator.userAgent : 'Unknown'
 }
 </script>
 

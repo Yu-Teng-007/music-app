@@ -10,6 +10,9 @@ export interface Song {
   duration: number
   coverUrl: string
   audioUrl: string
+  genre?: string
+  playCount?: number
+  createdAt?: string
 }
 
 export interface PlayMode {
@@ -155,7 +158,7 @@ export const useMusicStore = defineStore('music', () => {
       isLoading.value = true
       error.value = null
       const response = await musicApi.getSongs(params)
-      return response.data || []
+      return response || []
     } catch (err: any) {
       error.value = err.message || '加载歌曲失败'
       console.error('Failed to load songs:', err)
@@ -170,7 +173,7 @@ export const useMusicStore = defineStore('music', () => {
       isLoading.value = true
       error.value = null
       const response = await musicApi.getRecommendedSongs(limit)
-      return response.data || []
+      return response || []
     } catch (err: any) {
       error.value = err.message || '加载推荐歌曲失败'
       console.error('Failed to load recommended songs:', err)
@@ -185,7 +188,7 @@ export const useMusicStore = defineStore('music', () => {
       isLoading.value = true
       error.value = null
       const response = await musicApi.getPopularSongs(limit)
-      return response.data || []
+      return response || []
     } catch (err: any) {
       error.value = err.message || '加载热门歌曲失败'
       console.error('Failed to load popular songs:', err)
@@ -200,7 +203,7 @@ export const useMusicStore = defineStore('music', () => {
       isLoading.value = true
       error.value = null
       const response = await musicApi.searchSongs(keyword, limit)
-      return response.data || []
+      return response || []
     } catch (err: any) {
       error.value = err.message || '搜索歌曲失败'
       console.error('Failed to search songs:', err)

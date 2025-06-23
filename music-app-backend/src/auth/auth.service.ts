@@ -28,19 +28,27 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, password, name, confirmPassword } = registerDto
+    const { email, username, password, name, confirmPassword } = registerDto
 
     // 验证密码确认
     if (password !== confirmPassword) {
       throw new ConflictException('两次输入的密码不一致')
     }
 
-    // 检查用户是否已存在
-    const existingUser = await this.userRepository.findOne({
+    // 检查邮箱是否已存在
+    const existingUserByEmail = await this.userRepository.findOne({
       where: { email },
     })
-    if (existingUser) {
+    if (existingUserByEmail) {
       throw new ConflictException('该邮箱已被注册')
+    }
+
+    // 检查用户名是否已存在
+    const existingUserByUsername = await this.userRepository.findOne({
+      where: { username },
+    })
+    if (existingUserByUsername) {
+      throw new ConflictException('该用户名已被注册')
     }
 
     // 加密密码
@@ -49,6 +57,7 @@ export class AuthService {
     // 创建用户
     const user = this.userRepository.create({
       email,
+      username,
       name,
       password: hashedPassword,
     })
@@ -65,22 +74,32 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const { email, password } = loginDto
+    const { username, password } = loginDto
 
     // 查找用户
     const user = await this.userRepository.findOne({
-      where: { email },
-      select: ['id', 'email', 'name', 'password', 'avatar', 'isActive', 'createdAt', 'updatedAt'],
+      where: { username },
+      select: [
+        'id',
+        'email',
+        'username',
+        'name',
+        'password',
+        'avatar',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
     })
 
     if (!user || !user.isActive) {
-      throw new UnauthorizedException('邮箱或密码错误')
+      throw new UnauthorizedException('用户名或密码错误')
     }
 
     // 验证密码
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-      throw new UnauthorizedException('邮箱或密码错误')
+      throw new UnauthorizedException('用户名或密码错误')
     }
 
     // 生成tokens
@@ -174,6 +193,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
       name: user.name,
     }
 

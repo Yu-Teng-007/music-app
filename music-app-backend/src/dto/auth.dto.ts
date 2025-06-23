@@ -1,8 +1,10 @@
 import { IsEmail, IsString, MinLength, MaxLength, IsOptional } from 'class-validator'
 
 export class LoginDto {
-  @IsEmail({}, { message: '请输入有效的邮箱地址' })
-  email: string
+  @IsString({ message: '用户名必须是字符串' })
+  @MinLength(3, { message: '用户名长度至少3位' })
+  @MaxLength(20, { message: '用户名长度不能超过20位' })
+  username: string
 
   @IsString({ message: '密码必须是字符串' })
   @MinLength(6, { message: '密码长度至少6位' })
@@ -12,6 +14,11 @@ export class LoginDto {
 export class RegisterDto {
   @IsEmail({}, { message: '请输入有效的邮箱地址' })
   email: string
+
+  @IsString({ message: '用户名必须是字符串' })
+  @MinLength(3, { message: '用户名长度至少3位' })
+  @MaxLength(20, { message: '用户名长度不能超过20位' })
+  username: string
 
   @IsString({ message: '姓名必须是字符串' })
   @MinLength(2, { message: '姓名长度至少2位' })

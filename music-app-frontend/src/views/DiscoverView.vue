@@ -187,17 +187,19 @@ const searchSongs = async (keyword: string) => {
 }
 
 // 监听搜索查询变化
-watch(
-  searchQuery,
-  newQuery => {
+let searchTimeout: number | null = null
+watch(searchQuery, newQuery => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout)
+  }
+  searchTimeout = setTimeout(() => {
     if (newQuery.trim()) {
       searchSongs(newQuery)
     } else {
       searchResults.value = []
     }
-  },
-  { debounce: 300 }
-)
+  }, 300)
+})
 
 const playSong = (song: Song) => {
   musicStore.setCurrentSong(song)

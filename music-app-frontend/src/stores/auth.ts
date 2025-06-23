@@ -5,6 +5,7 @@ import { authApi } from '@/services/auth-api'
 export interface User {
   id: string
   email: string
+  username: string
   name: string
   avatar?: string
   createdAt: string
@@ -12,12 +13,13 @@ export interface User {
 }
 
 export interface LoginCredentials {
-  email: string
+  username: string
   password: string
 }
 
 export interface RegisterCredentials {
   email: string
+  username: string
   password: string
   name: string
   confirmPassword: string
