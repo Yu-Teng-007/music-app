@@ -275,7 +275,7 @@ SELECT COUNT(*) FROM users;
 # 查看 music-app-backend/test-api.http
 
 # 或使用 curl 测试
-curl http://localhost:3001/api/songs
+curl http://localhost:3000/api/songs
 ```
 
 ## 常见问题和解决方案

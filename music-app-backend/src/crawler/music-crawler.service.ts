@@ -325,19 +325,25 @@ export class MusicCrawlerService {
           skipped++
           this.logger.debug(`歌曲已存在，跳过: ${crawledSong.title} - ${crawledSong.artist}`)
         } else {
+          // 生成随机播放次数以模拟真实数据
+          const playCount = this.generateRandomPlayCount(crawledSong.genre)
+
           // 创建新歌曲
           const newSong = this.songRepository.create({
             title: crawledSong.title,
             artist: crawledSong.artist,
             album: crawledSong.album || '未知专辑',
-            duration: crawledSong.duration || 0,
-            coverUrl: crawledSong.coverUrl || '/default-cover.jpg',
-            audioUrl: crawledSong.audioUrl || '',
-            genre: crawledSong.genre,
-            year: crawledSong.year,
+            duration: crawledSong.duration || this.generateRandomDuration(),
+            coverUrl: crawledSong.coverUrl || this.generateCoverUrl(),
+            audioUrl: crawledSong.audioUrl || '/uploads/music/default-song.mp3',
+            genre: crawledSong.genre || this.inferGenreFromArtist(crawledSong.artist),
+            year: crawledSong.year || this.generateRandomYear(),
+            playCount: playCount,
             lyrics: crawledSong.lyrics,
             fileSize: crawledSong.fileSize,
             originalFileName: `${crawledSong.title}-${crawledSong.artist}.mp3`,
+            sourceId: crawledSong.sourceId,
+            sourceUrl: crawledSong.sourceUrl,
           })
 
           const savedSong = await this.songRepository.save(newSong)
@@ -704,5 +710,74 @@ export class MusicCrawlerService {
     }
 
     return null
+  }
+
+  /**
+   * 生成随机播放次数
+   */
+  private generateRandomPlayCount(genre?: string): number {
+    const baseRanges: { [key: string]: [number, number] } = {
+      流行: [1000, 8000],
+      摇滚: [500, 6000],
+      民谣: [300, 4000],
+      中国风: [800, 5000],
+      电子: [200, 3000],
+      古典: [100, 2000],
+      爵士: [150, 2500],
+      说唱: [400, 5000],
+    }
+
+    const range = (genre && baseRanges[genre]) || [100, 3000]
+    return Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0]
+  }
+
+  /**
+   * 生成随机时长（秒）
+   */
+  private generateRandomDuration(): number {
+    // 大部分歌曲在3-5分钟之间
+    return Math.floor(Math.random() * (300 - 180 + 1)) + 180
+  }
+
+  /**
+   * 生成封面图片URL
+   */
+  private generateCoverUrl(): string {
+    const randomId = Math.floor(Math.random() * 1000) + 1
+    return `https://picsum.photos/300/300?random=${randomId}`
+  }
+
+  /**
+   * 根据艺术家推断音乐类型
+   */
+  private inferGenreFromArtist(artist: string): string {
+    const artistGenreMap: { [key: string]: string } = {
+      周杰伦: '流行',
+      薛之谦: '流行',
+      赵雷: '民谣',
+      Beyond: '摇滚',
+      于文文: '流行',
+      买辣椒也用券: '流行',
+      林俊杰: '流行',
+      邓紫棋: '流行',
+      陈奕迅: '流行',
+      王菲: '流行',
+      李荣浩: '流行',
+      毛不易: '民谣',
+      朴树: '民谣',
+      许巍: '摇滚',
+      汪峰: '摇滚',
+    }
+
+    return artistGenreMap[artist] || '流行'
+  }
+
+  /**
+   * 生成随机年份
+   */
+  private generateRandomYear(): number {
+    const currentYear = new Date().getFullYear()
+    // 生成1990到当前年份之间的随机年份
+    return Math.floor(Math.random() * (currentYear - 1990 + 1)) + 1990
   }
 }
