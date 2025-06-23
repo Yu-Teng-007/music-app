@@ -12,7 +12,10 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"src/**/*.ts\" --fix"
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "env:dev": "node scripts/env-setup.js dev",
+    "env:prod": "node scripts/env-setup.js prod",
+    "env:check": "node -e \"console.log('当前环境:', process.env.NODE_ENV || '未设置')\""
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
