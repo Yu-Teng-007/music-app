@@ -54,11 +54,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/test-api',
-      name: 'test-api',
-      component: () => import('../views/TestApiView.vue'),
-    },
-    {
       path: '/search',
       name: 'search',
       component: () => import('../views/SearchResultsView.vue'),
