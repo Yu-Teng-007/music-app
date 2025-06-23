@@ -16,12 +16,8 @@
       <!-- 错误信息 -->
       <div class="error-content">
         <h1>页面走丢了</h1>
-        <p class="error-message">
-          抱歉，您访问的页面不存在或已被移动。
-        </p>
-        <p class="error-suggestion">
-          可能是链接有误，或者页面已经被删除。
-        </p>
+        <p class="error-message">抱歉，您访问的页面不存在或已被移动。</p>
+        <p class="error-suggestion">可能是链接有误，或者页面已经被删除。</p>
       </div>
 
       <!-- 操作按钮 -->
@@ -225,7 +221,8 @@ const reportError = () => {
   flex-wrap: wrap;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn,
+.secondary-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -404,7 +401,11 @@ const reportError = () => {
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -416,7 +417,8 @@ const reportError = () => {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -428,22 +430,23 @@ const reportError = () => {
   .number-404 {
     font-size: 80px;
   }
-  
+
   .error-content h1 {
     font-size: 24px;
   }
-  
+
   .error-actions {
     flex-direction: column;
     align-items: center;
   }
-  
-  .primary-btn, .secondary-btn {
+
+  .primary-btn,
+  .secondary-btn {
     width: 100%;
     max-width: 200px;
     justify-content: center;
   }
-  
+
   .links-grid {
     grid-template-columns: repeat(2, 1fr);
   }

@@ -7,40 +7,40 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
-} from 'typeorm';
-import { User } from './user.entity';
-import { Song } from './song.entity';
+} from 'typeorm'
+import { User } from './user.entity'
+import { Song } from './song.entity'
 
 @Entity('playlists')
 export class Playlist {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column()
-  name: string;
+  name: string
 
   @Column({ nullable: true })
-  description: string;
+  description: string
 
   @Column({ nullable: true })
-  coverUrl: string;
+  coverUrl: string
 
   @Column({ default: false })
-  isPrivate: boolean;
+  isPrivate: boolean
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 
-  @ManyToOne(() => User, (user) => user.playlists, { onDelete: 'CASCADE' })
-  user: User;
+  @ManyToOne(() => User, user => user.playlists, { onDelete: 'CASCADE' })
+  user: User
 
   @Column()
-  userId: string;
+  userId: string
 
-  @ManyToMany(() => Song, (song) => song.playlists)
+  @ManyToMany(() => Song, song => song.playlists)
   @JoinTable({
     name: 'playlist_songs',
     joinColumn: {
@@ -52,5 +52,5 @@ export class Playlist {
       referencedColumnName: 'id',
     },
   })
-  songs: Song[];
+  songs: Song[]
 }

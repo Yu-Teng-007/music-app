@@ -255,8 +255,8 @@ const filteredMyPlaylists = computed(() => {
   if (!searchQuery.value.trim()) {
     return myPlaylists.value
   }
-  return myPlaylists.value.filter((playlist) =>
-    playlist.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  return myPlaylists.value.filter(playlist =>
+    playlist.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
@@ -265,10 +265,9 @@ const filteredRecommendedPlaylists = computed(() => {
     return recommendedPlaylists.value
   }
   return recommendedPlaylists.value.filter(
-    (playlist) =>
+    playlist =>
       playlist.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (playlist.creator &&
-        playlist.creator.toLowerCase().includes(searchQuery.value.toLowerCase())),
+      (playlist.creator && playlist.creator.toLowerCase().includes(searchQuery.value.toLowerCase()))
   )
 })
 

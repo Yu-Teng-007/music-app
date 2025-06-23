@@ -1,7 +1,6 @@
-import { registerAs } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User, Song, Playlist } from '../entities';
-import { randomUUID } from 'crypto';
+import { registerAs } from '@nestjs/config'
+import { TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { User, Song, Playlist } from '../entities'
 
 export default registerAs(
   'database',
@@ -17,5 +16,5 @@ export default registerAs(
     logging: process.env.NODE_ENV === 'development',
     charset: 'utf8mb4',
     timezone: '+08:00',
-  }),
-);
+  })
+)

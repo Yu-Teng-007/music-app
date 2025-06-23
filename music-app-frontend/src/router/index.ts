@@ -202,7 +202,7 @@ router.afterEach((to, from) => {
 })
 
 // 路由错误处理
-router.onError((error) => {
+router.onError(error => {
   console.error('路由错误:', error)
 
   // 可以在这里添加错误报告逻辑

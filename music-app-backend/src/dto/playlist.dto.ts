@@ -1,51 +1,51 @@
-import { IsString, IsOptional, IsBoolean, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsUUID } from 'class-validator'
 
 export class CreatePlaylistDto {
   @IsString({ message: '播放列表名称必须是字符串' })
-  name: string;
+  name: string
 
   @IsOptional()
   @IsString({ message: '描述必须是字符串' })
-  description?: string;
+  description?: string
 
   @IsOptional()
   @IsString({ message: '封面URL必须是字符串' })
-  coverUrl?: string;
+  coverUrl?: string
 
   @IsOptional()
   @IsBoolean({ message: '私有状态必须是布尔值' })
-  isPrivate?: boolean = false;
+  isPrivate?: boolean = false
 }
 
 export class UpdatePlaylistDto {
   @IsOptional()
   @IsString({ message: '播放列表名称必须是字符串' })
-  name?: string;
+  name?: string
 
   @IsOptional()
   @IsString({ message: '描述必须是字符串' })
-  description?: string;
+  description?: string
 
   @IsOptional()
   @IsString({ message: '封面URL必须是字符串' })
-  coverUrl?: string;
+  coverUrl?: string
 
   @IsOptional()
   @IsBoolean({ message: '私有状态必须是布尔值' })
-  isPrivate?: boolean;
+  isPrivate?: boolean
 }
 
 export class AddSongToPlaylistDto {
   @IsUUID('4', { message: '歌曲ID格式不正确' })
-  songId: string;
+  songId: string
 }
 
 export class QueryPlaylistsDto {
   @IsOptional()
   @IsString({ message: '搜索关键词必须是字符串' })
-  search?: string;
+  search?: string
 
   @IsOptional()
   @IsBoolean({ message: '私有状态必须是布尔值' })
-  isPrivate?: boolean;
+  isPrivate?: boolean
 }

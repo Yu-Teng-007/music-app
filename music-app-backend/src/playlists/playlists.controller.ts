@@ -10,10 +10,15 @@ import {
   UseGuards,
   Request,
   ParseUUIDPipe,
-} from '@nestjs/common';
-import { PlaylistsService } from './playlists.service';
-import { CreatePlaylistDto, UpdatePlaylistDto, AddSongToPlaylistDto, QueryPlaylistsDto } from '../dto/playlist.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+} from '@nestjs/common'
+import { PlaylistsService } from './playlists.service'
+import {
+  CreatePlaylistDto,
+  UpdatePlaylistDto,
+  AddSongToPlaylistDto,
+  QueryPlaylistsDto,
+} from '../dto/playlist.dto'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 
 @Controller('playlists')
 export class PlaylistsController {
@@ -22,76 +27,76 @@ export class PlaylistsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Request() req, @Body() createPlaylistDto: CreatePlaylistDto) {
-    const result = await this.playlistsService.create(req.user.id, createPlaylistDto);
+    const result = await this.playlistsService.create(req.user.id, createPlaylistDto)
     return {
       success: true,
       data: result,
       message: '播放列表创建成功',
-    };
+    }
   }
 
   @Get()
   async findAll(@Query() queryDto: QueryPlaylistsDto, @Request() req) {
     // 如果用户已登录，传递用户ID，否则只显示公开播放列表
-    const userId = req.user?.id;
-    const result = await this.playlistsService.findAll(userId, queryDto);
+    const userId = req.user?.id
+    const result = await this.playlistsService.findAll(userId, queryDto)
     return {
       success: true,
       data: result,
       message: '获取播放列表成功',
-    };
+    }
   }
 
   @Get('my')
   @UseGuards(JwtAuthGuard)
   async findUserPlaylists(@Request() req) {
-    const result = await this.playlistsService.findUserPlaylists(req.user.id);
+    const result = await this.playlistsService.findUserPlaylists(req.user.id)
     return {
       success: true,
       data: result,
       message: '获取我的播放列表成功',
-    };
+    }
   }
 
   @Get('public')
   async getPublicPlaylists(@Query('limit') limit?: number) {
-    const result = await this.playlistsService.getPublicPlaylists(limit);
+    const result = await this.playlistsService.getPublicPlaylists(limit)
     return {
       success: true,
       data: result,
       message: '获取公开播放列表成功',
-    };
+    }
   }
 
   @Get('recommended')
   async getRecommendedPlaylists(@Query('limit') limit?: number) {
-    const result = await this.playlistsService.getRecommendedPlaylists(limit);
+    const result = await this.playlistsService.getRecommendedPlaylists(limit)
     return {
       success: true,
       data: result,
       message: '获取推荐播放列表成功',
-    };
+    }
   }
 
   @Get('search')
   async searchPlaylists(@Query('keyword') keyword: string, @Query('limit') limit?: number) {
-    const result = await this.playlistsService.searchPlaylists(keyword, limit);
+    const result = await this.playlistsService.searchPlaylists(keyword, limit)
     return {
       success: true,
       data: result,
       message: '搜索播放列表成功',
-    };
+    }
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
-    const userId = req.user?.id;
-    const result = await this.playlistsService.findOne(id, userId);
+    const userId = req.user?.id
+    const result = await this.playlistsService.findOne(id, userId)
     return {
       success: true,
       data: result,
       message: '获取播放列表详情成功',
-    };
+    }
   }
 
   @Patch(':id')
@@ -99,24 +104,24 @@ export class PlaylistsController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req,
-    @Body() updatePlaylistDto: UpdatePlaylistDto,
+    @Body() updatePlaylistDto: UpdatePlaylistDto
   ) {
-    const result = await this.playlistsService.update(id, req.user.id, updatePlaylistDto);
+    const result = await this.playlistsService.update(id, req.user.id, updatePlaylistDto)
     return {
       success: true,
       data: result,
       message: '播放列表更新成功',
-    };
+    }
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async remove(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
-    await this.playlistsService.remove(id, req.user.id);
+    await this.playlistsService.remove(id, req.user.id)
     return {
       success: true,
       message: '播放列表删除成功',
-    };
+    }
   }
 
   @Post(':id/songs')
@@ -124,14 +129,14 @@ export class PlaylistsController {
   async addSong(
     @Param('id', ParseUUIDPipe) id: string,
     @Request() req,
-    @Body() addSongDto: AddSongToPlaylistDto,
+    @Body() addSongDto: AddSongToPlaylistDto
   ) {
-    const result = await this.playlistsService.addSong(id, req.user.id, addSongDto);
+    const result = await this.playlistsService.addSong(id, req.user.id, addSongDto)
     return {
       success: true,
       data: result,
       message: '歌曲添加成功',
-    };
+    }
   }
 
   @Delete(':id/songs/:songId')
@@ -139,13 +144,13 @@ export class PlaylistsController {
   async removeSong(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('songId', ParseUUIDPipe) songId: string,
-    @Request() req,
+    @Request() req
   ) {
-    const result = await this.playlistsService.removeSong(id, songId, req.user.id);
+    const result = await this.playlistsService.removeSong(id, songId, req.user.id)
     return {
       success: true,
       data: result,
       message: '歌曲移除成功',
-    };
+    }
   }
 }

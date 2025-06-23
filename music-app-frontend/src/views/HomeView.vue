@@ -390,7 +390,7 @@ onMounted(() => {
 @media (max-width: 768px) {
   .home-view {
     padding: 1.5rem;
-    padding-bottom: 100px; 
+    padding-bottom: 100px;
   }
 
   .user-text h1 {

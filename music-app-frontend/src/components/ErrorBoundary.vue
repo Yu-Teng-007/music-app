@@ -4,19 +4,17 @@
       <div class="error-icon">
         <AlertTriangle :size="64" />
       </div>
-      
+
       <div class="error-content">
         <h2>出现了一些问题</h2>
-        <p class="error-message">
-          应用遇到了意外错误，我们正在努力修复这个问题。
-        </p>
-        
+        <p class="error-message">应用遇到了意外错误，我们正在努力修复这个问题。</p>
+
         <div class="error-details" v-if="showDetails">
           <h3>错误详情：</h3>
           <pre class="error-stack">{{ errorInfo }}</pre>
         </div>
       </div>
-      
+
       <div class="error-actions">
         <button @click="retry" class="primary-btn">
           <RefreshCw :size="20" />
@@ -31,7 +29,7 @@
           {{ showDetails ? '隐藏' : '显示' }}详情
         </button>
       </div>
-      
+
       <div class="error-report">
         <button @click="reportError" class="report-btn">
           <Send :size="16" />
@@ -40,20 +38,14 @@
       </div>
     </div>
   </div>
-  
+
   <slot v-else />
 </template>
 
 <script setup lang="ts">
 import { ref, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  AlertTriangle,
-  RefreshCw,
-  Home,
-  Info,
-  Send,
-} from 'lucide-vue-next'
+import { AlertTriangle, RefreshCw, Home, Info, Send } from 'lucide-vue-next'
 
 const router = useRouter()
 
@@ -66,23 +58,23 @@ onErrorCaptured((error: Error, instance, info) => {
   console.error('Error captured by ErrorBoundary:', error)
   console.error('Component instance:', instance)
   console.error('Error info:', info)
-  
+
   hasError.value = true
   errorInfo.value = `${error.message}\n\n${error.stack || ''}\n\nComponent: ${info}`
-  
+
   // 阻止错误继续传播
   return false
 })
 
 // 监听全局未捕获的错误
-window.addEventListener('error', (event) => {
+window.addEventListener('error', event => {
   console.error('Global error:', event.error)
   hasError.value = true
   errorInfo.value = `${event.error?.message || event.message}\n\n${event.error?.stack || ''}`
 })
 
 // 监听Promise rejection
-window.addEventListener('unhandledrejection', (event) => {
+window.addEventListener('unhandledrejection', event => {
   console.error('Unhandled promise rejection:', event.reason)
   hasError.value = true
   errorInfo.value = `Promise rejection: ${event.reason}`
@@ -92,7 +84,7 @@ const retry = () => {
   hasError.value = false
   errorInfo.value = ''
   showDetails.value = false
-  
+
   // 重新加载当前路由
   router.go(0)
 }
@@ -116,9 +108,9 @@ const reportError = () => {
     userAgent: navigator.userAgent,
     timestamp: new Date().toISOString(),
   }
-  
+
   console.log('Error report:', errorReport)
-  
+
   // 这里可以发送错误报告到服务器
   alert('错误报告已发送，感谢您的反馈！')
 }
@@ -201,7 +193,8 @@ const reportError = () => {
   flex-wrap: wrap;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn,
+.secondary-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -263,13 +256,14 @@ const reportError = () => {
     padding: 24px;
     margin: 16px;
   }
-  
+
   .error-actions {
     flex-direction: column;
     align-items: center;
   }
-  
-  .primary-btn, .secondary-btn {
+
+  .primary-btn,
+  .secondary-btn {
     width: 100%;
     max-width: 200px;
     justify-content: center;

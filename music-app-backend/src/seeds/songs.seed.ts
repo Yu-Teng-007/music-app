@@ -1,4 +1,4 @@
-import { Song } from '../entities/song.entity';
+import { Song } from '../entities/song.entity'
 
 export const seedSongs: Partial<Song>[] = [
   {
@@ -151,4 +151,4 @@ export const seedSongs: Partial<Song>[] = [
 风雨里追赶雾里分不清影踪
 天空海阔你与我可会变`,
   },
-];
+]

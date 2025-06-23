@@ -86,7 +86,7 @@ export const useMusicStore = defineStore('music', () => {
 
   function setCurrentSong(song: Song) {
     currentSong.value = song
-    const index = playlist.value.findIndex((s) => s.id === song.id)
+    const index = playlist.value.findIndex(s => s.id === song.id)
     if (index !== -1) {
       currentIndex.value = index
     }
@@ -121,7 +121,7 @@ export const useMusicStore = defineStore('music', () => {
   }
 
   // setProgress方法将由AudioPlayer组件提供
-  let setProgress: (progress: number) => void = (newProgress: number) => {
+  const setProgress: (progress: number) => void = (newProgress: number) => {
     currentTime.value = (newProgress / 100) * duration.value
   }
 
@@ -137,13 +137,13 @@ export const useMusicStore = defineStore('music', () => {
   }
 
   function addToPlaylist(song: Song) {
-    if (!playlist.value.find((s) => s.id === song.id)) {
+    if (!playlist.value.find(s => s.id === song.id)) {
       playlist.value.push(song)
     }
   }
 
   function removeFromPlaylist(songId: string) {
-    const index = playlist.value.findIndex((s) => s.id === songId)
+    const index = playlist.value.findIndex(s => s.id === songId)
     if (index !== -1) {
       playlist.value.splice(index, 1)
       if (index <= currentIndex.value && currentIndex.value > 0) {

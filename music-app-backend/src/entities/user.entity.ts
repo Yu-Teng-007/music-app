@@ -5,43 +5,43 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
-import { Playlist } from './playlist.entity';
+} from 'typeorm'
+import { Exclude } from 'class-transformer'
+import { Playlist } from './playlist.entity'
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column({ unique: true })
-  email: string;
+  email: string
 
   @Column()
-  name: string;
+  name: string
 
   @Column()
   @Exclude()
-  password: string;
+  password: string
 
   @Column({ nullable: true })
-  avatar: string;
+  avatar: string
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive: boolean
 
   @Column({ nullable: true, type: 'varchar', length: 255 })
-  resetPasswordToken: string | null;
+  resetPasswordToken: string | null
 
   @Column({ nullable: true, type: 'datetime' })
-  resetPasswordExpires: Date | null;
+  resetPasswordExpires: Date | null
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 
-  @OneToMany(() => Playlist, (playlist) => playlist.user)
-  playlists: Playlist[];
+  @OneToMany(() => Playlist, playlist => playlist.user)
+  playlists: Playlist[]
 }

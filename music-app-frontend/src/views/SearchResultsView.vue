@@ -242,7 +242,7 @@ const filteredSongs = computed(() => {
   let result = songs.value
 
   if (selectedGenre.value) {
-    result = result.filter((song) => song.genre === selectedGenre.value)
+    result = result.filter(song => song.genre === selectedGenre.value)
   }
 
   // 排序
@@ -252,7 +252,7 @@ const filteredSongs = computed(() => {
       break
     case 'createdAt':
       result = result.sort(
-        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+        (a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
       )
       break
     case 'title':
@@ -303,7 +303,7 @@ const extractArtistsAndAlbums = () => {
   const artistSet = new Set<string>()
   const albumMap = new Map<string, any>()
 
-  songs.value.forEach((song) => {
+  songs.value.forEach(song => {
     // 提取艺人
     artistSet.add(song.artist)
 
@@ -341,7 +341,7 @@ const getTabCount = (tabKey: string) => {
 }
 
 const getArtistSongCount = (artist: string) => {
-  return songs.value.filter((song) => song.artist === artist).length
+  return songs.value.filter(song => song.artist === artist).length
 }
 
 const applyFilters = () => {
@@ -430,12 +430,12 @@ onMounted(() => {
 // 监听路由变化
 watch(
   () => route.query.q,
-  (newQuery) => {
+  newQuery => {
     if (newQuery && newQuery !== searchQuery.value) {
       searchQuery.value = newQuery as string
       performSearch()
     }
-  },
+  }
 )
 </script>
 

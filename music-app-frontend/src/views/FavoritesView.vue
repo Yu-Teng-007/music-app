@@ -34,9 +34,7 @@
         <Heart :size="64" class="empty-icon" />
         <h3>{{ searchQuery ? '没有找到相关歌曲' : '还没有收藏任何歌曲' }}</h3>
         <p>{{ searchQuery ? '尝试其他关键词' : '去发现页面找些喜欢的歌曲吧' }}</p>
-        <button v-if="!searchQuery" @click="goToDiscover" class="discover-btn">
-          去发现音乐
-        </button>
+        <button v-if="!searchQuery" @click="goToDiscover" class="discover-btn">去发现音乐</button>
       </div>
 
       <div v-else class="favorites-list">
@@ -66,11 +64,7 @@
 
       <!-- 分页 -->
       <div v-if="totalPages > 1" class="pagination">
-        <button
-          @click="goToPage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="page-btn"
-        >
+        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1" class="page-btn">
           上一页
         </button>
         <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
@@ -111,12 +105,13 @@ const filteredFavorites = computed(() => {
   if (!searchQuery.value.trim()) {
     return favorites.value
   }
-  
+
   const query = searchQuery.value.toLowerCase()
-  return favorites.value.filter(song =>
-    song.title.toLowerCase().includes(query) ||
-    song.artist.toLowerCase().includes(query) ||
-    song.album.toLowerCase().includes(query)
+  return favorites.value.filter(
+    song =>
+      song.title.toLowerCase().includes(query) ||
+      song.artist.toLowerCase().includes(query) ||
+      song.album.toLowerCase().includes(query)
   )
 })
 
@@ -127,9 +122,9 @@ const loadFavorites = async () => {
     const response = await favoritesApi.getFavorites({
       page: currentPage.value,
       limit: pageSize.value,
-      search: searchQuery.value.trim() || undefined
+      search: searchQuery.value.trim() || undefined,
     })
-    
+
     favorites.value = response.data || []
     totalFavorites.value = response.pagination?.total || 0
     totalPages.value = response.pagination?.totalPages || 0
@@ -293,8 +288,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state {
@@ -370,7 +369,8 @@ onMounted(() => {
   margin-bottom: 4px;
 }
 
-.song-artist, .song-album {
+.song-artist,
+.song-album {
   font-size: 14px;
   color: var(--text-secondary);
   margin-bottom: 2px;
@@ -387,7 +387,8 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.play-btn, .remove-btn {
+.play-btn,
+.remove-btn {
   background: var(--primary);
   color: white;
   border: none;
@@ -452,22 +453,22 @@ onMounted(() => {
   .favorites-view {
     padding: 16px;
   }
-  
+
   .header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .search-bar {
     max-width: 100%;
   }
-  
+
   .song-item {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .song-meta {
     justify-content: center;
   }

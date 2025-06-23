@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { authApi } from '@/services/auth-api'
 
 export interface User {
   id: string
@@ -118,13 +119,173 @@ export const useAuthStore = defineStore('auth', () => {
   // 检查token是否过期
   const isTokenExpired = () => {
     if (!token.value) return true
-    
+
     try {
       const payload = JSON.parse(atob(token.value.split('.')[1]))
       const currentTime = Date.now() / 1000
       return payload.exp < currentTime
     } catch (error) {
       return true
+    }
+  }
+
+  // 认证相关的业务逻辑 actions
+
+  // 用户登录
+  const login = async (credentials: LoginCredentials): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      const authResponse = await authApi.login(credentials)
+      saveAuth(authResponse)
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 用户注册
+  const register = async (credentials: RegisterCredentials): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      const authResponse = await authApi.register(credentials)
+      saveAuth(authResponse)
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 用户登出
+  const logout = async (): Promise<void> => {
+    setLoading(true)
+
+    try {
+      await authApi.logout()
+    } catch (error) {
+      console.error('Logout API call failed:', error)
+    } finally {
+      clearAuth()
+      setLoading(false)
+    }
+  }
+
+  // 刷新用户信息
+  const refreshUserInfo = async (): Promise<void> => {
+    if (!isAuthenticated.value) return
+
+    try {
+      const userData = await authApi.getCurrentUser()
+      updateUser(userData)
+    } catch (error: any) {
+      console.error('Failed to refresh user info:', error)
+      // 如果获取用户信息失败，可能token已过期
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        clearAuth()
+      }
+    }
+  }
+
+  // 更新用户资料
+  const updateProfile = async (userData: Partial<User>): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      const updatedUser = await authApi.updateProfile(userData)
+      updateUser(updatedUser)
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 修改密码
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      await authApi.changePassword({ currentPassword, newPassword })
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 忘记密码
+  const forgotPassword = async (email: string): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      await authApi.forgotPassword(email)
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 重置密码
+  const resetPassword = async (resetToken: string, password: string): Promise<void> => {
+    setLoading(true)
+    clearError()
+
+    try {
+      await authApi.resetPassword({ token: resetToken, password })
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 检查认证状态
+  const checkAuthStatus = (): boolean => {
+    if (!isAuthenticated.value) return false
+
+    if (isTokenExpired()) {
+      clearAuth()
+      return false
+    }
+
+    return true
+  }
+
+  // 自动刷新token（如果需要）
+  const autoRefreshToken = async (): Promise<boolean> => {
+    if (!refreshToken.value) return false
+
+    try {
+      const tokens = await authApi.refreshToken(refreshToken.value)
+
+      // 更新token
+      token.value = tokens.token
+      refreshToken.value = tokens.refreshToken
+
+      // 更新localStorage
+      localStorage.setItem('auth_token', tokens.token)
+      localStorage.setItem('auth_refresh_token', tokens.refreshToken)
+
+      return true
+    } catch (error) {
+      console.error('Auto refresh token failed:', error)
+      clearAuth()
+      return false
     }
   }
 
@@ -138,12 +299,12 @@ export const useAuthStore = defineStore('auth', () => {
     refreshToken,
     isLoading,
     error,
-    
+
     // 计算属性
     isAuthenticated,
     userInitials,
-    
-    // 方法
+
+    // 基础方法
     saveAuth,
     clearAuth,
     setError,
@@ -152,5 +313,17 @@ export const useAuthStore = defineStore('auth', () => {
     updateUser,
     isTokenExpired,
     restoreAuth,
+
+    // 业务逻辑 actions
+    login,
+    register,
+    logout,
+    refreshUserInfo,
+    updateProfile,
+    changePassword,
+    forgotPassword,
+    resetPassword,
+    checkAuthStatus,
+    autoRefreshToken,
   }
 })

@@ -1,17 +1,17 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { databaseConfig, jwtConfig, appConfig } from './config';
-import { AuthModule } from './auth/auth.module';
-import { SongsModule } from './songs/songs.module';
-import { PlaylistsModule } from './playlists/playlists.module';
-import { UploadModule } from './upload/upload.module';
-import { DatabaseModule } from './database/database.module';
-import { FavoritesModule } from './favorites/favorites.module';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { databaseConfig, jwtConfig, appConfig } from './config'
+import { AuthModule } from './auth/auth.module'
+import { SongsModule } from './songs/songs.module'
+import { PlaylistsModule } from './playlists/playlists.module'
+import { UploadModule } from './upload/upload.module'
+import { DatabaseModule } from './database/database.module'
+import { FavoritesModule } from './favorites/favorites.module'
 
 @Module({
   imports: [
@@ -42,11 +42,7 @@ import { FavoritesModule } from './favorites/favorites.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => [
         {
-          rootPath: join(
-            __dirname,
-            '..',
-            configService.get('app.uploadDir') || 'uploads',
-          ),
+          rootPath: join(__dirname, '..', configService.get('app.uploadDir') || 'uploads'),
           serveRoot: '/uploads',
         },
       ],

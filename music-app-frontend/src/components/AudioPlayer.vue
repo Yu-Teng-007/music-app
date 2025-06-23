@@ -44,11 +44,11 @@ watch(
       audioRef.value.load()
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 // 监听播放状态变化
-watch(isPlaying, (playing) => {
+watch(isPlaying, playing => {
   if (!audioRef.value) {
     return
   }
@@ -57,7 +57,7 @@ watch(isPlaying, (playing) => {
     audioRef.value
       .play()
       .then(() => {})
-      .catch((error) => {
+      .catch(error => {
         musicStore.pause()
       })
   } else {
@@ -66,7 +66,7 @@ watch(isPlaying, (playing) => {
 })
 
 // 监听音量变化
-watch(volume, (vol) => {
+watch(volume, vol => {
   if (audioRef.value) {
     audioRef.value.volume = vol
   }

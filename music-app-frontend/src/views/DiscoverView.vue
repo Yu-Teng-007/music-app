@@ -185,9 +185,9 @@ const filteredSongs = computed(() => {
   if (!searchQuery.value) return []
 
   return recommendedSongs.value.filter(
-    (song) =>
+    song =>
       song.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      song.artist.toLowerCase().includes(searchQuery.value.toLowerCase()),
+      song.artist.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 

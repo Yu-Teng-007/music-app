@@ -54,7 +54,6 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { authService } from '@/services/auth'
 import { Camera, Heart, Users, Share, Settings, ChevronRight, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -138,7 +137,7 @@ const handleMenuClick = async (item: any) => {
 
 const handleLogout = async () => {
   try {
-    await authService.logout()
+    await authStore.logout()
     router.push('/auth')
   } catch (error) {
     console.error('Logout failed:', error)

@@ -191,7 +191,6 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { authService } from '@/services/auth'
 import { ChevronLeft, ChevronRight, LogOut } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -256,7 +255,7 @@ const clearCache = () => {
 // 处理个人资料更新
 const handleProfileUpdate = async () => {
   try {
-    await authService.updateProfile(profileForm)
+    await authStore.updateProfile(profileForm)
     showProfileEdit.value = false
     console.log('个人资料更新成功')
   } catch (error) {
@@ -267,7 +266,7 @@ const handleProfileUpdate = async () => {
 // 处理密码修改
 const handlePasswordChange = async () => {
   try {
-    await authService.changePassword(passwordForm.currentPassword, passwordForm.newPassword)
+    await authStore.changePassword(passwordForm.currentPassword, passwordForm.newPassword)
     showPasswordChange.value = false
     passwordForm.currentPassword = ''
     passwordForm.newPassword = ''
@@ -280,7 +279,7 @@ const handlePasswordChange = async () => {
 // 处理登出
 const handleLogout = async () => {
   try {
-    await authService.logout()
+    await authStore.logout()
     router.push('/auth')
   } catch (error) {
     console.error('Logout failed:', error)

@@ -248,12 +248,11 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
-  authService,
   validateEmail,
   validatePassword,
   validateName,
   validateConfirmPassword,
-} from '@/services/auth'
+} from '@/services/validators'
 import type { LoginCredentials, RegisterCredentials } from '@/stores/auth'
 
 const router = useRouter()
@@ -316,10 +315,10 @@ const switchToRegister = () => {
 
 // 清除错误信息
 const clearErrors = () => {
-  Object.keys(loginErrors).forEach((key) => {
+  Object.keys(loginErrors).forEach(key => {
     loginErrors[key as keyof typeof loginErrors] = ''
   })
-  Object.keys(registerErrors).forEach((key) => {
+  Object.keys(registerErrors).forEach(key => {
     registerErrors[key as keyof typeof registerErrors] = ''
   })
 }
@@ -369,7 +368,7 @@ const validateRegisterForm = (): boolean => {
 
   const confirmPasswordError = validateConfirmPassword(
     registerForm.password,
-    registerForm.confirmPassword,
+    registerForm.confirmPassword
   )
   if (confirmPasswordError) {
     registerErrors.confirmPassword = confirmPasswordError
@@ -384,7 +383,7 @@ const handleLogin = async () => {
   if (!validateLoginForm()) return
 
   try {
-    await authService.login(loginForm)
+    await authStore.login(loginForm)
     successMessage.value = '登录成功！正在跳转...'
 
     setTimeout(() => {
@@ -401,7 +400,7 @@ const handleRegister = async () => {
   if (!validateRegisterForm()) return
 
   try {
-    await authService.register(registerForm)
+    await authStore.register(registerForm)
     successMessage.value = '注册成功！正在跳转...'
 
     setTimeout(() => {
@@ -418,7 +417,7 @@ const handleForgotPassword = async () => {
   if (!forgotPasswordEmail.value) return
 
   try {
-    await authService.forgotPassword(forgotPasswordEmail.value)
+    await authStore.forgotPassword(forgotPasswordEmail.value)
     successMessage.value = '重置密码邮件已发送，请查收邮箱'
     showForgotPassword.value = false
     forgotPasswordEmail.value = ''

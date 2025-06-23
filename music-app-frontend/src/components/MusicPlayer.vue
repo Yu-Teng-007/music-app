@@ -186,7 +186,7 @@ const progressOffset = computed(() => {
 
 // 背景渐变样式
 const backgroundStyle = computed(() => {
-  if (!currentSong) return {}
+  if (!currentSong.value) return {}
 
   return {
     background: `linear-gradient(135deg, 
@@ -308,7 +308,7 @@ const handleImageError = (event: Event) => {
 // 生命周期
 onMounted(() => {
   // 初始化默认播放列表
-  if (!currentSong) {
+  if (!currentSong.value) {
     // 使用默认音源
     musicStore.initializeDefaultPlaylist()
     if (musicStore.playlist.length > 0) {

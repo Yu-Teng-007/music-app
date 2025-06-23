@@ -5,28 +5,28 @@ import {
   ManyToOne,
   Column,
   Unique,
-} from 'typeorm';
-import { User } from './user.entity';
-import { Song } from './song.entity';
+} from 'typeorm'
+import { User } from './user.entity'
+import { Song } from './song.entity'
 
 @Entity('favorites')
 @Unique(['userId', 'songId']) // 确保用户不能重复收藏同一首歌
 export class Favorite {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: string
 
   @Column()
-  userId: string;
+  userId: string
 
   @Column()
-  songId: string;
+  songId: string
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user: User;
+  user: User
 
   @ManyToOne(() => Song, { onDelete: 'CASCADE' })
-  song: Song;
+  song: Song
 }
