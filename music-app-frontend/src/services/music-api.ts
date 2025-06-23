@@ -1,5 +1,5 @@
 import { apiClient } from './http'
-import type { SongQueryParams } from './types'
+import type { SongQueryParams } from '@/types/api'
 
 // 音乐相关API
 export const musicApi = {

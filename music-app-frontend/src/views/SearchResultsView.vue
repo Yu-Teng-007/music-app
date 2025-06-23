@@ -196,7 +196,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
-import { musicApi } from '@/services/api'
+import { musicApi } from '@/services'
 import type { Song } from '@/stores/music'
 import { Search, X, Play, Music, User, Disc, ListMusic, Clock } from 'lucide-vue-next'
 

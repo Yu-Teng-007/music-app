@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { apiClient, authApi, musicApi, playlistApi } from '@/services/api'
+import { apiClient, authApi, musicApi, playlistApi } from '@/services'
 
 interface TestResult {
   name: string

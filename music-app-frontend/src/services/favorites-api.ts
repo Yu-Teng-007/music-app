@@ -1,5 +1,5 @@
 import { apiClient } from './http'
-import type { FavoriteQueryParams } from './types'
+import type { FavoriteQueryParams } from '@/types/api'
 
 // 收藏相关API
 export const favoritesApi = {

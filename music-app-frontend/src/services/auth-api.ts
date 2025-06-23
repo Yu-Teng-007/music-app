@@ -1,6 +1,6 @@
 import { type AxiosResponse } from 'axios'
 import { apiClient } from './http'
-import type { ApiResponse, ChangePasswordData, ResetPasswordData } from './types'
+import type { ApiResponse, ChangePasswordData, ResetPasswordData } from '@/types/api'
 import type { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/stores/auth'
 
 // 认证相关API

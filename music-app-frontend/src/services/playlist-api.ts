@@ -1,5 +1,5 @@
 import { apiClient } from './http'
-import type { PlaylistQueryParams, PlaylistData, PlaylistUpdateData } from './types'
+import type { PlaylistQueryParams, PlaylistData, PlaylistUpdateData } from '@/types/api'
 
 // 播放列表相关API
 export const playlistApi = {

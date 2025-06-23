@@ -1,5 +1,5 @@
 import { apiClient } from './http'
-import type { UploadResponse } from './types'
+import type { UploadResponse } from '@/types/api'
 
 // 文件上传相关API
 export const uploadApi = {

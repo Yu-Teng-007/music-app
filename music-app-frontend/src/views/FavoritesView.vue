@@ -84,7 +84,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
-import { favoritesApi } from '@/services/api'
+import { favoritesApi } from '@/services'
 import type { Song } from '@/stores/music'
 import { Search, X, Play, Heart } from 'lucide-vue-next'
 
