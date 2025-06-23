@@ -5,20 +5,21 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { databaseConfig, jwtConfig, appConfig } from './config'
+import { databaseConfig, jwtConfig, appConfig, crawlerConfig } from './config'
 import { AuthModule } from './auth/auth.module'
 import { SongsModule } from './songs/songs.module'
 import { PlaylistsModule } from './playlists/playlists.module'
 import { UploadModule } from './upload/upload.module'
 import { DatabaseModule } from './database/database.module'
 import { FavoritesModule } from './favorites/favorites.module'
+import { CrawlerModule } from './crawler/crawler.module'
 
 @Module({
   imports: [
     // 配置模块
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, jwtConfig, appConfig],
+      load: [databaseConfig, jwtConfig, appConfig, crawlerConfig],
       envFilePath: ['.env.local', '.env'],
     }),
 
@@ -56,6 +57,7 @@ import { FavoritesModule } from './favorites/favorites.module'
     FavoritesModule,
     UploadModule,
     DatabaseModule,
+    CrawlerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

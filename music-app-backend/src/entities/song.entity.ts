@@ -49,6 +49,12 @@ export class Song {
   @Column({ nullable: true })
   originalFileName: string
 
+  @Column({ nullable: true })
+  sourceId: string
+
+  @Column({ nullable: true })
+  sourceUrl: string
+
   @CreateDateColumn()
   createdAt: Date
 
