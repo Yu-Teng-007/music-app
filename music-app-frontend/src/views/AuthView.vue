@@ -252,7 +252,7 @@ import {
   validatePassword,
   validateName,
   validateConfirmPassword,
-} from '@/services/validators'
+} from '@/utils/validators'
 import type { LoginCredentials, RegisterCredentials } from '@/stores/auth'
 
 const router = useRouter()
