@@ -17,15 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(payload: { sub: string; email: string; username: string }) {
+  async validate(payload: { sub: string; phone: string; username: string }) {
     try {
       const user = await this.authService.validateUser(payload.sub)
       return {
         id: user.id,
-        email: user.email,
+        phone: user.phone,
         username: user.username,
-        name: user.name,
-        role: user.role,
       }
     } catch {
       throw new UnauthorizedException('Token无效')

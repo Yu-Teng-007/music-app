@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
@@ -16,7 +17,9 @@ import {
   UpdateProfileDto,
   ChangePasswordDto,
   RefreshTokenDto,
+  SendSmsDto,
 } from '../dto/auth.dto'
+import { SmsService } from '../sms/sms.service'
 
 @Injectable()
 export class AuthService {
@@ -24,91 +27,200 @@ export class AuthService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private smsService: SmsService
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, username, password, name, confirmPassword } = registerDto
+    const { registerType, phone, smsCode, username, password, confirmPassword } = registerDto
 
-    // 验证密码确认
-    if (password !== confirmPassword) {
-      throw new ConflictException('两次输入的密码不一致')
-    }
+    if (registerType === 'phone') {
+      // 手机号注册
+      if (!phone || !smsCode) {
+        throw new BadRequestException('手机号和验证码不能为空')
+      }
 
-    // 检查邮箱是否已存在
-    const existingUserByEmail = await this.userRepository.findOne({
-      where: { email },
-    })
-    if (existingUserByEmail) {
-      throw new ConflictException('该邮箱已被注册')
-    }
+      // 验证短信验证码
+      await this.smsService.verifySmsCode(phone, smsCode, 'register')
 
-    // 检查用户名是否已存在
-    const existingUserByUsername = await this.userRepository.findOne({
-      where: { username },
-    })
-    if (existingUserByUsername) {
-      throw new ConflictException('该用户名已被注册')
-    }
+      // 检查手机号是否已存在
+      const existingUserByPhone = await this.userRepository.findOne({
+        where: { phone },
+      })
+      if (existingUserByPhone) {
+        throw new ConflictException('该手机号已被注册')
+      }
 
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(password, 12)
+      // 创建用户（手机号注册不需要密码）
+      const user = this.userRepository.create({
+        phone,
+        username: null, // 手机号注册时用户名为空
+        password: null, // 手机号注册时密码为空
+      })
 
-    // 创建用户
-    const user = this.userRepository.create({
-      email,
-      username,
-      name,
-      password: hashedPassword,
-    })
+      const savedUser = await this.userRepository.save(user)
 
-    const savedUser = await this.userRepository.save(user)
+      // 生成tokens
+      const tokens = await this.generateTokens(savedUser)
 
-    // 生成tokens
-    const tokens = await this.generateTokens(savedUser)
+      return {
+        user: this.sanitizeUser(savedUser),
+        ...tokens,
+      }
+    } else if (registerType === 'username') {
+      // 用户名注册
+      if (!username || !password || !confirmPassword) {
+        throw new BadRequestException('用户名、密码和确认密码不能为空')
+      }
 
-    return {
-      user: this.sanitizeUser(savedUser),
-      ...tokens,
+      // 验证密码确认
+      if (password !== confirmPassword) {
+        throw new ConflictException('两次输入的密码不一致')
+      }
+
+      // 检查用户名是否已存在
+      const existingUserByUsername = await this.userRepository.findOne({
+        where: { username },
+      })
+      if (existingUserByUsername) {
+        throw new ConflictException('该用户名已被注册')
+      }
+
+      // 加密密码
+      const hashedPassword = await bcrypt.hash(password, 12)
+
+      // 创建用户
+      const user = this.userRepository.create({
+        phone: null, // 用户名注册时手机号为空
+        username,
+        password: hashedPassword,
+      })
+
+      const savedUser = await this.userRepository.save(user)
+
+      // 生成tokens
+      const tokens = await this.generateTokens(savedUser)
+
+      return {
+        user: this.sanitizeUser(savedUser),
+        ...tokens,
+      }
+    } else {
+      throw new BadRequestException('无效的注册方式')
     }
   }
 
   async login(loginDto: LoginDto) {
-    const { username, password } = loginDto
+    const { loginType, phone, smsCode, username, password } = loginDto
 
-    // 查找用户
-    const user = await this.userRepository.findOne({
-      where: { username },
-      select: [
-        'id',
-        'email',
-        'username',
-        'name',
-        'password',
-        'avatar',
-        'isActive',
-        'createdAt',
-        'updatedAt',
-      ],
-    })
+    if (loginType === 'phone') {
+      // 手机号登录
+      if (!phone || !smsCode) {
+        throw new BadRequestException('手机号和验证码不能为空')
+      }
 
-    if (!user || !user.isActive) {
-      throw new UnauthorizedException('用户名或密码错误')
+      // 验证短信验证码
+      await this.smsService.verifySmsCode(phone, smsCode, 'login')
+
+      // 查找用户
+      const user = await this.userRepository.findOne({
+        where: { phone },
+        select: [
+          'id',
+          'phone',
+          'username',
+          'password',
+          'avatar',
+          'isActive',
+          'createdAt',
+          'updatedAt',
+        ],
+      })
+
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException('用户不存在或已被禁用')
+      }
+
+      // 生成tokens
+      const tokens = await this.generateTokens(user)
+
+      return {
+        user: this.sanitizeUser(user),
+        ...tokens,
+      }
+    } else if (loginType === 'username') {
+      // 用户名登录
+      if (!username || !password) {
+        throw new BadRequestException('用户名和密码不能为空')
+      }
+
+      // 查找用户
+      const user = await this.userRepository.findOne({
+        where: { username },
+        select: [
+          'id',
+          'phone',
+          'username',
+          'password',
+          'avatar',
+          'isActive',
+          'createdAt',
+          'updatedAt',
+        ],
+      })
+
+      if (!user || !user.isActive) {
+        throw new UnauthorizedException('用户名或密码错误')
+      }
+
+      // 验证密码
+      if (!user.password) {
+        throw new UnauthorizedException('用户名或密码错误')
+      }
+      const isPasswordValid = await bcrypt.compare(password, user.password)
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('用户名或密码错误')
+      }
+
+      // 生成tokens
+      const tokens = await this.generateTokens(user)
+
+      return {
+        user: this.sanitizeUser(user),
+        ...tokens,
+      }
+    } else {
+      throw new BadRequestException('无效的登录方式')
+    }
+  }
+
+  async sendSmsCode(sendSmsDto: SendSmsDto) {
+    const { phone, type } = sendSmsDto
+
+    // 如果是注册验证码，检查手机号是否已存在
+    if (type === 'register') {
+      const existingUser = await this.userRepository.findOne({
+        where: { phone },
+      })
+      if (existingUser) {
+        throw new ConflictException('该手机号已被注册')
+      }
     }
 
-    // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('用户名或密码错误')
+    // 如果是登录验证码，检查手机号是否存在
+    if (type === 'login') {
+      const existingUser = await this.userRepository.findOne({
+        where: { phone },
+      })
+      if (!existingUser) {
+        throw new NotFoundException('该手机号尚未注册')
+      }
     }
 
-    // 生成tokens
-    const tokens = await this.generateTokens(user)
+    // 发送短信验证码
+    await this.smsService.sendSmsCode(phone, type)
 
-    return {
-      user: this.sanitizeUser(user),
-      ...tokens,
-    }
+    return { message: '验证码发送成功' }
   }
 
   async refreshToken(refreshTokenDto: RefreshTokenDto) {
@@ -167,7 +279,16 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'password', 'avatar', 'isActive', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'phone',
+        'username',
+        'password',
+        'avatar',
+        'isActive',
+        'createdAt',
+        'updatedAt',
+      ],
     })
 
     if (!user) {
@@ -175,6 +296,9 @@ export class AuthService {
     }
 
     // 验证当前密码
+    if (!user.password) {
+      throw new UnauthorizedException('用户未设置密码')
+    }
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password)
     if (!isCurrentPasswordValid) {
       throw new UnauthorizedException('当前密码错误')
@@ -192,10 +316,8 @@ export class AuthService {
   private async generateTokens(user: User) {
     const payload = {
       sub: user.id,
-      email: user.email,
+      phone: user.phone,
       username: user.username,
-      name: user.name,
-      role: user.role,
     }
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -230,74 +352,5 @@ export class AuthService {
     }
 
     return user
-  }
-
-  async forgotPassword(email: string) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-    })
-
-    if (!user || !user.isActive) {
-      // 为了安全，即使用户不存在也返回成功消息
-      return { message: '如果该邮箱存在，重置密码邮件已发送' }
-    }
-
-    // 生成重置令牌
-    const resetToken = this.generateResetToken()
-    const resetTokenExpires = new Date(Date.now() + 3600000) // 1小时后过期
-
-    // 保存重置令牌到数据库
-    user.resetPasswordToken = resetToken
-    user.resetPasswordExpires = resetTokenExpires
-    await this.userRepository.save(user)
-
-    // TODO: 发送邮件
-    // 在实际应用中，这里应该发送包含重置链接的邮件
-    // console.log(`重置密码令牌: ${resetToken}`)
-    // console.log(`重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`)
-
-    // 临时日志记录，生产环境应移除
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.log(`重置密码令牌: ${resetToken}`)
-      // eslint-disable-next-line no-console
-      console.log(`重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`)
-    }
-
-    return { message: '重置密码邮件已发送' }
-  }
-
-  async resetPassword(token: string, newPassword: string) {
-    const user = await this.userRepository.findOne({
-      where: {
-        resetPasswordToken: token,
-      },
-    })
-
-    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
-      throw new UnauthorizedException('重置令牌无效或已过期')
-    }
-
-    // 加密新密码
-    const hashedPassword = await bcrypt.hash(newPassword, 12)
-
-    // 更新密码并清除重置令牌
-    user.password = hashedPassword
-    user.resetPasswordToken = null
-    user.resetPasswordExpires = null
-
-    await this.userRepository.save(user)
-
-    return { message: '密码重置成功' }
-  }
-
-  private generateResetToken(): string {
-    // 生成32位随机字符串
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    let result = ''
-    for (let i = 0; i < 32; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-    return result
   }
 }

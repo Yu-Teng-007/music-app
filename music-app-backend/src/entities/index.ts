@@ -1,4 +1,4 @@
-export { User, UserRole } from './user.entity'
+export { User } from './user.entity'
 export { Song } from './song.entity'
 export { Playlist } from './playlist.entity'
 export { Favorite } from './favorite.entity'

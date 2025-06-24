@@ -2,36 +2,30 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from '../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { User, UserRole } from '../src/entities/user.entity'
+import { User } from '../src/entities/user.entity'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcryptjs'
 
 interface AdminUserData {
-  email: string
+  phone: string | null
   username: string
-  name: string
   password: string
-  role: UserRole
   avatar?: string
 }
 
 // 开发环境管理员账号
 const developmentAdmin: AdminUserData = {
-  email: 'admin@musicapp.com',
+  phone: null,
   username: 'admin',
-  name: '系统管理员',
   password: 'admin123456', // 开发环境使用简单密码
-  role: UserRole.ADMIN,
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
 }
 
 // 生产环境管理员账号（使用更安全的密码）
 const productionAdmin: AdminUserData = {
-  email: 'admin@musicapp.com',
+  phone: null,
   username: 'admin',
-  name: '系统管理员',
   password: 'MusicApp@Admin2024!', // 生产环境使用复杂密码
-  role: UserRole.ADMIN,
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
 }
 
@@ -50,19 +44,11 @@ async function seedAdminUser() {
 
     // 检查管理员是否已存在
     const existingAdmin = await userRepository.findOne({
-      where: [{ email: adminData.email }, { username: adminData.username }],
+      where: { username: adminData.username },
     })
 
     if (existingAdmin) {
       console.log('管理员账号已存在，跳过创建')
-
-      // 如果存在但角色不是管理员，则更新角色
-      if (existingAdmin.role !== UserRole.ADMIN) {
-        existingAdmin.role = UserRole.ADMIN
-        await userRepository.save(existingAdmin)
-        console.log('已将现有用户升级为管理员')
-      }
-
       await app.close()
       return
     }
@@ -72,11 +58,9 @@ async function seedAdminUser() {
 
     // 创建管理员用户
     const adminUser = userRepository.create({
-      email: adminData.email,
+      phone: adminData.phone,
       username: adminData.username,
-      name: adminData.name,
       password: hashedPassword,
-      role: adminData.role,
       avatar: adminData.avatar,
       isActive: true,
     })
@@ -84,7 +68,6 @@ async function seedAdminUser() {
     await userRepository.save(adminUser)
 
     console.log('✅ 管理员账号创建成功！')
-    console.log('📧 邮箱:', adminData.email)
     console.log('👤 用户名:', adminData.username)
     console.log('🔑 密码:', adminData.password)
     console.log('⚠️  请在生产环境中及时修改默认密码！')

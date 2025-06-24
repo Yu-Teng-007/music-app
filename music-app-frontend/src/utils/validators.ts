@@ -1,26 +1,10 @@
 // 表单验证工具函数
 
-// 邮箱验证
-export const validateEmail = (email: string): string | null => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!email) return '邮箱不能为空'
-  if (!emailRegex.test(email)) return '请输入有效的邮箱地址'
-  return null
-}
-
 // 密码验证
 export const validatePassword = (password: string): string | null => {
   if (!password) return '密码不能为空'
   if (password.length < 6) return '密码长度至少6位'
   if (password.length > 50) return '密码长度不能超过50位'
-  return null
-}
-
-// 姓名验证
-export const validateName = (name: string): string | null => {
-  if (!name) return '姓名不能为空'
-  if (name.length < 2) return '姓名长度至少2位'
-  if (name.length > 20) return '姓名长度不能超过20位'
   return null
 }
 
@@ -48,6 +32,13 @@ export const validatePhone = (phone: string): string | null => {
   const phoneRegex = /^1[3-9]\d{9}$/
   if (!phone) return '手机号不能为空'
   if (!phoneRegex.test(phone)) return '请输入有效的手机号'
+  return null
+}
+
+// 短信验证码验证
+export const validateSmsCode = (code: string): string | null => {
+  if (!code) return '验证码不能为空'
+  if (!/^\d{6}$/.test(code)) return '验证码必须是6位数字'
   return null
 }
 

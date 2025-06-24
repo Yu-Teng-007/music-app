@@ -4,25 +4,28 @@ import { authApi } from '@/services/auth-api'
 
 export interface User {
   id: string
-  email: string
-  username: string
-  name: string
+  phone?: string
+  username?: string
   avatar?: string
   createdAt: string
   updatedAt: string
 }
 
 export interface LoginCredentials {
-  username: string
-  password: string
+  loginType: 'phone' | 'username'
+  phone?: string
+  smsCode?: string
+  username?: string
+  password?: string
 }
 
 export interface RegisterCredentials {
-  email: string
-  username: string
-  password: string
-  name: string
-  confirmPassword: string
+  registerType: 'phone' | 'username'
+  phone?: string
+  smsCode?: string
+  username?: string
+  password?: string
+  confirmPassword?: string
 }
 
 export interface AuthResponse {
@@ -42,12 +45,13 @@ export const useAuthStore = defineStore('auth', () => {
   // 计算属性
   const isAuthenticated = computed(() => !!user.value && !!token.value)
   const userInitials = computed(() => {
-    if (!user.value?.name) return ''
-    return user.value.name
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase())
-      .join('')
-      .slice(0, 2)
+    if (user.value?.username) {
+      return user.value.username.slice(0, 2).toUpperCase()
+    }
+    if (user.value?.phone) {
+      return user.value.phone.slice(-2)
+    }
+    return '用户'
   })
 
   // 从localStorage恢复认证状态
@@ -244,28 +248,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // 忘记密码
-  const forgotPassword = async (email: string): Promise<void> => {
+  // 发送短信验证码
+  const sendSmsCode = async (phone: string, type: 'register' | 'login'): Promise<void> => {
     setLoading(true)
     clearError()
 
     try {
-      await authApi.forgotPassword(email)
-    } catch (error: any) {
-      setError(error.message)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // 重置密码
-  const resetPassword = async (resetToken: string, password: string): Promise<void> => {
-    setLoading(true)
-    clearError()
-
-    try {
-      await authApi.resetPassword({ token: resetToken, password })
+      await authApi.sendSmsCode(phone, type)
     } catch (error: any) {
       setError(error.message)
       throw error
@@ -342,8 +331,7 @@ export const useAuthStore = defineStore('auth', () => {
     getUserProfile,
     updateProfile,
     changePassword,
-    forgotPassword,
-    resetPassword,
+    sendSmsCode,
     checkAuthStatus,
     autoRefreshToken,
   }

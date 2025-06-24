@@ -95,21 +95,12 @@ export const authApi = {
     }
   },
 
-  // 忘记密码
-  async forgotPassword(email: string): Promise<void> {
+  // 发送短信验证码
+  async sendSmsCode(phone: string, type: 'register' | 'login'): Promise<void> {
     try {
-      await apiClient.post('/auth/forgot-password', { email })
+      await apiClient.post('/auth/send-sms', { phone, type })
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || '发送重置密码邮件失败')
-    }
-  },
-
-  // 重置密码
-  async resetPassword(data: ResetPasswordData): Promise<void> {
-    try {
-      await apiClient.post('/auth/reset-password', data)
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || '重置密码失败')
+      throw new Error(error.response?.data?.message || '发送验证码失败')
     }
   },
 }

@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { User } from '../entities/user.entity'
+import { SmsModule } from '../sms/sms.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { User } from '../entities/user.entity'
       }),
       inject: [ConfigService],
     }),
+    SmsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

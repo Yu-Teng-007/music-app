@@ -36,11 +36,9 @@ async function quickSeed() {
     const hashedPassword = await bcrypt.hash('admin123456', 12)
 
     const adminUser = userRepository.create({
-      email: 'admin@musicapp.com',
+      phone: null,
       username: 'admin',
-      name: '系统管理员',
       password: hashedPassword,
-      role: 'admin' as any,
       isActive: true,
     })
     await userRepository.save(adminUser)
@@ -135,7 +133,6 @@ async function quickSeed() {
     console.log(`  🎶 示例歌曲: ${sampleSongs.length}`)
     console.log(`  📋 播放列表: 1`)
     console.log('\n🔐 管理员登录信息:')
-    console.log('  📧 邮箱: admin@musicapp.com')
     console.log('  👤 用户名: admin')
     console.log('  🔑 密码: admin123456')
   } catch (error) {

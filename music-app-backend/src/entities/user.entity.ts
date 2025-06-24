@@ -9,41 +9,26 @@ import {
 import { Exclude } from 'class-transformer'
 import { Playlist } from './playlist.entity'
 
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-}
-
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({ unique: true })
-  email: string
+  @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
+  phone: string | null
 
-  @Column({ unique: true, nullable: true })
-  username: string
+  @Column({ type: 'varchar', length: 50, unique: true, nullable: true })
+  username: string | null
 
-  @Column()
-  name: string
-
-  @Column()
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Exclude()
-  password: string
+  password: string | null
 
   @Column({ nullable: true })
   avatar: string
 
   @Column({ default: true })
   isActive: boolean
-
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER,
-  })
-  role: UserRole
 
   @Column({ nullable: true, type: 'varchar', length: 255 })
   resetPasswordToken: string | null

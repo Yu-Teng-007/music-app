@@ -17,12 +17,13 @@ import {
   UpdateProfileDto,
   ChangePasswordDto,
   RefreshTokenDto,
+  SendSmsDto,
 } from '../dto/auth.dto'
 
 interface AuthenticatedRequest extends Request {
   user: {
     id: string
-    email: string
+    phone: string
     username: string
   }
 }
@@ -139,6 +140,17 @@ export class AuthController {
     }
   }
 
+  @Post('send-sms')
+  @HttpCode(HttpStatus.OK)
+  async sendSmsCode(@Body() sendSmsDto: SendSmsDto) {
+    const result = await this.authService.sendSmsCode(sendSmsDto)
+    return {
+      success: true,
+      data: result,
+      message: result.message,
+    }
+  }
+
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -148,31 +160,6 @@ export class AuthController {
     return {
       success: true,
       message: '登出成功',
-    }
-  }
-
-  @Post('forgot-password')
-  @HttpCode(HttpStatus.OK)
-  async forgotPassword(@Body('email') email: string) {
-    const result = await this.authService.forgotPassword(email)
-    return {
-      success: true,
-      data: result,
-      message: result.message,
-    }
-  }
-
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordDto: { token: string; password: string }) {
-    const result = await this.authService.resetPassword(
-      resetPasswordDto.token,
-      resetPasswordDto.password
-    )
-    return {
-      success: true,
-      data: result,
-      message: result.message,
     }
   }
 }
