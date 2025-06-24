@@ -271,7 +271,7 @@ const loadMyPlaylists = async () => {
 const loadRecommendedPlaylists = async () => {
   try {
     isLoading.value = true
-    const playlists = await playlistApi.getRecommendedPlaylists(6)
+    const playlists = await playlistApi.getRecommendedPlaylists(9)
     recommendedPlaylists.value = playlists.map((playlist: any) => ({
       id: playlist.id,
       name: playlist.name,

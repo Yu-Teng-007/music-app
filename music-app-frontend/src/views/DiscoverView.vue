@@ -157,7 +157,7 @@ const filteredSongs = computed(() => {
 const loadRecommendedSongs = async () => {
   try {
     isLoading.value = true
-    const songs = await musicStore.loadRecommendedSongs(6)
+    const songs = await musicStore.loadRecommendedSongs(12)
     recommendedSongs.value = songs
   } catch (error) {
     recommendedSongs.value = []

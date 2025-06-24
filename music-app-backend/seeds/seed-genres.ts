@@ -119,6 +119,13 @@ const genresData: GenreData[] = [
     icon: '🎹',
     sortOrder: 15,
   },
+  {
+    name: '古风',
+    description: '中国风和古风音乐，融合传统文化元素的现代音乐',
+    color: '#CD853F',
+    icon: '🏮',
+    sortOrder: 16,
+  },
 ]
 
 async function seedGenres() {

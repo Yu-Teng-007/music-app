@@ -36,6 +36,42 @@ const chartTypes = ref([
     coverUrl: 'https://picsum.photos/300/300?random=31',
   },
   {
+    id: 'trending',
+    title: '飙升榜',
+    subtitle: '实时更新',
+    coverUrl: 'https://picsum.photos/300/300?random=33',
+  },
+  {
+    id: 'original',
+    title: '原创榜',
+    subtitle: '每日更新',
+    coverUrl: 'https://picsum.photos/300/300?random=34',
+  },
+  {
+    id: 'kpop',
+    title: 'K-Pop榜',
+    subtitle: '每周更新',
+    coverUrl: 'https://picsum.photos/300/300?random=35',
+  },
+  {
+    id: 'electronic',
+    title: '电音榜',
+    subtitle: '每日更新',
+    coverUrl: 'https://picsum.photos/300/300?random=36',
+  },
+  {
+    id: 'folk',
+    title: '民谣榜',
+    subtitle: '每周更新',
+    coverUrl: 'https://picsum.photos/300/300?random=37',
+  },
+  {
+    id: 'ancient',
+    title: '古风榜',
+    subtitle: '每日更新',
+    coverUrl: 'https://picsum.photos/300/300?random=38',
+  },
+  {
     id: 'mv',
     title: 'MV榜',
     subtitle: '每日更新',
