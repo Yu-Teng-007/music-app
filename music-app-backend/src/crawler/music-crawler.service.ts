@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import axios, { AxiosInstance } from 'axios'
 import * as cheerio from 'cheerio'
-import UserAgent from 'user-agents'
 import { Song } from '../entities/song.entity'
 import { CrawlSongDto, CrawlConfigDto } from '../dto/song.dto'
 
@@ -61,8 +60,12 @@ export class MusicCrawlerService {
 
     // 为每个请求设置随机User-Agent
     this.httpClient.interceptors.request.use(config => {
-      const userAgent = new (UserAgent as any)()
-      config.headers['User-Agent'] = userAgent.toString()
+      const userAgents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+      ]
+      config.headers['User-Agent'] = userAgents[Math.floor(Math.random() * userAgents.length)]
       return config
     })
   }
