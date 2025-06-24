@@ -8,7 +8,7 @@ import { UploadService } from './upload.service'
   imports: [
     MulterModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: () => ({
         limits: {
           fileSize: 50 * 1024 * 1024, // 50MB
         },

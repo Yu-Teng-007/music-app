@@ -9,13 +9,13 @@ export class AddFavoriteDto {
 
 export class QueryFavoritesDto {
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => parseInt(value as string))
   @IsNumber()
   @Min(1)
   page?: number = 1
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => parseInt(value as string))
   @IsNumber()
   @Min(1)
   limit?: number = 20

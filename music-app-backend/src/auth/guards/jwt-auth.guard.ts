@@ -8,9 +8,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context)
   }
 
-  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+  handleRequest(err: unknown, user: unknown): unknown {
     if (err || !user) {
-      throw err || new UnauthorizedException('请先登录')
+      throw new UnauthorizedException(err instanceof Error ? err.message : '请先登录')
     }
     return user
   }

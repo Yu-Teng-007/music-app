@@ -19,20 +19,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse
       } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        const responseObj = exceptionResponse as any
-        message = responseObj.message || responseObj.error || message
-        error = responseObj.error || error
-
-        // 处理验证错误
-        if (Array.isArray(responseObj.message)) {
-          message = responseObj.message.join(', ')
+        const responseObj = exceptionResponse as {
+          message?: string | string[]
+          error?: string
         }
+        message =
+          (Array.isArray(responseObj.message)
+            ? responseObj.message.join(', ')
+            : responseObj.message) ||
+          responseObj.error ||
+          message
+        error = responseObj.error || error
       }
     } else if (exception instanceof Error) {
       message = exception.message
     }
 
     // 记录错误日志
+    // eslint-disable-next-line no-console
     console.error(`[${new Date().toISOString()}] ${request.method} ${request.url}`, {
       status,
       message,

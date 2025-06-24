@@ -19,6 +19,14 @@ import {
   RefreshTokenDto,
 } from '../dto/auth.dto'
 
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string
+    email: string
+    username: string
+  }
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -57,7 +65,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUser(@Request() req) {
+  async getCurrentUser(@Request() req: AuthenticatedRequest) {
     const result = await this.authService.getCurrentUser(req.user.id)
     return {
       success: true,
@@ -68,7 +76,7 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
-  async getUserProfile(@Request() req) {
+  async getUserProfile(@Request() req: AuthenticatedRequest) {
     const user = await this.authService.getCurrentUser(req.user.id)
 
     // 生成个性化问候语
@@ -105,7 +113,10 @@ export class AuthController {
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
+  async updateProfile(
+    @Request() req: AuthenticatedRequest,
+    @Body() updateProfileDto: UpdateProfileDto
+  ) {
     const result = await this.authService.updateProfile(req.user.id, updateProfileDto)
     return {
       success: true,
@@ -116,7 +127,10 @@ export class AuthController {
 
   @Put('change-password')
   @UseGuards(JwtAuthGuard)
-  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+  async changePassword(
+    @Request() req: AuthenticatedRequest,
+    @Body() changePasswordDto: ChangePasswordDto
+  ) {
     const result = await this.authService.changePassword(req.user.id, changePasswordDto)
     return {
       success: true,
@@ -128,7 +142,7 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async logout() {
+  logout() {
     // 在实际应用中，这里可以将token加入黑名单
     // 目前只是返回成功响应，让前端清除本地token
     return {

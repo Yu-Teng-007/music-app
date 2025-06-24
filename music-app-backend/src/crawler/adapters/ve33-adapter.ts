@@ -283,7 +283,7 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 从元素提取歌曲信息
    */
   private extractSongFromElement(
-    element: cheerio.Cheerio<any>,
+    element: cheerio.Cheerio<cheerio.Element>,
     $: cheerio.CheerioAPI
   ): CrawlSongDto | null {
     try {
@@ -356,9 +356,14 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取艺术家信息
    */
-  private extractArtistInfo(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string {
+  private extractArtistInfo(
+    element: cheerio.Cheerio<cheerio.Element>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    $: cheerio.CheerioAPI
+  ): string {
     const strategies = [
       // 策略1: 查找艺术家链接
+
       () => {
         const artistLink = element
           .closest('tr, li, div')
@@ -398,7 +403,10 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取专辑信息
    */
-  private extractAlbumInfo(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string | null {
+  private extractAlbumInfo(
+    element: cheerio.Cheerio<cheerio.Element>,
+    $: cheerio.CheerioAPI
+  ): string | null {
     const container = element.closest('tr, li, div')
 
     const albumElement = container
@@ -425,7 +433,10 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取封面图片
    */
-  private extractCoverImage(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string | null {
+  private extractCoverImage(
+    element: cheerio.Cheerio<cheerio.Element>,
+    $: cheerio.CheerioAPI
+  ): string | null {
     const container = element.closest('tr, li, div, article')
 
     for (const selector of this.config.selectors.cover) {
@@ -445,7 +456,11 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取歌曲时长
    */
-  private extractDuration(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): number | null {
+  private extractDuration(
+    element: cheerio.Cheerio<cheerio.Element>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    $: cheerio.CheerioAPI
+  ): number | null {
     const container = element.closest('tr, li, div')
     const durationRegex = /(\d{1,2}):(\d{2})|(\d+)秒|(\d+)s/
     const textContent = container.text()
@@ -469,7 +484,11 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取音乐类型
    */
-  private extractGenre(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string | null {
+  private extractGenre(
+    element: cheerio.Cheerio<cheerio.Element>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    $: cheerio.CheerioAPI
+  ): string | null {
     const container = element.closest('tr, li, div')
     const genreKeywords = [
       '流行',
@@ -503,7 +522,7 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 从URL提取ID
    */
   private extractIdFromUrl(url: string): string {
-    const match = url.match(/\/mp3\/([^\/]+)\.html/)
+    const match = url.match(/\/mp3\/([^/]+)\.html/)
     return match ? match[1] : ''
   }
 

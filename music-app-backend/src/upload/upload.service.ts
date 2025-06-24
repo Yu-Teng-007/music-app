@@ -9,7 +9,7 @@ import * as path from 'path'
 export class UploadService {
   constructor(private configService: ConfigService) {}
 
-  async uploadMusic(file: Express.Multer.File): Promise<{ url: string; filename: string }> {
+  uploadMusic(file: Express.Multer.File): { url: string; filename: string } {
     if (!file) {
       throw new BadRequestException('请选择要上传的音乐文件')
     }
@@ -26,7 +26,7 @@ export class UploadService {
       throw new BadRequestException('音乐文件大小不能超过50MB')
     }
 
-    const uploadDir = this.configService.get('app.uploadDir')
+    const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
     const musicDir = path.join(uploadDir, 'music')
 
     // 确保目录存在
@@ -48,7 +48,7 @@ export class UploadService {
     }
   }
 
-  async uploadCover(file: Express.Multer.File): Promise<{ url: string; filename: string }> {
+  uploadCover(file: Express.Multer.File): { url: string; filename: string } {
     if (!file) {
       throw new BadRequestException('请选择要上传的封面图片')
     }
@@ -65,7 +65,7 @@ export class UploadService {
       throw new BadRequestException('图片文件大小不能超过5MB')
     }
 
-    const uploadDir = this.configService.get('app.uploadDir')
+    const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
     const coversDir = path.join(uploadDir, 'covers')
 
     // 确保目录存在
@@ -87,22 +87,23 @@ export class UploadService {
     }
   }
 
-  async deleteFile(filePath: string): Promise<void> {
+  deleteFile(filePath: string): void {
     try {
-      const uploadDir = this.configService.get('app.uploadDir')
+      const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
       const fullPath = path.join(uploadDir, filePath.replace('/uploads/', ''))
 
       if (fs.existsSync(fullPath)) {
         fs.unlinkSync(fullPath)
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('删除文件失败:', error)
     }
   }
 
   getFileInfo(filePath: string) {
     try {
-      const uploadDir = this.configService.get('app.uploadDir')
+      const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
       const fullPath = path.join(uploadDir, filePath.replace('/uploads/', ''))
 
       if (fs.existsSync(fullPath)) {
@@ -115,6 +116,7 @@ export class UploadService {
       }
       return null
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('获取文件信息失败:', error)
       return null
     }

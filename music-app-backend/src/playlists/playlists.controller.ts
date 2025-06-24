@@ -20,13 +20,29 @@ import {
 } from '../dto/playlist.dto'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string
+    email: string
+    username: string
+  }
+}
+
+interface OptionalAuthRequest extends Request {
+  user?: {
+    id: string
+    email: string
+    username: string
+  }
+}
+
 @Controller('playlists')
 export class PlaylistsController {
   constructor(private readonly playlistsService: PlaylistsService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Request() req, @Body() createPlaylistDto: CreatePlaylistDto) {
+  async create(@Request() req: AuthenticatedRequest, @Body() createPlaylistDto: CreatePlaylistDto) {
     const result = await this.playlistsService.create(req.user.id, createPlaylistDto)
     return {
       success: true,
@@ -36,7 +52,7 @@ export class PlaylistsController {
   }
 
   @Get()
-  async findAll(@Query() queryDto: QueryPlaylistsDto, @Request() req) {
+  async findAll(@Query() queryDto: QueryPlaylistsDto, @Request() req: OptionalAuthRequest) {
     // 如果用户已登录，传递用户ID，否则只显示公开播放列表
     const userId = req.user?.id
     const result = await this.playlistsService.findAll(userId, queryDto)
@@ -49,7 +65,7 @@ export class PlaylistsController {
 
   @Get('my')
   @UseGuards(JwtAuthGuard)
-  async findUserPlaylists(@Request() req) {
+  async findUserPlaylists(@Request() req: AuthenticatedRequest) {
     const result = await this.playlistsService.findUserPlaylists(req.user.id)
     return {
       success: true,
@@ -89,7 +105,7 @@ export class PlaylistsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
+  async findOne(@Param('id', ParseUUIDPipe) id: string, @Request() req: OptionalAuthRequest) {
     const userId = req.user?.id
     const result = await this.playlistsService.findOne(id, userId)
     return {
@@ -103,7 +119,7 @@ export class PlaylistsController {
   @UseGuards(JwtAuthGuard)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Body() updatePlaylistDto: UpdatePlaylistDto
   ) {
     const result = await this.playlistsService.update(id, req.user.id, updatePlaylistDto)
@@ -116,7 +132,7 @@ export class PlaylistsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Request() req: AuthenticatedRequest) {
     await this.playlistsService.remove(id, req.user.id)
     return {
       success: true,
@@ -128,7 +144,7 @@ export class PlaylistsController {
   @UseGuards(JwtAuthGuard)
   async addSong(
     @Param('id', ParseUUIDPipe) id: string,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
     @Body() addSongDto: AddSongToPlaylistDto
   ) {
     const result = await this.playlistsService.addSong(id, req.user.id, addSongDto)
@@ -144,7 +160,7 @@ export class PlaylistsController {
   async removeSong(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('songId', ParseUUIDPipe) songId: string,
-    @Request() req
+    @Request() req: AuthenticatedRequest
   ) {
     const result = await this.playlistsService.removeSong(id, songId, req.user.id)
     return {

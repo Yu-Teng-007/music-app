@@ -129,7 +129,7 @@ export class AuthService {
 
       const tokens = await this.generateTokens(user)
       return tokens
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('刷新令牌无效')
     }
   }
@@ -216,6 +216,7 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, resetPasswordToken, resetPasswordExpires, ...sanitizedUser } = user
     return sanitizedUser
   }
@@ -253,8 +254,16 @@ export class AuthService {
 
     // TODO: 发送邮件
     // 在实际应用中，这里应该发送包含重置链接的邮件
-    console.log(`重置密码令牌: ${resetToken}`)
-    console.log(`重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`)
+    // console.log(`重置密码令牌: ${resetToken}`)
+    // console.log(`重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`)
+
+    // 临时日志记录，生产环境应移除
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`重置密码令牌: ${resetToken}`)
+      // eslint-disable-next-line no-console
+      console.log(`重置链接: http://localhost:5173/auth/reset-password?token=${resetToken}`)
+    }
 
     return { message: '重置密码邮件已发送' }
   }

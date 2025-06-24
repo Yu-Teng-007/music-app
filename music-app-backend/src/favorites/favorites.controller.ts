@@ -15,6 +15,14 @@ import { FavoritesService } from './favorites.service'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { AddFavoriteDto, QueryFavoritesDto } from '../dto/favorite.dto'
 
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string
+    email: string
+    username: string
+  }
+}
+
 @Controller('favorites')
 @UseGuards(JwtAuthGuard)
 export class FavoritesController {
@@ -22,7 +30,7 @@ export class FavoritesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async addFavorite(@Request() req, @Body() addFavoriteDto: AddFavoriteDto) {
+  async addFavorite(@Request() req: AuthenticatedRequest, @Body() addFavoriteDto: AddFavoriteDto) {
     const result = await this.favoritesService.addFavorite(req.user.id, addFavoriteDto)
     return {
       success: true,
@@ -33,7 +41,7 @@ export class FavoritesController {
 
   @Delete(':songId')
   @HttpCode(HttpStatus.OK)
-  async removeFavorite(@Request() req, @Param('songId') songId: string) {
+  async removeFavorite(@Request() req: AuthenticatedRequest, @Param('songId') songId: string) {
     await this.favoritesService.removeFavorite(req.user.id, songId)
     return {
       success: true,
@@ -42,7 +50,7 @@ export class FavoritesController {
   }
 
   @Get()
-  async getFavorites(@Request() req, @Query() queryDto: QueryFavoritesDto) {
+  async getFavorites(@Request() req: AuthenticatedRequest, @Query() queryDto: QueryFavoritesDto) {
     const result = await this.favoritesService.getFavorites(req.user.id, queryDto)
     return {
       success: true,
@@ -53,7 +61,7 @@ export class FavoritesController {
   }
 
   @Get('check/:songId')
-  async checkFavorite(@Request() req, @Param('songId') songId: string) {
+  async checkFavorite(@Request() req: AuthenticatedRequest, @Param('songId') songId: string) {
     const isFavorite = await this.favoritesService.isFavorite(req.user.id, songId)
     return {
       success: true,
@@ -63,7 +71,7 @@ export class FavoritesController {
   }
 
   @Get('count')
-  async getFavoriteCount(@Request() req) {
+  async getFavoriteCount(@Request() req: AuthenticatedRequest) {
     const count = await this.favoritesService.getFavoriteCount(req.user.id)
     return {
       success: true,

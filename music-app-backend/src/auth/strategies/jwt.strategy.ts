@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(payload: any) {
+  async validate(payload: { sub: string; email: string; username: string }) {
     try {
       const user = await this.authService.validateUser(payload.sub)
       return {
@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         name: user.name,
         role: user.role,
       }
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Token无效')
     }
   }

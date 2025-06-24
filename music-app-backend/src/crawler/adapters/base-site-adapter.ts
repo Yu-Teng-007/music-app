@@ -84,7 +84,7 @@ export abstract class BaseSiteAdapter implements ISiteAdapter {
           error: error.message,
           url: error.config?.url,
         })
-        return Promise.reject(error)
+        return Promise.reject(new Error(error.message || 'Request failed'))
       }
     )
   }
@@ -226,7 +226,7 @@ export abstract class BaseSiteAdapter implements ISiteAdapter {
   protected cleanText(text: string, patterns: string[] = []): string {
     let cleaned = text
       .replace(/\s+/g, ' ')
-      .replace(/[^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a\s\-\(\)\[\]]/g, '')
+      .replace(/[^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a\s\-()[\]]/g, '')
       .trim()
 
     // 应用自定义清理模式

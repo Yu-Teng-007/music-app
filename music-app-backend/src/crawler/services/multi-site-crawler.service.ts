@@ -244,9 +244,11 @@ export class MultiSiteCrawlerService {
             added: 0,
             skipped: 0,
             errors: 1,
-            message: siteResult.reason?.message || '未知错误',
+            message: (siteResult.reason as Error)?.message || '未知错误',
           })
-          result.errors.push(`${adapter.siteName}: ${siteResult.reason?.message || '未知错误'}`)
+          result.errors.push(
+            `${adapter.siteName}: ${(siteResult.reason as Error)?.message || '未知错误'}`
+          )
         }
 
         this.updateSiteProgress(adapter.siteName, 'completed', 100, '爬取完成')
@@ -291,11 +293,11 @@ export class MultiSiteCrawlerService {
       this.logger.error('多网站爬取失败', error)
       this.crawlProgress.status = 'error'
       this.crawlProgress.endTime = new Date()
-      this.crawlProgress.message = `多网站爬取失败: ${error.message}`
+      this.crawlProgress.message = `多网站爬取失败: ${(error as Error).message}`
 
       result.success = false
       result.message = this.crawlProgress.message
-      result.errors.push(error.message)
+      result.errors.push((error as Error).message)
       return result
     }
   }
@@ -347,11 +349,11 @@ export class MultiSiteCrawlerService {
       }
     } catch (error) {
       this.logger.error(`从 ${adapter.siteName} 爬取失败`, error)
-      this.updateSiteProgress(adapter.siteName, 'error', 0, `爬取失败: ${error.message}`)
+      this.updateSiteProgress(adapter.siteName, 'error', 0, `爬取失败: ${(error as Error).message}`)
 
       return {
         success: false,
-        message: error.message,
+        message: (error as Error).message,
         songs: [],
       }
     }
@@ -520,7 +522,7 @@ export class MultiSiteCrawlerService {
           siteName: adapter.siteName,
           success: false,
           responseTime: 0,
-          error: error.message,
+          error: (error as Error).message,
         })
       }
     }

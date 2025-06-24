@@ -152,7 +152,7 @@ export class SongsService {
 
   async getStats() {
     const totalSongs = await this.songRepository.count()
-    const totalPlays = await this.songRepository
+    const totalPlaysResult = await this.songRepository
       .createQueryBuilder('song')
       .select('SUM(song.playCount)', 'total')
       .getRawOne()
@@ -179,7 +179,7 @@ export class SongsService {
 
     return {
       totalSongs,
-      totalPlays: totalPlays?.total || 0,
+      totalPlays: totalPlaysResult?.total || 0,
       topGenres,
       topArtists,
     }

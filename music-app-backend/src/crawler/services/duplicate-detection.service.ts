@@ -210,14 +210,16 @@ export class DuplicateDetectionService {
   /**
    * 查找音频指纹匹配
    */
-  private async findFingerprintMatch(
+  private findFingerprintMatch(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _newSong: CrawlSongDto,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _config: SimilarityConfig
   ): Promise<DuplicateDetectionResult | null> {
     // 这里应该集成音频指纹库，如 AcoustID 或自定义实现
     // 目前返回 null，表示未实现
     this.logger.debug('音频指纹匹配功能待实现')
-    return null
+    return Promise.resolve(null)
   }
 
   /**
@@ -520,6 +522,7 @@ export class DuplicateDetectionService {
     duplicatesRemoved: number
     errors: string[]
   }> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const finalConfig = { ...this.defaultConfig, ...config }
     const errors: string[] = []
     let duplicatesFound = 0
@@ -537,16 +540,21 @@ export class DuplicateDetectionService {
         if (!duplicateGroups.has(key)) {
           duplicateGroups.set(key, [])
         }
-        duplicateGroups.get(key)!.push(song)
+        const group = duplicateGroups.get(key)
+        if (group) {
+          group.push(song)
+        }
       }
 
       // 处理重复组
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const [key, songs] of duplicateGroups) {
         if (songs.length > 1) {
           duplicatesFound += songs.length - 1
 
           if (!dryRun) {
             // 保留第一个，删除其余的
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const toKeep = songs[0]
             const toRemove = songs.slice(1)
 
@@ -555,7 +563,7 @@ export class DuplicateDetectionService {
                 await this.songRepository.remove(song)
                 duplicatesRemoved++
               } catch (error) {
-                errors.push(`删除歌曲失败 ${song.id}: ${error.message}`)
+                errors.push(`删除歌曲失败 ${song.id}: ${(error as Error).message}`)
               }
             }
           }
@@ -573,7 +581,7 @@ export class DuplicateDetectionService {
       }
     } catch (error) {
       this.logger.error('重复清理失败', error)
-      errors.push(`清理过程失败: ${error.message}`)
+      errors.push(`清理过程失败: ${(error as Error).message}`)
 
       return {
         duplicatesFound,

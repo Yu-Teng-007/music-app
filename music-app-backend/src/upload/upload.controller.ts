@@ -22,7 +22,7 @@ export class UploadController {
       throw new BadRequestException('请选择要上传的音乐文件')
     }
 
-    const result = await this.uploadService.uploadMusic(file)
+    const result = this.uploadService.uploadMusic(file)
     return {
       success: true,
       data: result,
@@ -37,7 +37,7 @@ export class UploadController {
       throw new BadRequestException('请选择要上传的封面图片')
     }
 
-    const result = await this.uploadService.uploadCover(file)
+    const result = this.uploadService.uploadCover(file)
     return {
       success: true,
       data: result,

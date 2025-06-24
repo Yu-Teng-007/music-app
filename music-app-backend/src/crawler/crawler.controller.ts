@@ -55,7 +55,7 @@ export class CrawlerController {
       this.logger.error('爬取请求处理失败', error)
       return {
         success: false,
-        message: error.message || '爬取请求处理失败',
+        message: (error as Error).message || '爬取请求处理失败',
       }
     }
   }
@@ -312,7 +312,7 @@ export class CrawlerController {
       this.logger.error('多网站爬取失败', error)
       return {
         success: false,
-        message: error.message || '多网站爬取失败',
+        message: (error as Error).message || '多网站爬取失败',
       }
     }
   }

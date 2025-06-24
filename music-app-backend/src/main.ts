@@ -10,7 +10,7 @@ async function bootstrap() {
 
   // 启用CORS
   app.enableCors({
-    origin: configService.get('app.frontendUrl'),
+    origin: configService.get<string>('app.frontendUrl'),
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -34,9 +34,16 @@ async function bootstrap() {
   // 设置全局前缀
   app.setGlobalPrefix('api')
 
-  const port = configService.get('app.port')
+  const port = configService.get<number>('app.port') || 3000
   await app.listen(port)
 
+  // eslint-disable-next-line no-console
   console.log(`🚀 Application is running on: http://localhost:${port}/api`)
 }
-bootstrap()
+
+// 启动应用并处理错误
+void bootstrap().catch(error => {
+  // eslint-disable-next-line no-console
+  console.error('Failed to start application:', error)
+  process.exit(1)
+})
