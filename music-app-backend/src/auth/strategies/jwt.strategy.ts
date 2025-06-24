@@ -25,6 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         email: user.email,
         username: user.username,
         name: user.name,
+        role: user.role,
       }
     } catch (error) {
       throw new UnauthorizedException('Token无效')

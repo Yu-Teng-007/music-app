@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config'
 import { TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { User, Song, Playlist } from '../entities'
+import { User, Song, Playlist, Favorite, Genre } from '../entities'
 
 export default registerAs(
   'database',
@@ -11,7 +11,7 @@ export default registerAs(
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_DATABASE || 'music_app',
-    entities: [User, Song, Playlist],
+    entities: [User, Song, Playlist, Favorite, Genre],
     synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
     charset: 'utf8mb4',

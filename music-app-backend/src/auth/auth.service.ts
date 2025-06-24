@@ -195,6 +195,7 @@ export class AuthService {
       email: user.email,
       username: user.username,
       name: user.name,
+      role: user.role,
     }
 
     const [accessToken, refreshToken] = await Promise.all([

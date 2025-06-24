@@ -17,6 +17,7 @@ interface SeedSongData {
 }
 
 const recommendedSongs: SeedSongData[] = [
+  // 华语流行经典
   {
     title: '晴天',
     artist: '周杰伦',
@@ -24,9 +25,31 @@ const recommendedSongs: SeedSongData[] = [
     duration: 269,
     genre: '流行',
     year: 2003,
-    playCount: 9200,
+    playCount: 12500,
     lyrics: '故事的小黄花 从出生那年就飘着\n童年的荡秋千 随记忆一直摇到现在',
   },
+  {
+    title: '稻香',
+    artist: '周杰伦',
+    album: '魔杰座',
+    duration: 223,
+    genre: '流行',
+    year: 2008,
+    playCount: 11200,
+    lyrics: '对这个世界如果你有太多的抱怨\n跌倒了就不敢继续往前走',
+  },
+  {
+    title: '青花瓷',
+    artist: '周杰伦',
+    album: '我很忙',
+    duration: 228,
+    genre: '流行',
+    year: 2007,
+    playCount: 10800,
+    lyrics: '素胚勾勒出青花笔锋浓转淡\n瓶身描绘的牡丹一如你初妆',
+  },
+
+  // 摇滚经典
   {
     title: '夜空中最亮的星',
     artist: '逃跑计划',
@@ -34,9 +57,31 @@ const recommendedSongs: SeedSongData[] = [
     duration: 276,
     genre: '摇滚',
     year: 2011,
-    playCount: 8500,
+    playCount: 9800,
     lyrics: '夜空中最亮的星 能否听清\n那仰望的人 心底的孤独和叹息',
   },
+  {
+    title: '海阔天空',
+    artist: 'Beyond',
+    album: '乐与怒',
+    duration: 326,
+    genre: '摇滚',
+    year: 1993,
+    playCount: 15600,
+    lyrics: '今天我 寒夜里看雪飘过\n怀着冷却了的心窝飘远方',
+  },
+  {
+    title: '真的爱你',
+    artist: 'Beyond',
+    album: 'Beyond IV',
+    duration: 267,
+    genre: '摇滚',
+    year: 1989,
+    playCount: 14200,
+    lyrics: '无法可修饰的一对手\n带出温暖永远在背后',
+  },
+
+  // 民谣精选
   {
     title: '南山南',
     artist: '马頔',
@@ -44,7 +89,7 @@ const recommendedSongs: SeedSongData[] = [
     duration: 287,
     genre: '民谣',
     year: 2014,
-    playCount: 7800,
+    playCount: 8900,
     lyrics: '你在南方的艳阳里 大雪纷飞\n我在北方的寒夜里 四季如春',
   },
   {
@@ -54,8 +99,164 @@ const recommendedSongs: SeedSongData[] = [
     duration: 264,
     genre: '民谣',
     year: 2017,
-    playCount: 7200,
+    playCount: 8200,
     lyrics: '当你走进这欢乐场 背上所有的梦与想\n各色的脸上各色的妆 没人记得你的模样',
+  },
+  {
+    title: '成都',
+    artist: '赵雷',
+    album: '无法长大',
+    duration: 327,
+    genre: '民谣',
+    year: 2016,
+    playCount: 9500,
+    lyrics: '让我掉下眼泪的 不止昨夜的酒\n让我依依不舍的 不止你的温柔',
+  },
+
+  // 电子音乐
+  {
+    title: 'Faded',
+    artist: 'Alan Walker',
+    album: 'Different World',
+    duration: 212,
+    genre: '电子',
+    year: 2015,
+    playCount: 13200,
+    lyrics: 'You were the shadow to my light\nDid you feel us?',
+  },
+  {
+    title: 'Closer',
+    artist: 'The Chainsmokers',
+    album: 'Collage',
+    duration: 244,
+    genre: '电子',
+    year: 2016,
+    playCount: 11800,
+    lyrics: 'So baby pull me closer in the backseat of your Rover',
+  },
+
+  // 古典音乐
+  {
+    title: '月光奏鸣曲',
+    artist: '贝多芬',
+    album: '钢琴奏鸣曲集',
+    duration: 900,
+    genre: '古典',
+    year: 1801,
+    playCount: 6500,
+    lyrics: '',
+  },
+  {
+    title: '四季·春',
+    artist: '维瓦尔第',
+    album: '四季',
+    duration: 600,
+    genre: '古典',
+    year: 1725,
+    playCount: 5800,
+    lyrics: '',
+  },
+
+  // 爵士乐
+  {
+    title: 'Fly Me to the Moon',
+    artist: 'Frank Sinatra',
+    album: 'It Might as Well Be Swing',
+    duration: 148,
+    genre: '爵士',
+    year: 1964,
+    playCount: 7200,
+    lyrics: 'Fly me to the moon\nLet me play among the stars',
+  },
+  {
+    title: 'What a Wonderful World',
+    artist: 'Louis Armstrong',
+    album: 'What a Wonderful World',
+    duration: 137,
+    genre: '爵士',
+    year: 1967,
+    playCount: 8100,
+    lyrics: 'I see trees of green, red roses too\nI see them bloom for me and you',
+  },
+
+  // 说唱/Hip-Hop
+  {
+    title: '中国话',
+    artist: 'S.H.E',
+    album: 'PLAY',
+    duration: 198,
+    genre: '说唱',
+    year: 2007,
+    playCount: 7500,
+    lyrics: '全世界都在学中国话 孔夫子的话 越来越国际化',
+  },
+  {
+    title: '本草纲目',
+    artist: '周杰伦',
+    album: '依然范特西',
+    duration: 239,
+    genre: '说唱',
+    year: 2006,
+    playCount: 8800,
+    lyrics: '如果华佗再世 崇洋都被医治\n外邦来学汉字 激发我民族意识',
+  },
+
+  // 蓝调
+  {
+    title: 'The Thrill Is Gone',
+    artist: 'B.B. King',
+    album: 'Completely Well',
+    duration: 311,
+    genre: '蓝调',
+    year: 1969,
+    playCount: 6200,
+    lyrics: 'The thrill is gone\nThe thrill is gone away',
+  },
+
+  // 乡村音乐
+  {
+    title: 'Country Roads',
+    artist: 'John Denver',
+    album: 'Poems, Prayers & Promises',
+    duration: 195,
+    genre: '乡村',
+    year: 1971,
+    playCount: 7800,
+    lyrics: 'Country roads, take me home\nTo the place I belong',
+  },
+
+  // 新世纪音乐
+  {
+    title: 'River Flows in You',
+    artist: 'Yiruma',
+    album: 'First Love',
+    duration: 210,
+    genre: '新世纪',
+    year: 2001,
+    playCount: 9200,
+    lyrics: '',
+  },
+  {
+    title: 'Kiss the Rain',
+    artist: 'Yiruma',
+    album: 'From the Yellow Room',
+    duration: 280,
+    genre: '新世纪',
+    year: 2003,
+    playCount: 8500,
+    lyrics: '',
+  },
+
+  // 轻音乐
+  {
+    title: '天空之城',
+    artist: '久石让',
+    album: '天空之城 原声带',
+    duration: 240,
+    genre: '轻音乐',
+    year: 1986,
+    playCount: 11500,
+    lyrics: '',
   },
   {
     title: '红豆',
