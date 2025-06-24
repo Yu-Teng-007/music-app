@@ -49,22 +49,19 @@ async function seedAdminUser() {
 
     // 检查管理员是否已存在
     const existingAdmin = await userRepository.findOne({
-      where: [
-        { email: adminData.email },
-        { username: adminData.username },
-      ],
+      where: [{ email: adminData.email }, { username: adminData.username }],
     })
 
     if (existingAdmin) {
       console.log('管理员账号已存在，跳过创建')
-      
+
       // 如果存在但角色不是管理员，则更新角色
       if (existingAdmin.role !== UserRole.ADMIN) {
         existingAdmin.role = UserRole.ADMIN
         await userRepository.save(existingAdmin)
         console.log('已将现有用户升级为管理员')
       }
-      
+
       await app.close()
       return
     }
@@ -90,7 +87,6 @@ async function seedAdminUser() {
     console.log('👤 用户名:', adminData.username)
     console.log('🔑 密码:', adminData.password)
     console.log('⚠️  请在生产环境中及时修改默认密码！')
-
   } catch (error) {
     console.error('❌ 创建管理员账号失败:', error.message)
     throw error

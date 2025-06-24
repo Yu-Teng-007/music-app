@@ -10,7 +10,7 @@ import { Repository } from 'typeorm'
  */
 async function quickSeed() {
   const app = await NestFactory.createApplicationContext(AppModule)
-  
+
   const userRepository = app.get<Repository<User>>(getRepositoryToken(User))
   const songRepository = app.get<Repository<Song>>(getRepositoryToken(Song))
   const playlistRepository = app.get<Repository<Playlist>>(getRepositoryToken(Playlist))
@@ -22,7 +22,7 @@ async function quickSeed() {
     // 检查是否已有数据
     const userCount = await userRepository.count()
     const songCount = await songRepository.count()
-    
+
     if (userCount > 0 || songCount > 0) {
       console.log('📊 数据库已有数据，跳过快速初始化')
       console.log(`  用户数量: ${userCount}`)
@@ -35,7 +35,7 @@ async function quickSeed() {
     console.log('👤 创建管理员用户...')
     const bcrypt = await import('bcryptjs')
     const hashedPassword = await bcrypt.hash('admin123456', 12)
-    
+
     const adminUser = userRepository.create({
       email: 'admin@musicapp.com',
       username: 'admin',
@@ -141,7 +141,6 @@ async function quickSeed() {
     console.log('  📧 邮箱: admin@musicapp.com')
     console.log('  👤 用户名: admin')
     console.log('  🔑 密码: admin123456')
-
   } catch (error) {
     console.error('❌ 快速种子文件初始化失败:', error.message)
     throw error

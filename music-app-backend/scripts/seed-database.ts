@@ -19,8 +19,8 @@ const DEFAULT_OPTIONS: SeedOptions = {
 
 async function runSeeder(name: string, seederFunction: () => Promise<void>) {
   console.log(`\n🌱 开始运行种子文件: ${name}`)
-  console.log('=' .repeat(50))
-  
+  console.log('='.repeat(50))
+
   try {
     await seederFunction()
     console.log(`✅ ${name} 完成`)
@@ -32,12 +32,12 @@ async function runSeeder(name: string, seederFunction: () => Promise<void>) {
 
 async function seedDatabase(options: Partial<SeedOptions> = {}) {
   const config = { ...DEFAULT_OPTIONS, ...options }
-  
+
   console.log('🚀 开始数据库种子文件初始化')
   console.log(`📍 环境: ${config.environment}`)
   console.log(`🔄 强制重新创建: ${config.force ? '是' : '否'}`)
   console.log(`⏭️  跳过已存在数据: ${config.skipExisting ? '是' : '否'}`)
-  console.log('=' .repeat(60))
+  console.log('='.repeat(60))
 
   try {
     // 1. 创建管理员用户
@@ -65,7 +65,7 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
     })
 
     console.log('\n🎉 所有种子文件运行完成！')
-    console.log('=' .repeat(60))
+    console.log('='.repeat(60))
     console.log('📊 数据库初始化摘要:')
     console.log('  ✅ 管理员用户已创建')
     console.log('  ✅ 音乐分类已添加')
@@ -74,12 +74,13 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
     console.log('\n🔐 管理员登录信息:')
     console.log(`  📧 邮箱: admin@musicapp.com`)
     console.log(`  👤 用户名: admin`)
-    console.log(`  🔑 密码: ${config.environment === 'production' ? 'MusicApp@Admin2024!' : 'admin123456'}`)
+    console.log(
+      `  🔑 密码: ${config.environment === 'production' ? 'MusicApp@Admin2024!' : 'admin123456'}`
+    )
     console.log('\n⚠️  重要提醒:')
     console.log('  - 生产环境请及时修改默认管理员密码')
     console.log('  - 建议定期备份数据库')
     console.log('  - 确保上传目录权限正确设置')
-
   } catch (error) {
     console.error('\n💥 种子文件运行失败:', error.message)
     console.error('请检查数据库连接和配置是否正确')
@@ -94,7 +95,7 @@ function parseArguments(): Partial<SeedOptions> {
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i]
-    
+
     switch (arg) {
       case '--env':
       case '--environment':
@@ -104,15 +105,15 @@ function parseArguments(): Partial<SeedOptions> {
         }
         i++
         break
-      
+
       case '--force':
         options.force = true
         break
-      
+
       case '--no-skip':
         options.skipExisting = false
         break
-      
+
       case '--help':
       case '-h':
         console.log(`

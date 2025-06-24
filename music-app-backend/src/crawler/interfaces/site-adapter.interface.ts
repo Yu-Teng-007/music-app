@@ -85,7 +85,7 @@ export enum CrawlType {
   LATEST = 'latest',
   SEARCH = 'search',
   BY_ARTIST = 'by_artist',
-  BY_GENRE = 'by_genre'
+  BY_GENRE = 'by_genre',
 }
 
 /**
