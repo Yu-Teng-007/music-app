@@ -5,19 +5,8 @@
       <div class="auth-header">
         <div class="logo">
           <div class="logo-icon">🎵</div>
-          <h1 class="logo-text">音乐应用</h1>
+          <h1 class="logo-text">气泡音乐</h1>
         </div>
-        <p class="auth-subtitle">
-          {{ isLogin ? '欢迎回来，开始您的音乐之旅' : '加入我们，发现更多精彩音乐' }}
-        </p>
-      </div>
-
-      <!-- 切换标签 -->
-      <div class="auth-tabs">
-        <button :class="['tab-button', { active: isLogin }]" @click="switchToLogin">登录</button>
-        <button :class="['tab-button', { active: !isLogin }]" @click="switchToRegister">
-          注册
-        </button>
       </div>
 
       <!-- 表单容器 -->
@@ -36,54 +25,59 @@
 
         <!-- 登录表单 -->
         <form v-if="isLogin" @submit.prevent="handleLogin" class="auth-form">
-          <!-- 登录方式选择 -->
-          <div class="auth-type-tabs">
-            <button
-              type="button"
-              :class="['type-tab', { active: loginType === 'username' }]"
-              @click="switchLoginType('username')"
-            >
-              用户名登录
-            </button>
-            <button
-              type="button"
-              :class="['type-tab', { active: loginType === 'phone' }]"
-              @click="switchLoginType('phone')"
-            >
-              手机号登录
-            </button>
-          </div>
-
-          <!-- 手机号登录 -->
+          <!-- 手机号登录（默认） -->
           <template v-if="loginType === 'phone'">
             <div class="form-group">
               <label for="login-phone" class="form-label">手机号</label>
-              <input
-                id="login-phone"
-                v-model="loginForm.phone"
-                type="tel"
-                class="form-input"
-                :class="{ error: loginErrors.phone }"
-                placeholder="请输入您的手机号"
-                autocomplete="tel"
-                required
-              />
+              <div class="input-wrapper">
+                <input
+                  id="login-phone"
+                  v-model="loginForm.phone"
+                  type="tel"
+                  class="form-input"
+                  :class="{ error: loginErrors.phone }"
+                  placeholder="请输入您的手机号"
+                  autocomplete="tel"
+                  required
+                />
+                <button
+                  v-if="loginForm.phone"
+                  type="button"
+                  class="clear-button"
+                  @click="loginForm.phone = ''"
+                >
+                  ✕
+                </button>
+              </div>
               <span v-if="loginErrors.phone" class="field-error">{{ loginErrors.phone }}</span>
+              <div class="form-hint">
+                <span class="hint-text">如果手机号未注册，登录时将自动为您注册账号</span>
+              </div>
             </div>
 
             <div class="form-group">
               <label for="login-sms-code" class="form-label">验证码</label>
               <div class="sms-input-wrapper">
-                <input
-                  id="login-sms-code"
-                  v-model="loginForm.smsCode"
-                  type="text"
-                  class="form-input"
-                  :class="{ error: loginErrors.smsCode }"
-                  placeholder="请输入验证码"
-                  maxlength="6"
-                  required
-                />
+                <div class="input-wrapper">
+                  <input
+                    id="login-sms-code"
+                    v-model="loginForm.smsCode"
+                    type="text"
+                    class="form-input"
+                    :class="{ error: loginErrors.smsCode }"
+                    placeholder="请输入验证码"
+                    maxlength="6"
+                    required
+                  />
+                  <button
+                    v-if="loginForm.smsCode"
+                    type="button"
+                    class="clear-button"
+                    @click="loginForm.smsCode = ''"
+                  >
+                    ✕
+                  </button>
+                </div>
                 <button
                   type="button"
                   class="sms-button"
@@ -101,16 +95,26 @@
           <template v-else>
             <div class="form-group">
               <label for="login-username" class="form-label">用户名</label>
-              <input
-                id="login-username"
-                v-model="loginForm.username"
-                type="text"
-                class="form-input"
-                :class="{ error: loginErrors.username }"
-                placeholder="请输入您的用户名"
-                autocomplete="username"
-                required
-              />
+              <div class="input-wrapper">
+                <input
+                  id="login-username"
+                  v-model="loginForm.username"
+                  type="text"
+                  class="form-input"
+                  :class="{ error: loginErrors.username }"
+                  placeholder="请输入您的用户名"
+                  autocomplete="username"
+                  required
+                />
+                <button
+                  v-if="loginForm.username"
+                  type="button"
+                  class="clear-button"
+                  @click="loginForm.username = ''"
+                >
+                  ✕
+                </button>
+              </div>
               <span v-if="loginErrors.username" class="field-error">{{
                 loginErrors.username
               }}</span>
@@ -118,7 +122,7 @@
 
             <div class="form-group">
               <label for="login-password" class="form-label">密码</label>
-              <div class="password-input-wrapper">
+              <div class="input-wrapper">
                 <input
                   id="login-password"
                   v-model="loginForm.password"
@@ -129,6 +133,14 @@
                   autocomplete="current-password"
                   required
                 />
+                <button
+                  v-if="loginForm.password"
+                  type="button"
+                  class="clear-button"
+                  @click="loginForm.password = ''"
+                >
+                  ✕
+                </button>
                 <button
                   type="button"
                   class="password-toggle"
@@ -144,89 +156,45 @@
           </template>
 
           <div class="form-options">
-            <label class="checkbox-label">
-              <input v-model="rememberMe" type="checkbox" class="checkbox" />
-              <span class="checkbox-text">记住我</span>
-            </label>
+            <!-- 登录方式切换入口 -->
+            <div class="login-type-switch">
+              <button
+                v-if="loginType === 'username'"
+                type="button"
+                class="link-button"
+                @click="switchLoginType('phone')"
+              >
+                手机号登录
+              </button>
+              <button v-else type="button" class="link-button" @click="switchLoginType('username')">
+                用户名登录
+              </button>
+            </div>
           </div>
 
           <button type="submit" class="submit-button" :disabled="authStore.isLoading">
             <span v-if="authStore.isLoading" class="loading-spinner">⏳</span>
             {{ authStore.isLoading ? '登录中...' : '登录' }}
           </button>
+
+          <!-- 注册入口 -->
+          <div class="register-link">
+            <span class="register-text">还没有账号？</span>
+            <button type="button" class="link-button" @click="switchToRegister">立即注册</button>
+          </div>
+
+          <!-- 开发工具入口（仅开发环境） -->
+          <div v-if="isDevelopment" class="dev-tools-link">
+            <router-link to="/dev-tools" class="link-button">🛠️ 开发工具</router-link>
+          </div>
         </form>
 
         <!-- 注册表单 -->
         <form v-else @submit.prevent="handleRegister" class="auth-form">
-          <!-- 注册方式选择 -->
-          <div class="auth-type-tabs">
-            <button
-              type="button"
-              :class="['type-tab', { active: registerType === 'phone' }]"
-              @click="switchRegisterType('phone')"
-            >
-              手机号注册
-            </button>
-            <button
-              type="button"
-              :class="['type-tab', { active: registerType === 'username' }]"
-              @click="switchRegisterType('username')"
-            >
-              用户名注册
-            </button>
-          </div>
-
-          <!-- 手机号注册 -->
-          <template v-if="registerType === 'phone'">
-            <div class="form-group">
-              <label for="register-phone" class="form-label">手机号</label>
-              <input
-                id="register-phone"
-                v-model="registerForm.phone"
-                type="tel"
-                class="form-input"
-                :class="{ error: registerErrors.phone }"
-                placeholder="请输入您的手机号"
-                autocomplete="tel"
-                required
-              />
-              <span v-if="registerErrors.phone" class="field-error">{{
-                registerErrors.phone
-              }}</span>
-            </div>
-
-            <div class="form-group">
-              <label for="register-sms-code" class="form-label">验证码</label>
-              <div class="sms-input-wrapper">
-                <input
-                  id="register-sms-code"
-                  v-model="registerForm.smsCode"
-                  type="text"
-                  class="form-input"
-                  :class="{ error: registerErrors.smsCode }"
-                  placeholder="请输入验证码"
-                  maxlength="6"
-                  required
-                />
-                <button
-                  type="button"
-                  class="sms-button"
-                  :disabled="smsCountdown > 0 || authStore.isLoading"
-                  @click="sendSmsCode('register')"
-                >
-                  {{ smsCountdown > 0 ? `${smsCountdown}s` : '获取验证码' }}
-                </button>
-              </div>
-              <span v-if="registerErrors.smsCode" class="field-error">{{
-                registerErrors.smsCode
-              }}</span>
-            </div>
-          </template>
-
           <!-- 用户名注册 -->
-          <template v-else>
-            <div class="form-group">
-              <label for="register-username" class="form-label">用户名</label>
+          <div class="form-group">
+            <label for="register-username" class="form-label">用户名</label>
+            <div class="input-wrapper">
               <input
                 id="register-username"
                 v-model="registerForm.username"
@@ -237,63 +205,87 @@
                 autocomplete="username"
                 required
               />
-              <span v-if="registerErrors.username" class="field-error">{{
-                registerErrors.username
-              }}</span>
+              <button
+                v-if="registerForm.username"
+                type="button"
+                class="clear-button"
+                @click="registerForm.username = ''"
+              >
+                ✕
+              </button>
             </div>
+            <span v-if="registerErrors.username" class="field-error">{{
+              registerErrors.username
+            }}</span>
+          </div>
 
-            <div class="form-group">
-              <label for="register-password" class="form-label">密码</label>
-              <div class="password-input-wrapper">
-                <input
-                  id="register-password"
-                  v-model="registerForm.password"
-                  :type="showRegisterPassword ? 'text' : 'password'"
-                  class="form-input"
-                  :class="{ error: registerErrors.password }"
-                  placeholder="请输入密码（至少6位）"
-                  autocomplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  class="password-toggle"
-                  @click="showRegisterPassword = !showRegisterPassword"
-                >
-                  {{ showRegisterPassword ? '👁️' : '👁️‍🗨️' }}
-                </button>
-              </div>
-              <span v-if="registerErrors.password" class="field-error">{{
-                registerErrors.password
-              }}</span>
+          <div class="form-group">
+            <label for="register-password" class="form-label">密码</label>
+            <div class="input-wrapper">
+              <input
+                id="register-password"
+                v-model="registerForm.password"
+                :type="showRegisterPassword ? 'text' : 'password'"
+                class="form-input"
+                :class="{ error: registerErrors.password }"
+                placeholder="请输入密码（至少6位）"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                v-if="registerForm.password"
+                type="button"
+                class="clear-button"
+                @click="registerForm.password = ''"
+              >
+                ✕
+              </button>
+              <button
+                type="button"
+                class="password-toggle"
+                @click="showRegisterPassword = !showRegisterPassword"
+              >
+                {{ showRegisterPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
             </div>
+            <span v-if="registerErrors.password" class="field-error">{{
+              registerErrors.password
+            }}</span>
+          </div>
 
-            <div class="form-group">
-              <label for="register-confirm-password" class="form-label">确认密码</label>
-              <div class="password-input-wrapper">
-                <input
-                  id="register-confirm-password"
-                  v-model="registerForm.confirmPassword"
-                  :type="showConfirmPassword ? 'text' : 'password'"
-                  class="form-input"
-                  :class="{ error: registerErrors.confirmPassword }"
-                  placeholder="请再次输入密码"
-                  autocomplete="new-password"
-                  required
-                />
-                <button
-                  type="button"
-                  class="password-toggle"
-                  @click="showConfirmPassword = !showConfirmPassword"
-                >
-                  {{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}
-                </button>
-              </div>
-              <span v-if="registerErrors.confirmPassword" class="field-error">{{
-                registerErrors.confirmPassword
-              }}</span>
+          <div class="form-group">
+            <label for="register-confirm-password" class="form-label">确认密码</label>
+            <div class="input-wrapper">
+              <input
+                id="register-confirm-password"
+                v-model="registerForm.confirmPassword"
+                :type="showConfirmPassword ? 'text' : 'password'"
+                class="form-input"
+                :class="{ error: registerErrors.confirmPassword }"
+                placeholder="请再次输入密码"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                v-if="registerForm.confirmPassword"
+                type="button"
+                class="clear-button"
+                @click="registerForm.confirmPassword = ''"
+              >
+                ✕
+              </button>
+              <button
+                type="button"
+                class="password-toggle"
+                @click="showConfirmPassword = !showConfirmPassword"
+              >
+                {{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
             </div>
-          </template>
+            <span v-if="registerErrors.confirmPassword" class="field-error">{{
+              registerErrors.confirmPassword
+            }}</span>
+          </div>
 
           <div class="form-options">
             <label class="checkbox-label">
@@ -313,24 +305,13 @@
             <span v-if="authStore.isLoading" class="loading-spinner">⏳</span>
             {{ authStore.isLoading ? '注册中...' : '注册' }}
           </button>
-        </form>
-      </div>
 
-      <!-- 第三方登录 -->
-      <div class="social-login">
-        <div class="divider">
-          <span class="divider-text">或者使用</span>
-        </div>
-        <div class="social-buttons">
-          <button class="social-button wechat" @click="handleSocialLogin('wechat')">
-            <span class="social-icon">💬</span>
-            微信登录
-          </button>
-          <button class="social-button qq" @click="handleSocialLogin('qq')">
-            <span class="social-icon">🐧</span>
-            QQ登录
-          </button>
-        </div>
+          <!-- 返回登录入口 -->
+          <div class="login-link">
+            <span class="login-text">已有账号？</span>
+            <button type="button" class="link-button" @click="switchToLogin">立即登录</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -356,10 +337,11 @@ const authStore = useAuthStore()
 // 页面状态
 const isLogin = ref(true)
 const successMessage = ref('')
+const isDevelopment = ref(import.meta.env.DEV)
 
 // 登录/注册方式
-const loginType = ref<'phone' | 'username'>('username')
-const registerType = ref<'phone' | 'username'>('phone')
+const loginType = ref<'phone' | 'username'>('phone')
+const registerType = ref<'phone' | 'username'>('username')
 
 // 密码显示状态
 const showLoginPassword = ref(false)
@@ -372,7 +354,7 @@ const smsTimer = ref<NodeJS.Timeout | null>(null)
 
 // 表单数据
 const loginForm = reactive<LoginCredentials>({
-  loginType: 'username',
+  loginType: 'phone',
   phone: '',
   smsCode: '',
   username: '',
@@ -380,7 +362,7 @@ const loginForm = reactive<LoginCredentials>({
 })
 
 const registerForm = reactive<RegisterCredentials>({
-  registerType: 'phone',
+  registerType: 'username',
   phone: '',
   smsCode: '',
   username: '',
@@ -389,7 +371,6 @@ const registerForm = reactive<RegisterCredentials>({
 })
 
 // 其他表单状态
-const rememberMe = ref(false)
 const agreeToTerms = ref(false)
 
 // 表单验证错误
@@ -425,11 +406,21 @@ const switchToRegister = () => {
 const switchLoginType = (type: 'phone' | 'username') => {
   loginType.value = type
   loginForm.loginType = type
+
+  // 清空不相关的字段
+  if (type === 'phone') {
+    loginForm.username = ''
+    loginForm.password = ''
+  } else {
+    loginForm.phone = ''
+    loginForm.smsCode = ''
+  }
+
   clearErrors()
   authStore.clearError()
 }
 
-// 切换注册方式
+// 切换注册方式（现在只有用户名注册，保留函数以防需要）
 const switchRegisterType = (type: 'phone' | 'username') => {
   registerType.value = type
   registerForm.registerType = type
@@ -453,6 +444,7 @@ const validateLoginForm = (): boolean => {
   let isValid = true
 
   if (loginForm.loginType === 'phone') {
+    // 手机号登录：只验证手机号和验证码，不需要用户名密码
     const phoneError = validatePhone(loginForm.phone || '')
     if (phoneError) {
       loginErrors.phone = phoneError
@@ -465,6 +457,7 @@ const validateLoginForm = (): boolean => {
       isValid = false
     }
   } else {
+    // 用户名登录：验证用户名和密码
     const usernameError = validateUsername(loginForm.username || '')
     if (usernameError) {
       loginErrors.username = usernameError
@@ -486,39 +479,26 @@ const validateRegisterForm = (): boolean => {
   clearErrors()
   let isValid = true
 
-  if (registerForm.registerType === 'phone') {
-    const phoneError = validatePhone(registerForm.phone || '')
-    if (phoneError) {
-      registerErrors.phone = phoneError
-      isValid = false
-    }
+  // 现在只有用户名注册
+  const usernameError = validateUsername(registerForm.username || '')
+  if (usernameError) {
+    registerErrors.username = usernameError
+    isValid = false
+  }
 
-    const smsCodeError = validateSmsCode(registerForm.smsCode || '')
-    if (smsCodeError) {
-      registerErrors.smsCode = smsCodeError
-      isValid = false
-    }
-  } else {
-    const usernameError = validateUsername(registerForm.username || '')
-    if (usernameError) {
-      registerErrors.username = usernameError
-      isValid = false
-    }
+  const passwordError = validatePassword(registerForm.password || '')
+  if (passwordError) {
+    registerErrors.password = passwordError
+    isValid = false
+  }
 
-    const passwordError = validatePassword(registerForm.password || '')
-    if (passwordError) {
-      registerErrors.password = passwordError
-      isValid = false
-    }
-
-    const confirmPasswordError = validateConfirmPassword(
-      registerForm.password || '',
-      registerForm.confirmPassword || ''
-    )
-    if (confirmPasswordError) {
-      registerErrors.confirmPassword = confirmPasswordError
-      isValid = false
-    }
+  const confirmPasswordError = validateConfirmPassword(
+    registerForm.password || '',
+    registerForm.confirmPassword || ''
+  )
+  if (confirmPasswordError) {
+    registerErrors.confirmPassword = confirmPasswordError
+    isValid = false
   }
 
   return isValid
@@ -595,13 +575,6 @@ const handleRegister = async () => {
   }
 }
 
-// 处理第三方登录
-const handleSocialLogin = (provider: string) => {
-  // TODO: 实现第三方登录逻辑
-  console.log(`Social login with ${provider}`)
-  authStore.setError('第三方登录功能暂未开放，敬请期待')
-}
-
 // 组件挂载时检查认证状态
 onMounted(() => {
   // 如果已经登录，直接跳转
@@ -645,19 +618,19 @@ onUnmounted(() => {
 
 .auth-container {
   width: 100%;
-  max-width: 400px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(25px);
+  border-radius: 24px;
+  padding: 2.5rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 /* 头部样式 */
 .auth-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .logo {
@@ -684,37 +657,62 @@ onUnmounted(() => {
   margin: 0;
 }
 
-/* 标签切换 */
-.auth-tabs {
-  display: flex;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 2rem;
+/* 注册/登录链接 */
+.register-link,
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.tab-button {
-  flex: 1;
-  padding: 0.75rem;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
+.register-text,
+.login-text {
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: 8px;
+  margin-right: 0.5rem;
+}
+
+/* 开发工具链接 */
+.dev-tools-link {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dev-tools-link .link-button {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #4fc3f7;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.3s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  outline: none;
 }
 
-.tab-button.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+.link-button:hover {
+  color: #29b6f6;
+  transform: translateY(-1px);
 }
 
-.tab-button:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
+.link-button:focus {
+  outline: none;
+  background: none;
+}
+
+.link-button:active {
+  background: none;
+  transform: translateY(0);
 }
 
 /* 认证方式选择标签 */
@@ -753,6 +751,10 @@ onUnmounted(() => {
   gap: 0.5rem;
 }
 
+.sms-input-wrapper .input-wrapper {
+  flex: 1;
+}
+
 .sms-input-wrapper .form-input {
   flex: 1;
 }
@@ -782,7 +784,7 @@ onUnmounted(() => {
 
 /* 表单容器 */
 .form-container {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 /* 消息提示 */
@@ -854,10 +856,50 @@ onUnmounted(() => {
   box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
 }
 
-.password-input-wrapper {
+/* 输入框包装器 */
+.input-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
+.input-wrapper .form-input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+/* 当有密码切换按钮时，为清除按钮留出空间 */
+.input-wrapper .form-input:has(+ .clear-button + .password-toggle) {
+  padding-right: 5rem;
+}
+
+/* 清除按钮 */
+.clear-button {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-size: 0.9rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.clear-button:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 密码切换按钮 */
 .password-toggle {
   position: absolute;
   right: 0.75rem;
@@ -870,10 +912,21 @@ onUnmounted(() => {
   padding: 0.25rem;
   font-size: 1rem;
   transition: color 0.3s ease;
+  z-index: 2;
+}
+
+/* 当有清除按钮时，密码切换按钮向左移动 */
+.input-wrapper .clear-button + .password-toggle {
+  right: 3rem;
 }
 
 .password-toggle:hover {
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* 保持旧的password-input-wrapper兼容性 */
+.password-input-wrapper {
+  position: relative;
 }
 
 .field-error {
@@ -882,31 +935,35 @@ onUnmounted(() => {
   margin-top: 0.25rem;
 }
 
+/* 表单提示信息 */
+.form-hint {
+  margin-top: 0.5rem;
+}
+
+.hint-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 /* 表单选项 */
 .form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1rem;
+  min-height: 2rem;
 }
 
-.checkbox-label {
+/* 登录方式切换 */
+.login-type-switch {
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.checkbox {
-  width: 1rem;
-  height: 1rem;
-  accent-color: #007aff;
-}
-
-.checkbox-text {
-  color: rgba(255, 255, 255, 0.8);
+  height: 100%;
 }
 
 .forgot-password {
@@ -976,75 +1033,6 @@ onUnmounted(() => {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* 第三方登录 */
-.social-login {
-  margin-top: 2rem;
-}
-
-.divider {
-  position: relative;
-  text-align: center;
-  margin: 1.5rem 0;
-}
-
-.divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.divider-text {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0 1rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
-  backdrop-filter: blur(20px);
-}
-
-.social-buttons {
-  display: flex;
-  gap: 1rem;
-}
-
-.social-button {
-  flex: 1;
-  padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: white;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.social-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-
-.social-button.wechat:hover {
-  border-color: #1aad19;
-  box-shadow: 0 0 0 2px rgba(26, 173, 25, 0.2);
-}
-
-.social-button.qq:hover {
-  border-color: #12b7f5;
-  box-shadow: 0 0 0 2px rgba(18, 183, 245, 0.2);
-}
-
-.social-icon {
-  font-size: 1.1rem;
 }
 
 /* 模态框样式 */
@@ -1119,13 +1107,12 @@ onUnmounted(() => {
   }
 
   .form-options {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 0.75rem;
   }
 
-  .social-buttons {
-    flex-direction: column;
+  .login-type-switch {
+    margin-left: 0;
   }
 
   .modal-actions {

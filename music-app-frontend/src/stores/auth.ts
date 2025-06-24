@@ -263,6 +263,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // 获取验证码（仅开发环境）
+  const getSmsCode = async (
+    phone: string,
+    type: 'register' | 'login'
+  ): Promise<{ code: string; expiresAt: string } | null> => {
+    try {
+      return await authApi.getSmsCode(phone, type)
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    }
+  }
+
+  // 获取所有验证码（仅开发环境）
+  const getAllSmsCodes = async (): Promise<
+    Array<{ phone: string; code: string; type: string; expiresAt: string }>
+  > => {
+    try {
+      return await authApi.getAllSmsCodes()
+    } catch (error: any) {
+      setError(error.message)
+      throw error
+    }
+  }
+
   // 检查认证状态
   const checkAuthStatus = (): boolean => {
     if (!isAuthenticated.value) return false
@@ -332,6 +357,8 @@ export const useAuthStore = defineStore('auth', () => {
     updateProfile,
     changePassword,
     sendSmsCode,
+    getSmsCode,
+    getAllSmsCodes,
     checkAuthStatus,
     autoRefreshToken,
   }

@@ -1,10 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { isFirstLaunch } from '@/utils'
 import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 引导页面路由
+    {
+      path: '/onboarding',
+      name: 'onboarding',
+      component: () => import('../views/OnboardingView.vue'),
+      meta: { requiresGuest: true, hideNavigation: true },
+    },
     {
       path: '/',
       name: 'home',
@@ -95,6 +103,12 @@ const router = createRouter({
       component: () => import('../views/FavoritesView.vue'),
       meta: { requiresAuth: true },
     },
+    // 开发工具页面（仅开发环境）
+    {
+      path: '/dev-tools',
+      name: 'dev-tools',
+      component: () => import('../views/DevToolsView.vue'),
+    },
     // 404页面 - 必须放在最后
     {
       path: '/:pathMatch(.*)*',
@@ -112,6 +126,18 @@ router.beforeEach(async (to, _from, next) => {
     // 页面加载进度指示（可选）
     if (typeof window !== 'undefined') {
       document.body.style.cursor = 'wait'
+    }
+
+    // 检查是否为首次启动（除了引导页面本身）
+    if (to.name !== 'onboarding' && isFirstLaunch()) {
+      next('/onboarding')
+      return
+    }
+
+    // 如果已完成引导但访问引导页面，重定向到首页
+    if (to.name === 'onboarding' && !isFirstLaunch()) {
+      next('/')
+      return
     }
 
     // 检查是否需要认证
@@ -176,6 +202,7 @@ router.afterEach((to, from) => {
     auth: '登录注册',
     settings: '设置',
     player: '播放器',
+    onboarding: '欢迎使用',
     'not-found': '页面未找到',
   }
 

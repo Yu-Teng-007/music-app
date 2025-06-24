@@ -59,7 +59,7 @@ import { authApi, musicApi, favoritesApi } from '@/services'
 import { useAuthStore } from '@/stores/auth'
 
 // 导入验证工具
-import { validateEmail, validatePassword } from '@/utils/validators'
+import { validatePassword } from '@/utils/validators'
 
 // 导入类型
 import type { ApiResponse, SongQueryParams } from '@/types/api'

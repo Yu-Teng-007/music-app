@@ -103,4 +103,32 @@ export const authApi = {
       throw new Error(error.response?.data?.message || '发送验证码失败')
     }
   },
+
+  // 获取验证码（仅开发环境）
+  async getSmsCode(
+    phone: string,
+    type: 'register' | 'login'
+  ): Promise<{ code: string; expiresAt: string } | null> {
+    try {
+      const response: AxiosResponse<ApiResponse<{ code: string; expiresAt: string } | null>> =
+        await apiClient.get(`/auth/get-sms-code?phone=${phone}&type=${type}`)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '获取验证码失败')
+    }
+  },
+
+  // 获取所有验证码（仅开发环境）
+  async getAllSmsCodes(): Promise<
+    Array<{ phone: string; code: string; type: string; expiresAt: string }>
+  > {
+    try {
+      const response: AxiosResponse<
+        ApiResponse<Array<{ phone: string; code: string; type: string; expiresAt: string }>>
+      > = await apiClient.get('/auth/get-all-sms-codes')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '获取验证码列表失败')
+    }
+  },
 }

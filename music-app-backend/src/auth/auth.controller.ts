@@ -8,8 +8,10 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
+import { SmsService } from '../sms/sms.service'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import {
   LoginDto,
@@ -30,7 +32,10 @@ interface AuthenticatedRequest extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly smsService: SmsService
+  ) {}
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -148,6 +153,28 @@ export class AuthController {
       success: true,
       data: result,
       message: result.message,
+    }
+  }
+
+  @Get('get-sms-code')
+  @HttpCode(HttpStatus.OK)
+  async getSmsCode(@Query('phone') phone: string, @Query('type') type: 'register' | 'login') {
+    const result = await this.smsService.getSmsCode(phone, type)
+    return {
+      success: true,
+      data: result,
+      message: result ? '获取验证码成功' : '验证码不存在或已过期',
+    }
+  }
+
+  @Get('get-all-sms-codes')
+  @HttpCode(HttpStatus.OK)
+  async getAllSmsCodes() {
+    const result = await this.smsService.getAllSmsCodes()
+    return {
+      success: true,
+      data: result,
+      message: '获取所有验证码成功',
     }
   }
 

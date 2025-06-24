@@ -59,11 +59,24 @@ export class PlaylistsService {
   }
 
   async findUserPlaylists(userId: string): Promise<Playlist[]> {
-    return await this.playlistRepository.find({
+    const playlists = await this.playlistRepository.find({
       where: { userId },
       relations: ['songs'],
       order: { createdAt: 'DESC' },
     })
+
+    // 如果用户没有歌单，创建默认歌单
+    if (playlists.length === 0) {
+      await this.createDefaultPlaylists(userId)
+      // 重新获取歌单列表
+      return await this.playlistRepository.find({
+        where: { userId },
+        relations: ['songs'],
+        order: { createdAt: 'DESC' },
+      })
+    }
+
+    return playlists
   }
 
   async findOne(id: string, userId?: string): Promise<Playlist> {
@@ -159,15 +172,36 @@ export class PlaylistsService {
 
   async getRecommendedPlaylists(limit: number = 10): Promise<Playlist[]> {
     // 获取包含歌曲最多的公开播放列表
-    return await this.playlistRepository
+    // 首先获取按歌曲数量排序的播放列表ID
+    const playlistIds = await this.playlistRepository
+      .createQueryBuilder('playlist')
+      .leftJoin('playlist.songs', 'songs')
+      .where('playlist.isPrivate = false')
+      .groupBy('playlist.id')
+      .orderBy('COUNT(songs.id)', 'DESC')
+      .addOrderBy('playlist.createdAt', 'DESC') // 添加第二排序条件
+      .limit(limit)
+      .select('playlist.id')
+      .getRawMany()
+
+    if (playlistIds.length === 0) {
+      return []
+    }
+
+    // 然后根据ID获取完整的播放列表信息，保持原有的排序
+    const ids = playlistIds.map(item => item.playlist_id)
+    const playlists = await this.playlistRepository
       .createQueryBuilder('playlist')
       .leftJoinAndSelect('playlist.user', 'user')
       .leftJoinAndSelect('playlist.songs', 'songs')
-      .where('playlist.isPrivate = false')
-      .orderBy('COUNT(songs.id)', 'DESC')
-      .groupBy('playlist.id')
-      .limit(limit)
+      .where('playlist.id IN (:...ids)', { ids })
       .getMany()
+
+    // 手动按照原始排序重新排列结果
+    const playlistMap = new Map(playlists.map(p => [p.id, p]))
+    return ids
+      .map(id => playlistMap.get(id))
+      .filter((playlist): playlist is Playlist => playlist !== undefined)
   }
 
   async searchPlaylists(keyword: string, limit: number = 20): Promise<Playlist[]> {
@@ -182,5 +216,34 @@ export class PlaylistsService {
       .orderBy('playlist.createdAt', 'DESC')
       .limit(limit)
       .getMany()
+  }
+
+  // 为用户创建默认歌单
+  async createDefaultPlaylists(userId: string): Promise<void> {
+    const defaultPlaylists = [
+      {
+        name: '我喜欢的',
+        description: '收藏您最喜欢的歌曲',
+        isPrivate: true,
+        isDefault: true,
+        coverUrl: 'https://picsum.photos/400/400?random=999',
+      },
+      {
+        name: '默认歌单',
+        description: '您的第一个歌单',
+        isPrivate: false,
+        isDefault: true,
+        coverUrl: 'https://picsum.photos/400/400?random=998',
+      },
+    ]
+
+    for (const playlistData of defaultPlaylists) {
+      const playlist = this.playlistRepository.create({
+        ...playlistData,
+        userId,
+        songs: [],
+      })
+      await this.playlistRepository.save(playlist)
+    }
   }
 }

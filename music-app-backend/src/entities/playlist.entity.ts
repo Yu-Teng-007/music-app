@@ -28,6 +28,9 @@ export class Playlist {
   @Column({ default: false })
   isPrivate: boolean
 
+  @Column({ default: false })
+  isDefault: boolean // 标识是否为系统默认歌单
+
   @CreateDateColumn()
   createdAt: Date
 

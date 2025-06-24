@@ -22,10 +22,11 @@ export class SmsService {
     // 检查是否频繁发送
     const key = `${phone}_${type}`
     const existingCode = this.smsCodes.get(key)
-    
+
     if (existingCode && existingCode.expiresAt > new Date()) {
       const timeDiff = existingCode.expiresAt.getTime() - Date.now()
-      if (timeDiff > 4 * 60 * 1000) { // 如果距离过期还有超过4分钟，说明刚发送过
+      if (timeDiff > 4 * 60 * 1000) {
+        // 如果距离过期还有超过4分钟，说明刚发送过
         throw new BadRequestException('验证码发送过于频繁，请稍后再试')
       }
     }
@@ -46,7 +47,9 @@ export class SmsService {
     // 在开发环境下打印验证码到控制台
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.log(`📱 短信验证码 [${phone}] [${type}]: ${code} (${this.CODE_EXPIRY_MINUTES}分钟内有效)`)
+      console.log(
+        `📱 短信验证码 [${phone}] [${type}]: ${code} (${this.CODE_EXPIRY_MINUTES}分钟内有效)`
+      )
     }
 
     // TODO: 在生产环境中，这里应该调用真实的短信服务API
@@ -87,6 +90,66 @@ export class SmsService {
     // 验证成功，删除验证码
     this.smsCodes.delete(key)
     return true
+  }
+
+  /**
+   * 获取验证码（仅开发环境使用）
+   */
+  async getSmsCode(
+    phone: string,
+    type: 'register' | 'login'
+  ): Promise<{ code: string; expiresAt: Date } | null> {
+    // 仅在开发环境下提供此功能
+    if (process.env.NODE_ENV !== 'development') {
+      throw new BadRequestException('此功能仅在开发环境下可用')
+    }
+
+    const key = `${phone}_${type}`
+    const storedCode = this.smsCodes.get(key)
+
+    if (!storedCode) {
+      return null
+    }
+
+    // 检查是否过期
+    if (storedCode.expiresAt < new Date()) {
+      this.smsCodes.delete(key)
+      return null
+    }
+
+    return {
+      code: storedCode.code,
+      expiresAt: storedCode.expiresAt,
+    }
+  }
+
+  /**
+   * 获取所有验证码（仅开发环境使用）
+   */
+  async getAllSmsCodes(): Promise<
+    Array<{ phone: string; code: string; type: string; expiresAt: Date }>
+  > {
+    // 仅在开发环境下提供此功能
+    if (process.env.NODE_ENV !== 'development') {
+      throw new BadRequestException('此功能仅在开发环境下可用')
+    }
+
+    const now = new Date()
+    const codes: Array<{ phone: string; code: string; type: string; expiresAt: Date }> = []
+
+    for (const [key, smsCode] of this.smsCodes.entries()) {
+      // 只返回未过期的验证码
+      if (smsCode.expiresAt > now) {
+        codes.push({
+          phone: smsCode.phone,
+          code: smsCode.code,
+          type: smsCode.type,
+          expiresAt: smsCode.expiresAt,
+        })
+      }
+    }
+
+    return codes
   }
 
   /**

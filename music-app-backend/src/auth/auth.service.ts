@@ -114,7 +114,7 @@ export class AuthService {
     const { loginType, phone, smsCode, username, password } = loginDto
 
     if (loginType === 'phone') {
-      // 手机号登录
+      // 手机号登录 - 只使用手机号和验证码，忽略用户名和密码
       if (!phone || !smsCode) {
         throw new BadRequestException('手机号和验证码不能为空')
       }
@@ -123,7 +123,7 @@ export class AuthService {
       await this.smsService.verifySmsCode(phone, smsCode, 'login')
 
       // 查找用户
-      const user = await this.userRepository.findOne({
+      let user = await this.userRepository.findOne({
         where: { phone },
         select: [
           'id',
@@ -137,8 +137,16 @@ export class AuthService {
         ],
       })
 
-      if (!user || !user.isActive) {
-        throw new UnauthorizedException('用户不存在或已被禁用')
+      // 如果用户不存在，自动注册
+      if (!user) {
+        user = this.userRepository.create({
+          phone,
+          username: null,
+          password: null,
+        })
+        user = await this.userRepository.save(user)
+      } else if (!user.isActive) {
+        throw new UnauthorizedException('用户已被禁用')
       }
 
       // 生成tokens
@@ -207,15 +215,7 @@ export class AuthService {
       }
     }
 
-    // 如果是登录验证码，检查手机号是否存在
-    if (type === 'login') {
-      const existingUser = await this.userRepository.findOne({
-        where: { phone },
-      })
-      if (!existingUser) {
-        throw new NotFoundException('该手机号尚未注册')
-      }
-    }
+    // 登录验证码不再检查手机号是否存在，支持自动注册
 
     // 发送短信验证码
     await this.smsService.sendSmsCode(phone, type)
@@ -320,14 +320,18 @@ export class AuthService {
       username: user.username,
     }
 
+    // 设置默认过期时间为3个月
+    const accessTokenExpiresIn = '90d' // 3个月
+    const refreshTokenExpiresIn = '90d' // 3个月
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.get('jwt.secret'),
-        expiresIn: this.configService.get('jwt.expiresIn'),
+        expiresIn: accessTokenExpiresIn,
       }),
       this.jwtService.signAsync(payload, {
         secret: this.configService.get('jwt.refreshSecret'),
-        expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+        expiresIn: refreshTokenExpiresIn,
       }),
     ])
 

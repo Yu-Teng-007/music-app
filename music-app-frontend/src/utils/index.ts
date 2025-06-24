@@ -2,9 +2,7 @@
 
 // 表单验证工具
 export {
-  validateEmail,
   validatePassword,
-  validateName,
   validateConfirmPassword,
   validateUsername,
   validatePhone,
@@ -15,3 +13,12 @@ export {
   validateAudioFile,
   validateImageFile,
 } from './validators'
+
+// 本地存储工具
+export {
+  isFirstLaunch,
+  setFirstLaunchCompleted,
+  clearFirstLaunchFlag,
+  getFirstLaunchTime,
+  isOnboardingCompleted,
+} from './storage'

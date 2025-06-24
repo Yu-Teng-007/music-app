@@ -12,14 +12,22 @@ const authStore = useAuthStore()
 
 // 判断是否显示底部导航栏
 const showBottomNav = computed(() => {
-  const hiddenRoutes = ['/player', '/auth']
-  return !hiddenRoutes.includes(route.path) && !route.path.startsWith('/auth')
+  const hiddenRoutes = ['/player', '/auth', '/onboarding', '/dev-tools']
+  return (
+    !hiddenRoutes.includes(route.path) &&
+    !route.path.startsWith('/auth') &&
+    !route.meta.hideNavigation
+  )
 })
 
 // 判断是否显示迷你播放器
 const showMiniPlayer = computed(() => {
-  const hiddenRoutes = ['/player', '/auth']
-  return !hiddenRoutes.includes(route.path) && !route.path.startsWith('/auth')
+  const hiddenRoutes = ['/player', '/auth', '/onboarding', '/dev-tools']
+  return (
+    !hiddenRoutes.includes(route.path) &&
+    !route.path.startsWith('/auth') &&
+    !route.meta.hideNavigation
+  )
 })
 
 // 应用启动时初始化认证状态

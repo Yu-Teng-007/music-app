@@ -28,9 +28,9 @@
 
       <div v-else>
         <!-- 我的歌单 -->
-        <div class="section" v-if="authStore.isAuthenticated && filteredMyPlaylists.length > 0">
+        <div class="section" v-if="authStore.isAuthenticated">
           <h2>我的歌单</h2>
-          <div class="playlist-grid">
+          <div v-if="filteredMyPlaylists.length > 0" class="playlist-grid">
             <div
               v-for="playlist in filteredMyPlaylists"
               :key="playlist.id"
@@ -51,12 +51,15 @@
               <p class="playlist-info">{{ playlist.songCount }}首歌曲</p>
             </div>
           </div>
+          <div v-else class="empty-playlists">
+            <p>正在为您创建默认歌单...</p>
+          </div>
         </div>
 
         <!-- 推荐歌单 -->
-        <div class="section" v-if="filteredRecommendedPlaylists.length > 0">
+        <div class="section">
           <h2>推荐歌单</h2>
-          <div class="playlist-grid">
+          <div v-if="filteredRecommendedPlaylists.length > 0" class="playlist-grid">
             <div
               v-for="playlist in filteredRecommendedPlaylists"
               :key="playlist.id"
@@ -76,6 +79,9 @@
               <h3 class="playlist-name">{{ playlist.name }}</h3>
               <p class="playlist-info">by {{ playlist.creator }}</p>
             </div>
+          </div>
+          <div v-else class="empty-playlists">
+            <p>暂无推荐歌单</p>
           </div>
         </div>
 
@@ -265,12 +271,12 @@ const loadMyPlaylists = async () => {
 const loadRecommendedPlaylists = async () => {
   try {
     isLoading.value = true
-    const playlists = await playlistApi.getPublicPlaylists(6)
+    const playlists = await playlistApi.getRecommendedPlaylists(6)
     recommendedPlaylists.value = playlists.map((playlist: any) => ({
       id: playlist.id,
       name: playlist.name,
       coverUrl: playlist.coverUrl || 'https://picsum.photos/300/300?random=122',
-      creator: playlist.creator?.name || '未知用户',
+      creator: playlist.user?.username || playlist.creator?.name || '未知用户',
     }))
   } catch (error) {
     console.error('Failed to load recommended playlists:', error)
@@ -558,6 +564,13 @@ onMounted(() => {
   font-size: 0.875rem;
   margin: 0;
   opacity: 0.8;
+}
+
+.empty-playlists {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
 }
 
 /* 加载状态样式 */

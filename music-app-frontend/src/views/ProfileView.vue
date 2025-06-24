@@ -62,9 +62,17 @@ const authStore = useAuthStore()
 // 用户信息（从认证store获取或使用默认值）
 const user = computed(() => {
   if (authStore.user) {
+    // 生成用户显示名称和handle
+    const displayName = authStore.user.username || authStore.user.phone || '用户'
+    const handle = authStore.user.username
+      ? `@${authStore.user.username}`
+      : authStore.user.phone
+        ? `@${authStore.user.phone.slice(-4)}` // 显示手机号后4位
+        : '@user'
+
     return {
-      name: authStore.user.name,
-      handle: `@${authStore.user.email.split('@')[0]}`,
+      name: displayName,
+      handle: handle,
       avatarUrl: authStore.user.avatar || 'https://picsum.photos/300/300?random=138',
       playlists: 228, // TODO: 从API获取实际数据
       followers: 24.5, // TODO: 从API获取实际数据
