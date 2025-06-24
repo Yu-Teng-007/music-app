@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import * as cheerio from 'cheerio'
+import { Element } from 'domhandler'
 import { BaseSiteAdapter } from './base-site-adapter'
 import { CrawlType, CrawlOptions, SiteConfig } from '../interfaces/site-adapter.interface'
 import { CrawlSongDto } from '../../dto/song.dto'
@@ -283,7 +284,7 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 从元素提取歌曲信息
    */
   private extractSongFromElement(
-    element: cheerio.Cheerio<cheerio.Element>,
+    element: cheerio.Cheerio<any>,
     $: cheerio.CheerioAPI
   ): CrawlSongDto | null {
     try {
@@ -357,8 +358,8 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 提取艺术家信息
    */
   private extractArtistInfo(
-    element: cheerio.Cheerio<cheerio.Element>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    element: cheerio.Cheerio<any>,
+
     $: cheerio.CheerioAPI
   ): string {
     const strategies = [
@@ -403,10 +404,7 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取专辑信息
    */
-  private extractAlbumInfo(
-    element: cheerio.Cheerio<cheerio.Element>,
-    $: cheerio.CheerioAPI
-  ): string | null {
+  private extractAlbumInfo(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string | null {
     const container = element.closest('tr, li, div')
 
     const albumElement = container
@@ -433,10 +431,7 @@ export class Ve33Adapter extends BaseSiteAdapter {
   /**
    * 提取封面图片
    */
-  private extractCoverImage(
-    element: cheerio.Cheerio<cheerio.Element>,
-    $: cheerio.CheerioAPI
-  ): string | null {
+  private extractCoverImage(element: cheerio.Cheerio<any>, $: cheerio.CheerioAPI): string | null {
     const container = element.closest('tr, li, div, article')
 
     for (const selector of this.config.selectors.cover) {
@@ -457,8 +452,8 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 提取歌曲时长
    */
   private extractDuration(
-    element: cheerio.Cheerio<cheerio.Element>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    element: cheerio.Cheerio<any>,
+
     $: cheerio.CheerioAPI
   ): number | null {
     const container = element.closest('tr, li, div')
@@ -485,8 +480,8 @@ export class Ve33Adapter extends BaseSiteAdapter {
    * 提取音乐类型
    */
   private extractGenre(
-    element: cheerio.Cheerio<cheerio.Element>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    element: cheerio.Cheerio<any>,
+
     $: cheerio.CheerioAPI
   ): string | null {
     const container = element.closest('tr, li, div')

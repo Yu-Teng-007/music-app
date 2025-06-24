@@ -27,7 +27,7 @@ export class PlaylistsService {
     return await this.playlistRepository.save(playlist)
   }
 
-  async findAll(userId: string, queryDto: QueryPlaylistsDto) {
+  async findAll(userId: string | undefined, queryDto: QueryPlaylistsDto) {
     const { search, isPrivate } = queryDto
 
     const queryBuilder = this.playlistRepository
@@ -35,8 +35,13 @@ export class PlaylistsService {
       .leftJoinAndSelect('playlist.user', 'user')
       .leftJoinAndSelect('playlist.songs', 'songs')
 
-    // 只显示用户自己的播放列表或公开的播放列表
-    queryBuilder.where('(playlist.userId = :userId OR playlist.isPrivate = false)', { userId })
+    // 如果用户已登录，显示用户自己的播放列表或公开的播放列表
+    // 如果用户未登录，只显示公开的播放列表
+    if (userId) {
+      queryBuilder.where('(playlist.userId = :userId OR playlist.isPrivate = false)', { userId })
+    } else {
+      queryBuilder.where('playlist.isPrivate = false')
+    }
 
     if (search) {
       queryBuilder.andWhere('playlist.name LIKE :search', {

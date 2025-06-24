@@ -216,7 +216,6 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, resetPasswordToken, resetPasswordExpires, ...sanitizedUser } = user
     return sanitizedUser
   }

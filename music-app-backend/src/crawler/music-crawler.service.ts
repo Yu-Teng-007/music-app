@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import axios, { AxiosInstance } from 'axios'
 import * as cheerio from 'cheerio'
-import * as UserAgent from 'user-agents'
+import UserAgent from 'user-agents'
 import { Song } from '../entities/song.entity'
 import { CrawlSongDto, CrawlConfigDto } from '../dto/song.dto'
 

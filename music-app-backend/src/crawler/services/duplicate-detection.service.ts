@@ -211,9 +211,8 @@ export class DuplicateDetectionService {
    * 查找音频指纹匹配
    */
   private findFingerprintMatch(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _newSong: CrawlSongDto,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     _config: SimilarityConfig
   ): Promise<DuplicateDetectionResult | null> {
     // 这里应该集成音频指纹库，如 AcoustID 或自定义实现
@@ -522,7 +521,6 @@ export class DuplicateDetectionService {
     duplicatesRemoved: number
     errors: string[]
   }> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const finalConfig = { ...this.defaultConfig, ...config }
     const errors: string[] = []
     let duplicatesFound = 0
@@ -547,14 +545,14 @@ export class DuplicateDetectionService {
       }
 
       // 处理重复组
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       for (const [key, songs] of duplicateGroups) {
         if (songs.length > 1) {
           duplicatesFound += songs.length - 1
 
           if (!dryRun) {
             // 保留第一个，删除其余的
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
             const toKeep = songs[0]
             const toRemove = songs.slice(1)
 

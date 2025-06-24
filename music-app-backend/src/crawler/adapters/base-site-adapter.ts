@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common'
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import * as cheerio from 'cheerio'
-import * as UserAgent from 'user-agents'
+import UserAgent from 'user-agents'
 import {
   ISiteAdapter,
   CrawlType,
@@ -62,7 +62,7 @@ export abstract class BaseSiteAdapter implements ISiteAdapter {
   private setupInterceptors(): void {
     // 请求拦截器 - 添加随机User-Agent
     this.httpClient.interceptors.request.use(config => {
-      const userAgent = new (UserAgent as any)()
+      const userAgent = new UserAgent()
       config.headers['User-Agent'] = userAgent.toString()
 
       // 记录请求
