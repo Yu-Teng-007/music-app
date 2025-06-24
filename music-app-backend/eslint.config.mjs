@@ -1,4 +1,3 @@
-// @ts-check
 import eslint from '@eslint/js'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import globals from 'globals'
@@ -46,8 +45,8 @@ export default tseslint.config(
       // 通用规则 - 较为宽松
       'no-console': 'warn',
       'no-debugger': 'warn',
-      'no-unused-vars': 'off', // 由 TypeScript 处理
-      'no-undef': 'off', // 由 TypeScript 处理
+      'no-unused-vars': 'off',
+      'no-undef': 'off',
       'prefer-const': 'warn',
       'no-var': 'warn',
       'no-empty': 'warn',
