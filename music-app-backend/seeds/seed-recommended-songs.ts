@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from '../src/app.module'
 import { SongsService } from '../src/songs/songs.service'

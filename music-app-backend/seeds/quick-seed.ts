@@ -1,8 +1,8 @@
+/* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from '../src/app.module'
-import { getRepositoryToken } from '@nestjs/typeorm'
 import { User, Song, Playlist, Genre } from '../src/entities'
-import { Repository } from 'typeorm'
+import { DataSource } from 'typeorm'
 
 /**
  * 快速种子文件 - 用于开发环境快速初始化基础数据
@@ -11,12 +11,12 @@ import { Repository } from 'typeorm'
 async function quickSeed() {
   const app = await NestFactory.createApplicationContext(AppModule)
 
-  const userRepository = app.get<Repository<User>>(getRepositoryToken(User))
-  const songRepository = app.get<Repository<Song>>(getRepositoryToken(Song))
-  const playlistRepository = app.get<Repository<Playlist>>(getRepositoryToken(Playlist))
-  const genreRepository = app.get<Repository<Genre>>(getRepositoryToken(Genre))
-
-  console.log('🚀 快速种子文件初始化开始...')
+  // 获取 DataSource 并通过它获取 Repository
+  const dataSource = app.get(DataSource)
+  const userRepository = dataSource.getRepository(User)
+  const songRepository = dataSource.getRepository(Song)
+  const playlistRepository = dataSource.getRepository(Playlist)
+  const genreRepository = dataSource.getRepository(Genre)
 
   try {
     // 检查是否已有数据
@@ -32,7 +32,6 @@ async function quickSeed() {
     }
 
     // 1. 创建管理员用户
-    console.log('👤 创建管理员用户...')
     const bcrypt = await import('bcryptjs')
     const hashedPassword = await bcrypt.hash('admin123456', 12)
 
@@ -47,7 +46,6 @@ async function quickSeed() {
     await userRepository.save(adminUser)
 
     // 2. 创建基础音乐分类
-    console.log('🎵 创建基础音乐分类...')
     const basicGenres = [
       { name: '流行', color: '#FF6B6B', icon: '🎵' },
       { name: '摇滚', color: '#4ECDC4', icon: '🎸' },
@@ -68,7 +66,6 @@ async function quickSeed() {
     }
 
     // 3. 创建示例歌曲
-    console.log('🎶 创建示例歌曲...')
     const sampleSongs = [
       {
         title: '晴天',
@@ -119,7 +116,6 @@ async function quickSeed() {
     }
 
     // 4. 创建示例播放列表
-    console.log('📋 创建示例播放列表...')
     const playlist = playlistRepository.create({
       name: '精选推荐',
       description: '系统精选的优质音乐',
@@ -131,6 +127,7 @@ async function quickSeed() {
     })
     await playlistRepository.save(playlist)
 
+    // 只输出最终结果
     console.log('✅ 快速种子文件初始化完成！')
     console.log('📊 创建的数据:')
     console.log(`  👤 管理员用户: 1`)

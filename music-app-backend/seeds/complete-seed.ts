@@ -1,9 +1,4 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../src/app.module'
-import { seedAdminUser } from './seed-admin-user'
-import { seedGenres } from './seed-genres'
-import { seedRecommendedSongs } from './seed-recommended-songs'
-import { seedPlaylists } from './seed-playlists'
+/* eslint-disable no-console */
 
 interface SeedOptions {
   environment: 'development' | 'production'
@@ -116,22 +111,6 @@ function parseArguments(): Partial<SeedOptions> {
 
       case '--help':
       case '-h':
-        console.log(`
-数据库种子文件运行工具
-
-用法: npm run seed [选项]
-
-选项:
-  --env, --environment <env>  指定环境 (development|production)
-  --force                     强制重新创建所有数据
-  --no-skip                   不跳过已存在的数据
-  --help, -h                  显示帮助信息
-
-示例:
-  npm run seed                           # 使用默认设置运行
-  npm run seed -- --env production      # 在生产环境运行
-  npm run seed -- --force               # 强制重新创建数据
-        `)
         process.exit(0)
     }
   }

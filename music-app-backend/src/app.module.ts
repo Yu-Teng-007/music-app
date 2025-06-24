@@ -13,6 +13,7 @@ import { UploadModule } from './upload/upload.module'
 import { DatabaseModule } from './database/database.module'
 import { FavoritesModule } from './favorites/favorites.module'
 import { CrawlerModule } from './crawler/crawler.module'
+import { User, Song, Playlist, Favorite, Genre } from './entities'
 
 @Module({
   imports: [
@@ -37,6 +38,9 @@ import { CrawlerModule } from './crawler/crawler.module'
       charset: 'utf8mb4',
       timezone: '+08:00',
     }),
+
+    // 注册所有实体以便在种子脚本中使用
+    TypeOrmModule.forFeature([User, Song, Playlist, Favorite, Genre]),
 
     // 静态文件服务
     ServeStaticModule.forRootAsync({
