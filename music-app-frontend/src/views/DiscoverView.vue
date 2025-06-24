@@ -160,7 +160,6 @@ const loadRecommendedSongs = async () => {
     const songs = await musicStore.loadRecommendedSongs(6)
     recommendedSongs.value = songs
   } catch (error) {
-    console.error('Failed to load recommended songs:', error)
     recommendedSongs.value = []
   } finally {
     isLoading.value = false
@@ -179,7 +178,6 @@ const searchSongs = async (keyword: string) => {
     const songs = await musicStore.searchSongs(keyword, 20)
     searchResults.value = songs
   } catch (error) {
-    console.error('Failed to search songs:', error)
     searchResults.value = []
   } finally {
     isSearching.value = false

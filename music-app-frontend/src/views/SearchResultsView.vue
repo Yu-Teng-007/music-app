@@ -440,10 +440,28 @@ watch(
 </script>
 
 <style scoped>
+/* CSS变量定义 */
 .search-results-view {
+  --primary: #007aff;
+  --primary-dark: #0056b3;
+  --primary-alpha: rgba(0, 122, 255, 0.2);
+
+  --bg-primary: #000;
+  --bg-secondary: rgba(255, 255, 255, 0.05);
+  --bg-tertiary: rgba(255, 255, 255, 0.1);
+  --bg-hover: rgba(255, 255, 255, 0.1);
+
+  --text-primary: #fff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+
+  --border: rgba(255, 255, 255, 0.1);
+
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: var(--text-primary);
 }
 
 .search-header {
