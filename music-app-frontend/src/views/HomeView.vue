@@ -8,6 +8,35 @@ import type { Song } from '@/stores/music'
 import type { Genre } from '@/services/genre-api'
 import { Play, ChevronRight } from 'lucide-vue-next'
 
+// 调整颜色深浅的辅助函数
+const adjustColor = (color: string, amount: number): string => {
+  // 如果颜色是十六进制格式
+  if (color.startsWith('#')) {
+    let hex = color.substring(1)
+
+    // 将3位颜色扩展为6位
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
+    }
+
+    // 转换为RGB
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+
+    // 调整颜色
+    const newR = Math.max(0, Math.min(255, r + amount))
+    const newG = Math.max(0, Math.min(255, g + amount))
+    const newB = Math.max(0, Math.min(255, b + amount))
+
+    // 转回十六进制
+    return `#${Math.round(newR).toString(16).padStart(2, '0')}${Math.round(newG).toString(16).padStart(2, '0')}${Math.round(newB).toString(16).padStart(2, '0')}`
+  }
+
+  // 如果是其他格式，返回原色
+  return color
+}
+
 const router = useRouter()
 const musicStore = useMusicStore()
 const authStore = useAuthStore()
@@ -256,16 +285,24 @@ onMounted(async () => {
         <h2>音乐分类</h2>
         <button class="see-all-button" @click="goToCategories">查看全部</button>
       </div>
-      <div class="categories-scroll">
+      <div class="categories-grid">
         <div
-          v-for="category in featuredCategories"
+          v-for="(category, index) in featuredCategories"
           :key="category.id"
-          class="category-item"
-          :style="{ backgroundColor: category.color }"
+          class="category-card"
           @click="goToCategory(category.name)"
         >
-          <div class="category-icon">{{ category.icon }}</div>
-          <span class="category-name">{{ category.name }}</span>
+          <img
+            :src="`https://picsum.photos/300/300?random=${100 + index}`"
+            :alt="category.name"
+            class="category-image"
+            @error="handleImageError"
+          />
+          <div class="category-overlay"></div>
+          <div class="category-content">
+            <div class="category-icon">{{ category.icon }}</div>
+            <span class="category-name">{{ category.name }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -396,36 +433,20 @@ onMounted(async () => {
   color: white;
 }
 
-.categories-scroll {
-  display: flex;
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
-  overflow-x: auto;
-  padding: 0.5rem 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
-.categories-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.category-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 80px;
-  height: 80px;
-  border-radius: 12px;
+.category-card {
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.5rem;
-}
-
-.category-item {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  height: 120px;
   /* 添加点击状态重置 */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -436,45 +457,81 @@ onMounted(async () => {
   outline: none;
 }
 
-.category-item:hover {
+.category-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.category-item:active {
+.category-card:active {
   transform: translateY(0);
-  background: rgba(255, 255, 255, 0.15);
 }
 
-.category-item:focus {
+.category-card:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
+.category-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+  z-index: 2;
+}
+
+.category-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
 /* 移动端分类项优化 */
 @media (hover: none) {
-  .category-item:active {
-    transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.15);
+  .category-card:active {
+    transform: scale(0.98);
     transition: all 0.1s ease;
   }
 
-  .category-item:focus {
+  .category-card:focus {
     outline: none;
     box-shadow: none;
   }
 }
 
 .category-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .category-name {
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   text-align: center;
   color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .quick-access {
@@ -859,6 +916,10 @@ onMounted(async () => {
   .charts-grid {
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   }
+
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
 }
 
 @media (max-width: 480px) {
@@ -893,6 +954,23 @@ onMounted(async () => {
 
   .charts-grid {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .category-card {
+    height: 100px;
+  }
+
+  .category-content {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .category-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
   }
 }
 </style>

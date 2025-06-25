@@ -16,7 +16,11 @@
 
     <!-- 分类信息 -->
     <div v-if="currentCategory" class="category-info">
-      <div class="category-banner" :style="{ backgroundColor: currentCategory.color }">
+      <div
+        class="category-banner"
+        :style="{ backgroundImage: `url(${getCategoryBackgroundImage(currentCategory.id)})` }"
+      >
+        <div class="category-overlay"></div>
         <div class="category-icon">{{ currentCategory.icon }}</div>
         <div class="category-details">
           <h2>{{ currentCategory.name }}</h2>
@@ -34,9 +38,10 @@
         v-for="category in categories"
         :key="category.id"
         class="category-card"
-        :style="{ backgroundColor: category.color }"
+        :style="{ backgroundImage: `url(${getCategoryBackgroundImage(category.id)})` }"
         @click="navigateToCategory(category.name)"
       >
+        <div class="category-overlay"></div>
         <div class="category-card-icon">{{ category.icon }}</div>
         <h3>{{ category.name }}</h3>
         <p>{{ category.description }}</p>
@@ -107,9 +112,7 @@
 
       <!-- 加载更多 -->
       <div v-if="hasMore && !isLoading" class="load-more">
-        <button class="load-more-button" @click="loadMore">
-          加载更多
-        </button>
+        <button class="load-more-button" @click="loadMore">加载更多</button>
       </div>
     </div>
 
@@ -117,12 +120,12 @@
     <div v-if="showFilterModal" class="modal-overlay" @click="showFilterModal = false">
       <div class="modal-content" @click.stop>
         <h3 class="modal-title">筛选选项</h3>
-        
+
         <div class="filter-section">
           <h4>年代</h4>
           <div class="filter-options">
             <button
-              v-for="(year,index) in yearOptions"
+              v-for="(year, index) in yearOptions"
               :key="index"
               :class="['filter-option', { active: selectedYear === year.value }]"
               @click="selectedYear = year.value"
@@ -136,7 +139,7 @@
           <h4>播放量</h4>
           <div class="filter-options">
             <button
-              v-for="(play,index) in playCountOptions"
+              v-for="(play, index) in playCountOptions"
               :key="index"
               :class="['filter-option', { active: selectedPlayCount === play.value }]"
               @click="selectedPlayCount = play.value"
@@ -163,14 +166,7 @@ import { useFavoritesStore } from '@/stores/favorites'
 import { genreApi, musicApi } from '@/services'
 import type { Genre } from '@/services/genre-api'
 import type { Song } from '@/stores/music'
-import {
-  ChevronLeft,
-  Filter,
-  Music,
-  Play,
-  Heart,
-  MoreVertical,
-} from 'lucide-vue-next'
+import { ChevronLeft, Filter, Music, Play, Heart, MoreVertical } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -226,6 +222,14 @@ const playCountOptions = [
   { value: 'low', label: '低播放量' },
 ]
 
+// 为每个分类生成随机背景图片
+const getCategoryBackgroundImage = (categoryId: string) => {
+  // 使用分类ID作为种子，确保同一分类每次获得相同的图片
+  const seed = categoryId.charCodeAt(0) + categoryId.charCodeAt(categoryId.length - 1)
+  // 使用picsum.photos，尺寸更大以适合背景图片
+  return `https://picsum.photos/800/600?random=${seed}`
+}
+
 // 方法
 async function loadCategories() {
   try {
@@ -237,7 +241,7 @@ async function loadCategories() {
 
 async function loadCategoryInfo() {
   if (!categoryType.value) return
-  
+
   try {
     currentCategory.value = await genreApi.getGenreByName(categoryType.value)
   } catch (error) {
@@ -247,9 +251,9 @@ async function loadCategoryInfo() {
 
 async function loadSongs(reset = false) {
   if (isLoading.value) return
-  
+
   isLoading.value = true
-  
+
   try {
     if (reset) {
       currentPage.value = 1
@@ -266,13 +270,13 @@ async function loadSongs(reset = false) {
     }
 
     const response = await musicApi.getSongsByGenre(categoryType.value, params)
-    
+
     if (reset) {
       songs.value = response
     } else {
       songs.value.push(...response)
     }
-    
+
     hasMore.value = response.length === pageSize
     currentPage.value++
   } catch (error) {
@@ -344,15 +348,19 @@ function goBack() {
 }
 
 // 监听路由变化
-watch(() => categoryType.value, async (newType) => {
-  if (newType) {
-    await loadCategoryInfo()
-    await loadSongs(true)
-  } else {
-    currentCategory.value = null
-    songs.value = []
-  }
-}, { immediate: true })
+watch(
+  () => categoryType.value,
+  async newType => {
+    if (newType) {
+      await loadCategoryInfo()
+      await loadSongs(true)
+    } else {
+      currentCategory.value = null
+      songs.value = []
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(async () => {
   await loadCategories()
@@ -368,161 +376,256 @@ onMounted(async () => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding-bottom: 100px;
+  padding-bottom: 120px;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1.25rem;
   position: sticky;
   top: 0;
-  background: rgba(26, 26, 46, 0.9);
-  backdrop-filter: blur(10px);
+  background: rgba(26, 26, 46, 0.95);
+  backdrop-filter: blur(20px);
   z-index: 10;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .back-button,
 .filter-button {
-  background: none;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: white;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .back-button:hover,
 .filter-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.back-button:active,
+.filter-button:active {
+  transform: scale(0.95);
 }
 
 .header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin: 0;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .category-info {
-  padding: 0 1rem 1rem;
+  padding: 0.5rem 1.25rem 1.5rem;
 }
 
 .category-banner {
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: 1.25rem;
+  padding: 2.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(10px);
+  gap: 2rem;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+  z-index: 1;
+}
+
+.category-banner:hover {
+  transform: translateY(-5px);
 }
 
 .category-icon {
-  font-size: 3rem;
-  width: 80px;
-  height: 80px;
+  font-size: 3.5rem;
+  width: 90px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.category-details {
+  position: relative;
+  z-index: 2;
 }
 
 .category-details h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .category-details p {
-  font-size: 0.9rem;
-  opacity: 0.8;
-  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.6;
 }
 
 .category-stats {
-  font-size: 0.875rem;
-  opacity: 0.7;
+  font-size: 0.95rem;
+  opacity: 0.8;
+  font-weight: 500;
 }
 
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 1.25rem;
 }
 
 .category-card {
-  padding: 1.5rem;
-  border-radius: 1rem;
+  padding: 2rem;
+  border-radius: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(10px);
+  transition: all 0.4s ease;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-card .category-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+  z-index: 1;
+  transition: background 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
 }
 
 .category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 .category-card-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 2;
 }
 
 .category-card h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  z-index: 2;
 }
 
 .category-card p {
-  font-size: 0.875rem;
-  opacity: 0.8;
+  font-size: 0.95rem;
+  opacity: 0.9;
   margin: 0;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
 }
 
 .songs-section {
-  padding: 0 1rem;
+  padding: 0.5rem 1.25rem;
 }
 
 .sort-options {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
   overflow-x: auto;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.sort-options::-webkit-scrollbar {
+  height: 4px;
+}
+
+.sort-options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sort-options::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
 }
 
 .sort-button {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.25rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  border-radius: 25px;
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
 
 .sort-button:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .sort-button.active {
   background: linear-gradient(135deg, #007aff, #0056cc);
   border-color: #007aff;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
 }
 
 .loading-state,
@@ -531,47 +634,53 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: 5rem 2rem;
   text-align: center;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #007aff;
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid #007aff;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  margin-bottom: 1.5rem;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state h3 {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.8);
+  margin: 1.25rem 0 0.75rem;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
 }
 
 .songs-list {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 1.25rem;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .song-item {
   display: flex;
   align-items: center;
-  padding: 1rem;
+  padding: 1.25rem;
   cursor: pointer;
-  transition: all 0.2s;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .song-item:last-child {
@@ -579,23 +688,30 @@ onMounted(async () => {
 }
 
 .song-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(5px);
 }
 
 .song-cover {
   position: relative;
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
   overflow: hidden;
-  margin-right: 1rem;
+  margin-right: 1.25rem;
   flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .song-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.song-item:hover .song-cover img {
+  transform: scale(1.1);
 }
 
 .play-overlay {
@@ -604,12 +720,12 @@ onMounted(async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .song-item:hover .play-overlay {
@@ -622,9 +738,9 @@ onMounted(async () => {
 }
 
 .song-title {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem 0;
   color: white;
   white-space: nowrap;
   overflow: hidden;
@@ -632,9 +748,9 @@ onMounted(async () => {
 }
 
 .song-artist {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 0.35rem 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -642,30 +758,34 @@ onMounted(async () => {
 
 .song-meta {
   display: flex;
-  gap: 1rem;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
+  gap: 1.25rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .song-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-left: 1rem;
+  gap: 0.75rem;
+  margin-left: 1.25rem;
 }
 
 .action-button {
-  background: none;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 50%;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .action-button:hover {
   color: white;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .action-button .filled {
@@ -675,22 +795,28 @@ onMounted(async () => {
 .load-more {
   display: flex;
   justify-content: center;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }
 
 .load-more-button {
-  padding: 0.875rem 2rem;
+  padding: 1rem 2.5rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 25px;
+  border-radius: 30px;
   color: white;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .load-more-button:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.load-more-button:active {
   transform: translateY(-1px);
 }
 
@@ -701,82 +827,114 @@ onMounted(async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: 1.25rem;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border-radius: 16px;
-  padding: 2rem;
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(30px);
+  border-radius: 20px;
+  padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
+  transform-origin: bottom;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-title {
   color: white;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
   text-align: center;
+  background: linear-gradient(to right, #fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .filter-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .filter-section h4 {
   color: white;
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
 }
 
 .filter-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .filter-option {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.25rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  border-radius: 25px;
   color: white;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .filter-option:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .filter-option.active {
   background: linear-gradient(135deg, #007aff, #0056cc);
   border-color: #007aff;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
 }
 
 .modal-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
 }
 
 .cancel-button,
 .confirm-button {
   flex: 1;
-  padding: 0.875rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -789,6 +947,7 @@ onMounted(async () => {
 
 .cancel-button:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
 .confirm-button {
@@ -800,27 +959,88 @@ onMounted(async () => {
 
 .confirm-button:hover {
   background: linear-gradient(135deg, #0056cc, #004499);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4);
+}
+
+.confirm-button:active,
+.cancel-button:active {
+  transform: translateY(0);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .categories-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
   }
-  
+
   .category-banner {
     flex-direction: column;
     text-align: center;
+    padding: 2rem 1.5rem;
   }
-  
+
+  .category-icon {
+    margin-bottom: 1rem;
+  }
+
   .song-meta {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.35rem;
   }
-  
+
+  .modal-content {
+    padding: 1.75rem;
+  }
+
   .modal-actions {
     flex-direction: column;
+  }
+
+  .song-cover {
+    width: 50px;
+    height: 50px;
+    margin-right: 1rem;
+  }
+
+  .song-title {
+    font-size: 1rem;
+  }
+
+  .song-artist {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.3rem;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-details h2 {
+    font-size: 1.5rem;
+  }
+
+  .song-item {
+    padding: 1rem;
+  }
+
+  .song-actions {
+    margin-left: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .action-button {
+    padding: 0.5rem;
   }
 }
 </style>
