@@ -4,6 +4,7 @@ import { AppModule } from '../../../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Song } from '../../../src/entities/song.entity'
 import { Repository } from 'typeorm'
+import { ConfigService } from '@nestjs/config'
 
 interface SeedSongData {
   title: string
@@ -871,6 +872,12 @@ async function seedRecommendedSongs() {
       const randomId = Math.floor(Math.random() * 1000) + 1
       const coverUrl = `https://picsum.photos/300/300?random=${randomId}`
 
+      // 获取服务器基础URL
+      const baseUrl = app
+        .get(ConfigService)
+        .get('app.frontendUrl')
+        .replace('localhost:5173', 'localhost:3000')
+
       // 创建歌曲
       const newSong = songRepository.create({
         title: songData.title,
@@ -878,7 +885,7 @@ async function seedRecommendedSongs() {
         album: songData.album,
         duration: songData.duration,
         coverUrl: coverUrl,
-        audioUrl: '/uploads/music/default-song.mp3',
+        audioUrl: `${baseUrl}/api/static/music/default-song.mp3`,
         genre: songData.genre,
         year: songData.year,
         playCount: songData.playCount,

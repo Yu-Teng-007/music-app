@@ -35,25 +35,19 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
   console.log('='.repeat(60))
 
   try {
-    // 1. 创建管理员用户
-    await runSeeder('管理员用户', async () => {
-      const { seedAdminUser } = await import('./seed-admin-user')
-      await seedAdminUser()
-    })
-
-    // 2. 创建音乐分类
+    // 1. 创建音乐分类
     await runSeeder('音乐分类', async () => {
       const { seedGenres } = await import('./seed-genres')
       await seedGenres()
     })
 
-    // 3. 创建推荐歌曲
+    // 2. 创建推荐歌曲
     await runSeeder('推荐歌曲', async () => {
       const { seedRecommendedSongs } = await import('./seed-recommended-songs')
       await seedRecommendedSongs()
     })
 
-    // 4. 创建默认播放列表
+    // 3. 创建默认播放列表
     await runSeeder('默认播放列表', async () => {
       const { seedPlaylists } = await import('./seed-playlists')
       await seedPlaylists()
@@ -62,18 +56,10 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
     console.log('\n🎉 所有种子文件运行完成！')
     console.log('='.repeat(60))
     console.log('📊 数据库初始化摘要:')
-    console.log('  ✅ 管理员用户已创建')
     console.log('  ✅ 音乐分类已添加')
     console.log('  ✅ 推荐歌曲已导入')
     console.log('  ✅ 默认播放列表已创建')
-    console.log('\n🔐 管理员登录信息:')
-    console.log(`  📧 邮箱: admin@musicapp.com`)
-    console.log(`  👤 用户名: admin`)
-    console.log(
-      `  🔑 密码: ${config.environment === 'production' ? 'MusicApp@Admin2024!' : 'admin123456'}`
-    )
     console.log('\n⚠️  重要提醒:')
-    console.log('  - 生产环境请及时修改默认管理员密码')
     console.log('  - 建议定期备份数据库')
     console.log('  - 确保上传目录权限正确设置')
   } catch (error) {

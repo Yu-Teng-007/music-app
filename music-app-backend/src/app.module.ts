@@ -50,6 +50,10 @@ import { User, Song, Playlist, Favorite, Genre } from './entities'
           rootPath: join(__dirname, '..', configService.get('app.uploadDir') || 'uploads'),
           serveRoot: '/uploads',
         },
+        {
+          rootPath: join(__dirname, 'static'),
+          serveRoot: '/static',
+        },
       ],
       inject: [ConfigService],
     }),
