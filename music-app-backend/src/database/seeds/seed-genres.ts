@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../src/app.module'
+import { AppModule } from '../../../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Genre } from '../src/entities/genre.entity'
+import { Genre } from '../../../src/entities/genre.entity'
 import { Repository } from 'typeorm'
 
 interface GenreData {

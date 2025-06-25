@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../src/app.module'
+import { AppModule } from '../../../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { User } from '../src/entities/user.entity'
+import { User } from '../../../src/entities/user.entity'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcryptjs'
 

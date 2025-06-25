@@ -13,6 +13,14 @@ export interface Song {
   genre?: string
   playCount?: number
   createdAt?: string
+  rankChange?: number
+}
+
+export interface PlayHistoryItem {
+  id: string
+  song: Song
+  playedAt: string
+  playDuration: number // 播放时长（秒）
 }
 
 export interface PlayMode {
@@ -26,6 +34,9 @@ export const useMusicStore = defineStore('music', () => {
 
   // 播放列表
   const playlist = ref<Song[]>([])
+
+  // 播放历史
+  const playHistory = ref<PlayHistoryItem[]>([])
 
   // 播放状态
   const isPlaying = ref(false)
@@ -41,6 +52,9 @@ export const useMusicStore = defineStore('music', () => {
 
   // 当前歌曲在播放列表中的索引
   const currentIndex = ref(0)
+
+  // 播放开始时间（用于计算播放时长）
+  const playStartTime = ref<number | null>(null)
 
   // 加载状态
   const isLoading = ref(false)
@@ -69,22 +83,50 @@ export const useMusicStore = defineStore('music', () => {
   // 播放控制
   function play() {
     isPlaying.value = true
+    // 记录播放开始时间
+    if (currentSong.value && !playStartTime.value) {
+      playStartTime.value = Date.now()
+    }
   }
 
   function pause() {
     isPlaying.value = false
+    // 记录播放历史
+    if (currentSong.value && playStartTime.value) {
+      const playDuration = Math.floor((Date.now() - playStartTime.value) / 1000)
+      if (playDuration >= 30) {
+        // 只有播放超过30秒才记录到历史
+        addToPlayHistory(currentSong.value, playDuration)
+      }
+      playStartTime.value = null
+    }
   }
 
   function togglePlay() {
-    isPlaying.value = !isPlaying.value
+    if (isPlaying.value) {
+      pause()
+    } else {
+      play()
+    }
   }
 
   function setCurrentSong(song: Song) {
+    // 如果切换歌曲，先记录上一首歌的播放历史
+    if (currentSong.value && playStartTime.value) {
+      const playDuration = Math.floor((Date.now() - playStartTime.value) / 1000)
+      if (playDuration >= 30) {
+        addToPlayHistory(currentSong.value, playDuration)
+      }
+    }
+
     currentSong.value = song
     const index = playlist.value.findIndex(s => s.id === song.id)
     if (index !== -1) {
       currentIndex.value = index
     }
+
+    // 重置播放开始时间
+    playStartTime.value = isPlaying.value ? Date.now() : null
   }
 
   function nextSong() {
@@ -213,6 +255,75 @@ export const useMusicStore = defineStore('music', () => {
     }
   }
 
+  // 播放历史管理
+  function addToPlayHistory(song: Song, playDuration: number) {
+    const historyItem: PlayHistoryItem = {
+      id: `${song.id}-${Date.now()}`,
+      song,
+      playedAt: new Date().toISOString(),
+      playDuration,
+    }
+
+    // 检查是否已存在相同歌曲的最近记录（5分钟内）
+    const recentIndex = playHistory.value.findIndex(
+      item =>
+        item.song.id === song.id && Date.now() - new Date(item.playedAt).getTime() < 5 * 60 * 1000
+    )
+
+    if (recentIndex !== -1) {
+      // 更新现有记录的播放时长
+      playHistory.value[recentIndex].playDuration += playDuration
+      playHistory.value[recentIndex].playedAt = new Date().toISOString()
+    } else {
+      // 添加新记录到开头
+      playHistory.value.unshift(historyItem)
+      // 限制历史记录数量（最多保留1000条）
+      if (playHistory.value.length > 1000) {
+        playHistory.value = playHistory.value.slice(0, 1000)
+      }
+    }
+
+    // 保存到本地存储
+    savePlayHistoryToStorage()
+  }
+
+  function removeFromPlayHistory(historyId: string) {
+    const index = playHistory.value.findIndex(item => item.id === historyId)
+    if (index !== -1) {
+      playHistory.value.splice(index, 1)
+      savePlayHistoryToStorage()
+    }
+  }
+
+  function clearPlayHistory() {
+    playHistory.value = []
+    savePlayHistoryToStorage()
+  }
+
+  function getPlayHistory(limit?: number) {
+    return limit ? playHistory.value.slice(0, limit) : playHistory.value
+  }
+
+  function savePlayHistoryToStorage() {
+    try {
+      localStorage.setItem('music_play_history', JSON.stringify(playHistory.value))
+    } catch (error) {
+      console.error('Failed to save play history to storage:', error)
+    }
+  }
+
+  function loadPlayHistoryFromStorage() {
+    try {
+      const stored = localStorage.getItem('music_play_history')
+      if (stored) {
+        playHistory.value = JSON.parse(stored)
+      }
+    } catch (error) {
+      console.error('Failed to load play history from storage:', error)
+      playHistory.value = []
+    }
+  }
+
   // 初始化播放列表（从API加载）
   async function initializePlaylist() {
     if (playlist.value.length === 0) {
@@ -223,10 +334,19 @@ export const useMusicStore = defineStore('music', () => {
     }
   }
 
+  // 初始化播放历史
+  function initializePlayHistory() {
+    loadPlayHistoryFromStorage()
+  }
+
+  // 初始化播放历史
+  initializePlayHistory()
+
   return {
     // 状态
     currentSong,
     playlist,
+    playHistory,
     isPlaying,
     currentTime,
     duration,
@@ -261,5 +381,12 @@ export const useMusicStore = defineStore('music', () => {
     loadPopularSongs,
     searchSongs,
     formatTime,
+
+    // 播放历史方法
+    addToPlayHistory,
+    removeFromPlayHistory,
+    clearPlayHistory,
+    getPlayHistory,
+    initializePlayHistory,
   }
 })

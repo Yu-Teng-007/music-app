@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../src/app.module'
+import { AppModule } from '../../../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Playlist } from '../src/entities/playlist.entity'
-import { Song } from '../src/entities/song.entity'
-import { User } from '../src/entities/user.entity'
+import { Playlist } from '../../../src/entities/playlist.entity'
+import { Song } from '../../../src/entities/song.entity'
+import { User } from '../../../src/entities/user.entity'
 import { Repository } from 'typeorm'
 
 interface PlaylistData {

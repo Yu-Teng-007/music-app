@@ -69,11 +69,11 @@ export const musicApi = {
     }
   },
 
-  // 按类型获取歌曲
-  async getSongsByGenre(genre: string, limit?: number) {
+  // 按分类获取歌曲
+  async getSongsByGenre(genre: string, params: any = {}) {
     try {
       const response = await apiClient.get(`/songs/genre/${genre}`, {
-        params: { limit },
+        params,
       })
       return response.data.data
     } catch (error: any) {

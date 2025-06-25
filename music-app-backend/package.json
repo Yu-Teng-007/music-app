@@ -16,15 +16,11 @@
     "lint": "eslint \"src/**/*.ts\" --fix",
     "lint:check": "eslint \"src/**/*.ts\"",
     "code-style": "npm run format && npm run lint",
-    "env:check": "node -e \"console.log('当前环境:', process.env.NODE_ENV || '未设置')\"",
-    "seed": "ts-node seeds/complete-seed.ts",
-    "seed:quick": "ts-node seeds/quick-seed.ts",
-    "seed:admin": "ts-node seeds/seed-admin-user.ts",
-    "seed:genres": "ts-node seeds/seed-genres.ts",
-    "seed:songs": "ts-node seeds/seed-recommended-songs.ts",
-    "seed:playlists": "ts-node seeds/seed-playlists.ts",
-    "seed:prod": "npm run seed -- --env production",
-    "seed:force": "npm run seed -- --force"
+    "seed": "ts-node src/database/seeds/complete-seed.ts",
+    "seed:admin": "ts-node src/database/seeds/seed-admin-user.ts",
+    "seed:genres": "ts-node src/database/seeds/seed-genres.ts",
+    "seed:songs": "ts-node src/database/seeds/seed-recommended-songs.ts",
+    "seed:playlists": "ts-node src/database/seeds/seed-playlists.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

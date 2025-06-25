@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../src/app.module'
-import { SongsService } from '../src/songs/songs.service'
+import { AppModule } from '../../../src/app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Song } from '../src/entities/song.entity'
+import { Song } from '../../../src/entities/song.entity'
 import { Repository } from 'typeorm'
 
 interface SeedSongData {

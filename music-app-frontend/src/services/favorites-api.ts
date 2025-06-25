@@ -37,7 +37,7 @@ export const favoritesApi = {
   async checkFavorite(songId: string) {
     try {
       const response = await apiClient.get(`/favorites/check/${songId}`)
-      return response.data.data.isFavorite
+      return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || '检查收藏状态失败')
     }
@@ -47,7 +47,7 @@ export const favoritesApi = {
   async getFavoriteCount() {
     try {
       const response = await apiClient.get('/favorites/count')
-      return response.data.data.count
+      return response.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || '获取收藏数量失败')
     }

@@ -12,6 +12,7 @@ import { PlaylistsModule } from './playlists/playlists.module'
 import { UploadModule } from './upload/upload.module'
 import { DatabaseModule } from './database/database.module'
 import { FavoritesModule } from './favorites/favorites.module'
+import { GenresModule } from './genres/genres.module'
 import { User, Song, Playlist, Favorite, Genre } from './entities'
 
 @Module({
@@ -58,6 +59,7 @@ import { User, Song, Playlist, Favorite, Genre } from './entities'
     SongsModule,
     PlaylistsModule,
     FavoritesModule,
+    GenresModule,
     UploadModule,
     DatabaseModule,
   ],
