@@ -53,12 +53,19 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
       await seedPlaylists()
     })
 
+    // 4. 创建排行榜数据
+    await runSeeder('排行榜数据', async () => {
+      const { seedCharts } = await import('./seed-charts')
+      await seedCharts()
+    })
+
     console.log('\n🎉 所有种子文件运行完成！')
     console.log('='.repeat(60))
     console.log('📊 数据库初始化摘要:')
     console.log('  ✅ 音乐分类已添加')
     console.log('  ✅ 推荐歌曲已导入')
     console.log('  ✅ 默认播放列表已创建')
+    console.log('  ✅ 排行榜数据已创建')
     console.log('\n⚠️  重要提醒:')
     console.log('  - 建议定期备份数据库')
     console.log('  - 确保上传目录权限正确设置')
