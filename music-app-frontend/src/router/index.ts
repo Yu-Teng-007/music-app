@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import('../views/PlaylistView.vue'),
       meta: { requiresAuth: true },
     },
+    // 歌单详情页路由
+    {
+      path: '/playlist/:id',
+      name: 'playlist-detail',
+      component: () => import('../views/PlaylistDetailView.vue'),
+    },
     {
       path: '/profile',
       name: 'profile',

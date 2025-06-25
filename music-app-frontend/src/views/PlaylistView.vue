@@ -243,6 +243,11 @@ const coverOptions = ref([
 const myPlaylists = ref<Playlist[]>([])
 const recommendedPlaylists = ref<Playlist[]>([])
 
+// 打开歌单详情页
+const openPlaylist = (playlist: Playlist) => {
+  router.push(`/playlist/${playlist.id}`)
+}
+
 // 加载我的播放列表
 const loadMyPlaylists = async () => {
   if (!authStore.isAuthenticated) {
@@ -306,10 +311,6 @@ const filteredRecommendedPlaylists = computed(() => {
       (playlist.creator && playlist.creator.toLowerCase().includes(searchQuery.value.toLowerCase()))
   )
 })
-
-const openPlaylist = (playlist: Playlist) => {
-  router.push(`/playlist/${playlist.id}`)
-}
 
 const createPlaylist = async () => {
   if (!newPlaylistName.value.trim() || !authStore.isAuthenticated) {
