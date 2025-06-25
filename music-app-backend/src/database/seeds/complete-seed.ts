@@ -47,13 +47,7 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
       await seedRecommendedSongs()
     })
 
-    // 3. 创建默认播放列表
-    await runSeeder('默认播放列表', async () => {
-      const { seedPlaylists } = await import('./seed-playlists')
-      await seedPlaylists()
-    })
-
-    // 4. 创建排行榜数据
+    // 3. 创建排行榜数据
     await runSeeder('排行榜数据', async () => {
       const { seedCharts } = await import('./seed-charts')
       await seedCharts()
