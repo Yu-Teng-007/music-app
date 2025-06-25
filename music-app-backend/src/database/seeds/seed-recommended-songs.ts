@@ -885,7 +885,7 @@ async function seedRecommendedSongs() {
         album: songData.album,
         duration: songData.duration,
         coverUrl: coverUrl,
-        audioUrl: `${baseUrl}/api/static/music/default-song.mp3`,
+        audioUrl: `${baseUrl}/static/music/default-song.mp3`,
         genre: songData.genre,
         year: songData.year,
         playCount: songData.playCount,
