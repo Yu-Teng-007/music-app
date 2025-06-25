@@ -5,7 +5,7 @@
       <div class="loading-spinner"></div>
       <p>加载中...</p>
     </div>
-    
+
     <div v-else-if="error" class="error-container">
       <AlertCircle :size="48" />
       <h3>{{ error }}</h3>
@@ -16,9 +16,9 @@
       <!-- 歌单头部信息 -->
       <div class="playlist-header">
         <div class="playlist-cover">
-          <img 
-            :src="playlist?.coverUrl || 'https://picsum.photos/300/300?random=120'" 
-            :alt="playlist?.name" 
+          <img
+            :src="playlist?.coverUrl || 'https://picsum.photos/300/300?random=120'"
+            :alt="playlist?.name"
             @error="handleImageError"
           />
         </div>
@@ -34,7 +34,9 @@
               <span>{{ formatDate(playlist?.createdAt) }}</span>
             </div>
           </div>
-          <p v-if="playlist?.description" class="playlist-description">{{ playlist?.description }}</p>
+          <p v-if="playlist?.description" class="playlist-description">
+            {{ playlist?.description }}
+          </p>
         </div>
       </div>
 
@@ -44,17 +46,13 @@
           <Play :size="18" />
           播放全部
         </button>
-        <button 
-          v-if="isOwner" 
-          @click="showEditModal = true" 
-          class="edit-btn"
-        >
+        <button v-if="isOwner" @click="showEditModal = true" class="edit-btn">
           <Edit :size="16" />
           编辑歌单
         </button>
-        <button 
-          v-if="!isOwner" 
-          @click="toggleFavorite" 
+        <button
+          v-if="!isOwner"
+          @click="toggleFavorite"
           class="favorite-btn"
           :class="{ active: isFavorite }"
         >
@@ -79,18 +77,18 @@
         </div>
 
         <div v-if="playlist?.songs && playlist.songs.length > 0" class="songs-list">
-          <div 
-            v-for="(song, index) in playlist.songs" 
-            :key="song.id" 
+          <div
+            v-for="(song, index) in playlist.songs"
+            :key="song.id"
             class="song-item"
             :class="{ active: currentSongId === song.id }"
             @dblclick="playSong(song, index)"
           >
             <div class="song-index">{{ index + 1 }}</div>
             <div class="song-info">
-              <img 
-                :src="song.coverUrl || 'https://picsum.photos/50/50?random=121'" 
-                :alt="song.title" 
+              <img
+                :src="song.coverUrl || 'https://picsum.photos/50/50?random=121'"
+                :alt="song.title"
                 class="song-cover"
                 @error="handleImageError"
               />
@@ -219,20 +217,20 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { playlistApi } from '@/services/playlist-api'
-import { 
-  Play, 
-  Edit, 
-  Heart, 
-  Share, 
-  Music, 
-  Plus, 
-  X, 
-  MoreHorizontal, 
+import {
+  Play,
+  Edit,
+  Heart,
+  Share,
+  Music,
+  Plus,
+  X,
+  MoreHorizontal,
   AlertCircle,
   MessageSquare,
   Send,
   Link,
-  QrCode
+  QrCode,
 } from 'lucide-vue-next'
 
 // 路由和认证信息
@@ -255,13 +253,12 @@ const isUpdating = ref(false)
 const editForm = ref({
   name: '',
   description: '',
-  isPrivate: false
+  isPrivate: false,
 })
 
 // 计算属性
 const isOwner = computed(() => {
-  return authStore.isAuthenticated && 
-    playlist.value?.userId === authStore.user?.id
+  return authStore.isAuthenticated && playlist.value?.userId === authStore.user?.id
 })
 
 // 加载歌单详情
@@ -277,7 +274,7 @@ const loadPlaylistDetail = async () => {
     isLoading.value = true
     const data = await playlistApi.getPlaylist(playlistId)
     playlist.value = data
-    
+
     // 初始化编辑表单
     if (data) {
       editForm.value.name = data.name || ''
@@ -297,10 +294,10 @@ const playAll = () => {
   if (!playlist.value?.songs || playlist.value.songs.length === 0) {
     return
   }
-  
+
   // 这里应该调用播放器的播放队列功能
   console.log('播放全部歌曲', playlist.value.songs)
-  
+
   // 播放第一首歌曲
   playSong(playlist.value.songs[0], 0)
 }
@@ -308,9 +305,9 @@ const playAll = () => {
 // 播放单首歌曲
 const playSong = (song: any, index: number) => {
   if (!song) return
-  
+
   currentSongId.value = song.id
-  
+
   // 这里应该调用播放器的播放功能
   console.log('播放歌曲', song, '索引:', index)
 }
@@ -325,20 +322,20 @@ const toggleFavorite = () => {
 // 更新歌单信息
 const updatePlaylist = async () => {
   if (!playlist.value?.id || !editForm.value.name.trim()) return
-  
+
   try {
     isUpdating.value = true
     await playlistApi.updatePlaylist(playlist.value.id, {
       name: editForm.value.name,
       description: editForm.value.description,
-      isPrivate: editForm.value.isPrivate
+      isPrivate: editForm.value.isPrivate,
     })
-    
+
     // 更新本地数据
     playlist.value.name = editForm.value.name
     playlist.value.description = editForm.value.description
     playlist.value.isPrivate = editForm.value.isPrivate
-    
+
     showEditModal.value = false
   } catch (err: any) {
     console.error('更新歌单失败:', err)
@@ -388,7 +385,11 @@ onMounted(() => {
 
 <style scoped>
 .playlist-detail-view {
-  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding: 1.5rem;
+  padding-bottom: 100px; /* 为底部导航留空间 */
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -400,15 +401,15 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #007aff;
   border-radius: 50%;
-  border-top-color: var(--color-primary);
   animation: spin 1s ease-in-out infinite;
   margin-bottom: 16px;
 }
@@ -422,11 +423,17 @@ onMounted(() => {
 .back-btn {
   margin-top: 16px;
   padding: 8px 16px;
-  background-color: var(--color-primary);
+  background-color: #007aff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background-color: #0056cc;
+  transform: translateY(-2px);
 }
 
 /* 歌单头部样式 */
@@ -434,20 +441,26 @@ onMounted(() => {
   display: flex;
   gap: 24px;
   margin-bottom: 24px;
+  animation: fadeIn 0.3s ease;
 }
 
 .playlist-cover {
   width: 200px;
   height: 200px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .playlist-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.playlist-cover:hover img {
+  transform: scale(1.05);
 }
 
 .playlist-info {
@@ -458,14 +471,15 @@ onMounted(() => {
 
 .playlist-type {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 8px;
 }
 
 .playlist-name {
-  font-size: 28px;
-  font-weight: bold;
-  margin: 0 0 12px;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: white;
 }
 
 .playlist-meta {
@@ -483,12 +497,12 @@ onMounted(() => {
   display: flex;
   gap: 16px;
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .playlist-description {
   font-size: 14px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.5;
   margin: 0;
   max-width: 600px;
@@ -505,45 +519,64 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 10px 20px;
+  border-radius: 24px;
   border: none;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .play-btn {
-  background-color: var(--color-primary);
+  background-color: #007aff;
   color: white;
+}
+
+.play-btn:hover {
+  background-color: #0056cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
 
 .edit-btn,
 .favorite-btn,
 .share-btn {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.edit-btn:hover,
+.favorite-btn:hover,
+.share-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .favorite-btn.active {
-  color: var(--color-primary);
+  color: #007aff;
 }
 
 /* 歌曲列表样式 */
 .songs-container {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.3s ease;
 }
 
 .songs-header {
   display: grid;
   grid-template-columns: 50px 3fr 2fr 2fr 100px 80px;
-  padding: 12px 16px;
-  background-color: rgba(0, 0, 0, 0.02);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .song-item {
@@ -551,16 +584,17 @@ onMounted(() => {
   grid-template-columns: 50px 3fr 2fr 2fr 100px 80px;
   padding: 12px 16px;
   align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
 }
 
 .song-item:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
 }
 
 .song-item.active {
-  background-color: rgba(var(--color-primary-rgb), 0.05);
+  background-color: rgba(0, 122, 255, 0.15);
 }
 
 .song-info {
@@ -572,8 +606,9 @@ onMounted(() => {
 .song-cover {
   width: 40px;
   height: 40px;
-  border-radius: 4px;
+  border-radius: 8px;
   object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .song-title-wrapper {
@@ -587,7 +622,7 @@ onMounted(() => {
 
 .song-features {
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .song-artist,
@@ -606,16 +641,17 @@ onMounted(() => {
 .action-btn {
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 50%;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: var(--color-text);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: scale(1.1);
 }
 
 /* 空状态样式 */
@@ -624,8 +660,8 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 0;
-  color: var(--color-text-secondary);
+  padding: 60px 0;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .empty-songs p {
@@ -636,12 +672,19 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background-color: var(--color-primary);
+  padding: 10px 20px;
+  background-color: #007aff;
   color: white;
   border: none;
-  border-radius: 20px;
+  border-radius: 24px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-songs-btn:hover {
+  background-color: #0056cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
 
 /* 模态框样式 */
@@ -651,68 +694,118 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-header h3 {
   margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .close-btn {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .form-section {
-  padding: 16px;
+  padding: 20px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .input-field,
 .textarea-field {
   width: 100%;
-  padding: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
   font-size: 14px;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus,
+.textarea-field:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  outline: none;
 }
 
 .input-counter {
   text-align: right;
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 4px;
 }
 
@@ -725,32 +818,44 @@ onMounted(() => {
 
 .checkbox-desc {
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cancel-btn {
-  padding: 8px 16px;
-  background: none;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .confirm-btn {
-  padding: 8px 16px;
-  background-color: var(--color-primary);
+  padding: 10px 20px;
+  background-color: #007aff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #0056cc;
+  transform: translateY(-1px);
 }
 
 .confirm-btn:disabled {
@@ -767,24 +872,26 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  padding: 16px;
+  padding: 20px;
 }
 
 .share-option {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
-  background-color: rgba(0, 0, 0, 0.02);
-  border: none;
-  border-radius: 8px;
+  gap: 12px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .share-option:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* 响应式样式 */
@@ -794,21 +901,53 @@ onMounted(() => {
     align-items: center;
     text-align: center;
   }
-  
+
   .playlist-cover {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
   }
-  
+
   .songs-header,
   .song-item {
     grid-template-columns: 40px 3fr 2fr 80px 40px;
   }
-  
+
   .song-album {
     display: none;
   }
+
+  .action-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .playlist-detail-view {
+    padding: 1rem;
+  }
+
+  .playlist-cover {
+    width: 150px;
+    height: 150px;
+  }
+
+  .playlist-name {
+    font-size: 24px;
+  }
+
+  .songs-header,
+  .song-item {
+    grid-template-columns: 30px 3fr 2fr 40px;
+    padding: 10px;
+  }
+
+  .song-duration {
+    display: none;
+  }
+
+  .share-options {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
-</code_block_to_apply_changes_from>
-</rewritten_file>

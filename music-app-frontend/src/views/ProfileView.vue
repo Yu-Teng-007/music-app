@@ -116,16 +116,6 @@ const menuItems = computed(() => [
     icon: UserCog,
   },
   {
-    id: 'friends',
-    label: '查找好友',
-    icon: Users,
-  },
-  {
-    id: 'share',
-    label: '分享',
-    icon: Share,
-  },
-  {
     id: 'settings',
     label: '设置',
     icon: Settings,

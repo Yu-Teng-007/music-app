@@ -1,138 +1,97 @@
 <template>
+  <!-- 隐藏的音频元素 -->
   <audio
     ref="audioRef"
-    :src="currentSong?.audioUrl"
-    @loadedmetadata="handleLoadedMetadata"
-    @loadeddata="handleLoadedData"
-    @timeupdate="handleTimeUpdate"
-    @ended="handleEnded"
-    @error="handleError"
-    @canplay="handleCanPlay"
-    @loadstart="handleLoadStart"
-    @waiting="handleWaiting"
-    @playing="handlePlaying"
-    @pause="handlePause"
-    preload="metadata"
-    crossorigin="anonymous"
-  />
+    :src="audioSrc"
+    @timeupdate="onTimeUpdate"
+    @loadedmetadata="onLoadedMetadata"
+    @ended="onEnded"
+    @error="onError"
+    preload="auto"
+  ></audio>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useMusicStore } from '@/stores/music'
 
 const musicStore = useMusicStore()
-const audioRef = ref<HTMLAudioElement>()
+const audioRef = ref<HTMLAudioElement | null>(null)
 
-// 从store中获取响应式引用 - 使用computed保持响应性
-const currentSong = computed(() => musicStore.currentSong)
-const isPlaying = computed(() => musicStore.isPlaying)
-const volume = computed(() => musicStore.volume)
-const currentTime = computed(() => musicStore.currentTime)
+// 计算音频源
+const audioSrc = ref('')
+
+// 播放音频
+const playAudio = () => {
+  if (audioRef.value && audioSrc.value) {
+    const playPromise = audioRef.value.play()
+
+    // 处理浏览器的自动播放策略
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // 播放成功
+        })
+        .catch(error => {
+          console.error('播放失败:', error)
+          // 自动播放被阻止，更新状态
+          musicStore.pause()
+        })
+    }
+  }
+}
+
+// 暂停音频
+const pauseAudio = () => {
+  if (audioRef.value) {
+    audioRef.value.pause()
+  }
+}
 
 // 监听当前歌曲变化
 watch(
-  currentSong,
-  (newSong, oldSong) => {
-    if (newSong && audioRef.value) {
-      // 重置播放状态
-      musicStore.currentTime = 0
-      musicStore.duration = 0
-
-      // 设置音频源并加载
-      audioRef.value.src = newSong.audioUrl
-      audioRef.value.load()
+  () => musicStore.currentSong,
+  newSong => {
+    if (newSong) {
+      audioSrc.value = 'src' + newSong.audioUrl
+      // 如果当前正在播放，则加载新歌曲后自动播放
+      if (musicStore.isPlaying) {
+        // 使用setTimeout等待DOM更新后再播放
+        setTimeout(() => {
+          playAudio()
+        }, 0)
+      }
+    } else {
+      audioSrc.value = ''
+      pauseAudio()
     }
   },
   { immediate: true }
 )
 
 // 监听播放状态变化
-watch(isPlaying, playing => {
-  if (!audioRef.value) {
-    return
+watch(
+  () => musicStore.isPlaying,
+  isPlaying => {
+    if (isPlaying) {
+      playAudio()
+    } else {
+      pauseAudio()
+    }
   }
-
-  if (playing) {
-    audioRef.value
-      .play()
-      .then(() => {})
-      .catch(error => {
-        musicStore.pause()
-      })
-  } else {
-    audioRef.value.pause()
-  }
-})
+)
 
 // 监听音量变化
-watch(volume, vol => {
-  if (audioRef.value) {
-    audioRef.value.volume = vol
-  }
-})
-
-// 监听进度设置 - 移除这个watch，因为会造成循环更新
-
-// 音频事件处理
-const handleLoadedMetadata = () => {
-  if (audioRef.value) {
-    musicStore.duration = audioRef.value.duration
-    audioRef.value.volume = musicStore.volume
-  }
-}
-
-const handleTimeUpdate = () => {
-  if (audioRef.value) {
-    musicStore.currentTime = audioRef.value.currentTime
-  }
-}
-
-const handleEnded = () => {
-  // 歌曲播放结束
-  if (musicStore.playMode.repeat === 'one') {
-    // 单曲循环
+watch(
+  () => musicStore.volume,
+  newVolume => {
     if (audioRef.value) {
-      audioRef.value.currentTime = 0
-      audioRef.value.play()
+      audioRef.value.volume = newVolume
     }
-  } else {
-    // 播放下一首
-    musicStore.nextSong()
   }
-}
+)
 
-const handleError = (event: Event) => {
-  const audio = event.target as HTMLAudioElement
-
-  musicStore.pause()
-}
-
-const handleCanPlay = () => {
-  // 音频可以播放
-}
-
-const handleLoadStart = () => {
-  // 开始加载音频
-}
-
-const handleLoadedData = () => {
-  // 音频数据加载完成
-}
-
-const handleWaiting = () => {
-  // 音频缓冲中...
-}
-
-const handlePlaying = () => {
-  // 音频开始播放
-}
-
-const handlePause = () => {
-  // 音频暂停
-}
-
-// 设置进度的方法
+// 实现设置进度的方法
 const setProgress = (progress: number) => {
   if (audioRef.value && musicStore.duration > 0) {
     const newTime = (progress / 100) * musicStore.duration
@@ -141,21 +100,55 @@ const setProgress = (progress: number) => {
   }
 }
 
-// 暴露方法给store使用
+// 注册设置进度方法到store
 onMounted(() => {
-  // 将setProgress方法添加到store中
+  // 覆盖store中的setProgress方法
   musicStore.setProgress = setProgress
 
-  // 如果有当前歌曲，确保音频元素正确设置
-  if (currentSong.value && audioRef.value) {
-    audioRef.value.src = currentSong.value.audioUrl
-    audioRef.value.load()
+  // 设置初始音量
+  if (audioRef.value) {
+    audioRef.value.volume = musicStore.volume
   }
 })
 
+// 事件处理
+const onTimeUpdate = () => {
+  if (audioRef.value) {
+    musicStore.currentTime = audioRef.value.currentTime
+  }
+}
+
+const onLoadedMetadata = () => {
+  if (audioRef.value) {
+    musicStore.duration = audioRef.value.duration || 0
+  }
+}
+
+const onEnded = () => {
+  // 根据播放模式决定下一步操作
+  if (musicStore.playMode.repeat === 'one') {
+    // 单曲循环
+    if (audioRef.value) {
+      audioRef.value.currentTime = 0
+      playAudio()
+    }
+  } else {
+    // 播放下一首
+    musicStore.nextSong()
+  }
+}
+
+const onError = (error: Event) => {
+  console.error('音频播放错误:', error)
+  // 可以添加错误处理逻辑，例如尝试下一首歌曲
+  musicStore.pause()
+}
+
+// 组件卸载时清理
 onUnmounted(() => {
   if (audioRef.value) {
     audioRef.value.pause()
+    audioRef.value.src = ''
   }
 })
 </script>

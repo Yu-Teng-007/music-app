@@ -151,7 +151,6 @@ import {
   Repeat,
   Repeat1,
   ChevronDown,
-  ChevronUp,
   MoreHorizontal,
   Heart,
   MessageCircle,
@@ -199,10 +198,6 @@ const backgroundStyle = computed(() => {
 // 方法
 const goBack = () => {
   router.go(-1) // 返回上一页
-}
-
-const toggleFullScreen = () => {
-  isFullScreen.value = !isFullScreen.value
 }
 
 const togglePlay = () => {
