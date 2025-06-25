@@ -3,15 +3,24 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
 import { useAuthStore } from '@/stores/auth'
+import { genreApi } from '@/services'
 import type { Song } from '@/stores/music'
-import { Play, Heart, MoreHorizontal } from 'lucide-vue-next'
+import type { Genre } from '@/services/genre-api'
+import { Play, Heart, MoreHorizontal, ChevronRight } from 'lucide-vue-next'
 
 const router = useRouter()
 const musicStore = useMusicStore()
 const authStore = useAuthStore()
 
+interface UserInfo {
+  name?: string
+  avatar: string
+  greeting: string  
+  subGreeting: string
+}
+
 // 用户信息
-const userInfo = ref({
+const userInfo = ref<UserInfo>({
   name: '音乐爱好者',
   avatar: 'https://picsum.photos/60/60?random=100',
   greeting: '戴上耳机好好听',
@@ -20,6 +29,9 @@ const userInfo = ref({
 
 // 最近播放的歌曲
 const recentSongs = ref<Song[]>([])
+
+// 精选分类
+const featuredCategories = ref<Genre[]>([])
 
 // 排行榜类型
 const chartTypes = ref([
@@ -90,7 +102,22 @@ const playSong = (song: Song) => {
 }
 
 const goToChart = (chartId: string) => {
-  router.push(`/chart/${chartId}`)
+  router.push(`/charts/${chartId}`)
+}
+
+// 跳转到分类页面
+const goToCategory = (categoryName: string) => {
+  router.push(`/category/${categoryName}`)
+}
+
+// 跳转到分类列表
+const goToCategories = () => {
+  router.push('/category')
+}
+
+// 跳转到新歌首发
+const goToNewReleases = () => {
+  router.push('/new-releases')
 }
 
 const handleImageError = (event: Event) => {
@@ -100,11 +127,13 @@ const handleImageError = (event: Event) => {
 
 // 加载用户信息
 const loadUserInfo = async () => {
+  if (!authStore.isAuthenticated) return
+
   if (authStore.isAuthenticated) {
     try {
       const profile = await authStore.getUserProfile()
       userInfo.value = {
-        name: profile.name,
+        name: profile.username,
         avatar: profile.avatar || 'https://picsum.photos/60/60?random=100',
         greeting: profile.greeting,
         subGreeting: profile.subGreeting,
@@ -114,7 +143,7 @@ const loadUserInfo = async () => {
       // 使用默认信息
       if (authStore.user) {
         userInfo.value = {
-          name: authStore.user.name,
+          name: authStore.user.username,
           avatar: authStore.user.avatar || 'https://picsum.photos/60/60?random=100',
           greeting: '戴上耳机好好听',
           subGreeting: '今日榜单上歌曲的准备吧！',
@@ -140,12 +169,27 @@ const loadRecentSongs = async () => {
   }
 }
 
+// 加载精选分类
+const loadFeaturedCategories = async () => {
+  try {
+    const categories = await genreApi.getActiveGenres()
+    // 只显示前6个分类
+    featuredCategories.value = categories.slice(0, 6)
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+    featuredCategories.value = []
+  }
+}
+
 onMounted(async () => {
   // 加载用户信息
   await loadUserInfo()
 
   // 加载最近播放歌曲
   await loadRecentSongs()
+
+  // 加载精选分类
+  await loadFeaturedCategories()
 
   // 初始化播放列表（如果还没有歌曲的话）
   if (!musicStore.currentSong) {
@@ -206,6 +250,26 @@ onMounted(async () => {
       </div>
     </div>
 
+    <!-- 音乐分类 -->
+    <div class="section">
+      <div class="section-header">
+        <h2>音乐分类</h2>
+        <button class="see-all-button" @click="goToCategories">查看全部</button>
+      </div>
+      <div class="categories-scroll">
+        <div
+          v-for="category in featuredCategories"
+          :key="category.id"
+          class="category-item"
+          :style="{ backgroundColor: category.color }"
+          @click="goToCategory(category.name)"
+        >
+          <div class="category-icon">{{ category.icon }}</div>
+          <span class="category-name">{{ category.name }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- 流行趋势 -->
     <div class="section">
       <div class="section-header">
@@ -224,6 +288,27 @@ onMounted(async () => {
           <div class="chart-info">
             <h3 class="chart-title">{{ chart.title }}</h3>
             <p class="chart-subtitle">{{ chart.subtitle }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 快捷入口 -->
+    <div class="section">
+      <div class="section-header">
+        <h2>发现更多</h2>
+      </div>
+      <div class="quick-access">
+        <div class="access-card" @click="goToNewReleases">
+          <div class="access-icon">
+            <span class="icon-emoji">🎵</span>
+          </div>
+          <div class="access-info">
+            <h3>新歌首发</h3>
+            <p>最新发布的热门歌曲</p>
+          </div>
+          <div class="access-arrow">
+            <ChevronRight :size="20" />
           </div>
         </div>
       </div>
@@ -296,6 +381,131 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.see-all-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.see-all-button:hover {
+  color: white;
+}
+
+.categories-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.categories-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+}
+
+.category-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.category-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  color: white;
+}
+
+.quick-access {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.access-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.access-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.access-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #007aff, #0056cc);
+  border-radius: 12px;
+  margin-right: 1rem;
+}
+
+.icon-emoji {
+  font-size: 1.5rem;
+}
+
+.access-info {
+  flex: 1;
+}
+
+.access-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: white;
+}
+
+.access-info p {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.access-arrow {
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s;
+}
+
+.access-card:hover .access-arrow {
+  color: white;
+  transform: translateX(4px);
 }
 
 /* 最近播放样式 */

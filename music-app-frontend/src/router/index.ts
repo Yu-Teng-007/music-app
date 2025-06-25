@@ -103,6 +103,38 @@ const router = createRouter({
       component: () => import('../views/FavoritesView.vue'),
       meta: { requiresAuth: true },
     },
+    // 播放历史页面
+    {
+      path: '/history',
+      name: 'history',
+      component: () => import('../views/HistoryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    // 分类浏览页面
+    {
+      path: '/category/:type?',
+      name: 'category',
+      component: () => import('../views/CategoryView.vue'),
+    },
+    // 排行榜详情页面
+    {
+      path: '/charts/:type',
+      name: 'charts',
+      component: () => import('../views/ChartsView.vue'),
+    },
+    // 新歌首发页面
+    {
+      path: '/new-releases',
+      name: 'new-releases',
+      component: () => import('../views/NewReleasesView.vue'),
+    },
+    // 账户管理页面
+    {
+      path: '/account',
+      name: 'account',
+      component: () => import('../views/AccountView.vue'),
+      meta: { requiresAuth: true },
+    },
     // 开发工具页面（仅开发环境）
     {
       path: '/dev-tools',

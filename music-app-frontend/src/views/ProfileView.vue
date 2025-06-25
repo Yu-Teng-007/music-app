@@ -54,7 +54,17 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { Camera, Heart, Users, Share, Settings, ChevronRight, LogOut } from 'lucide-vue-next'
+import {
+  Camera,
+  Heart,
+  Users,
+  Share,
+  Settings,
+  ChevronRight,
+  LogOut,
+  Clock,
+  UserCog,
+} from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -96,6 +106,16 @@ const menuItems = computed(() => [
     icon: Heart,
   },
   {
+    id: 'history',
+    label: '播放历史',
+    icon: Clock,
+  },
+  {
+    id: 'account',
+    label: '账户管理',
+    icon: UserCog,
+  },
+  {
     id: 'friends',
     label: '查找好友',
     icon: Users,
@@ -125,6 +145,12 @@ const handleMenuClick = async (item: any) => {
   switch (item.id) {
     case 'favorites':
       router.push('/favorites')
+      break
+    case 'history':
+      router.push('/history')
+      break
+    case 'account':
+      router.push('/account')
       break
     case 'friends':
       // TODO: 实现好友功能
