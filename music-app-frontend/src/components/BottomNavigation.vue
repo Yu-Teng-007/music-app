@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Home, Compass, Music, User } from 'lucide-vue-next'
 
@@ -122,6 +121,29 @@ const isActive = (path: string) => {
 
 .nav-item.active:focus {
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+}
+
+/* 移动端导航优化 */
+@media (hover: none) {
+  .nav-item:active {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
+
+  .nav-item.active:active {
+    background-color: rgba(0, 122, 255, 0.2);
+    transform: scale(0.95);
+  }
+
+  .nav-item:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .nav-item.active:focus {
+    box-shadow: none;
+  }
 }
 
 .nav-label {

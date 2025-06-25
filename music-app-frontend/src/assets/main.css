@@ -1,4 +1,5 @@
 @import './base.css';
+@import '../styles/tap-highlight-fix.css';
 
 #app {
   max-width: 1280px;
@@ -12,11 +13,42 @@ a,
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
   padding: 3px;
+  /* 移除移动端点击高亮 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
+/* 只在支持hover的设备上应用hover效果 */
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+/* 确保链接的active和focus状态正确重置 */
+a:active {
+  background-color: hsla(160, 100%, 37%, 0.3);
+  transform: none;
+}
+
+a:focus {
+  outline: none;
+  background-color: hsla(160, 100%, 37%, 0.2);
+}
+
+/* 移动端触摸后立即清除状态 */
+@media (hover: none) {
+  a:active {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+
+  a:focus {
+    background-color: transparent;
   }
 }
 

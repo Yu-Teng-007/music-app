@@ -708,11 +708,26 @@ onUnmounted(() => {
 .link-button:focus {
   outline: none;
   background: none;
+  box-shadow: none;
 }
 
 .link-button:active {
   background: none;
   transform: translateY(0);
+}
+
+/* 移动端优化 */
+@media (hover: none) {
+  .link-button:active {
+    opacity: 0.7;
+    background: none;
+    transform: none;
+  }
+
+  .link-button:focus {
+    background: none;
+    outline: none;
+  }
 }
 
 /* 认证方式选择标签 */
@@ -776,10 +791,33 @@ onUnmounted(() => {
   background: rgba(0, 122, 255, 1);
 }
 
+.sms-button:active:not(:disabled) {
+  background: rgba(0, 122, 255, 1);
+  transform: scale(0.98);
+}
+
+.sms-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+}
+
 .sms-button:disabled {
   background: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* 移动端SMS按钮优化 */
+@media (hover: none) {
+  .sms-button:active:not(:disabled) {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  .sms-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 /* 表单容器 */
@@ -899,6 +937,30 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.1);
 }
 
+.clear-button:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.9);
+}
+
+.clear-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端清除按钮优化 */
+@media (hover: none) {
+  .clear-button:active {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(0.85);
+    transition: all 0.1s ease;
+  }
+
+  .clear-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 /* 密码切换按钮 */
 .password-toggle {
   position: absolute;
@@ -922,6 +984,31 @@ onUnmounted(() => {
 
 .password-toggle:hover {
   color: rgba(255, 255, 255, 0.9);
+}
+
+.password-toggle:active {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.9);
+}
+
+.password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端密码切换按钮优化 */
+@media (hover: none) {
+  .password-toggle:active {
+    background: rgba(255, 255, 255, 0.05);
+    transform: scale(0.85);
+    transition: all 0.1s ease;
+  }
+
+  .password-toggle:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 /* 保持旧的password-input-wrapper兼容性 */
@@ -1016,10 +1103,28 @@ onUnmounted(() => {
   transform: translateY(0);
 }
 
+.submit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
 .submit-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* 移动端提交按钮优化 */
+@media (hover: none) {
+  .submit-button:active:not(:disabled) {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  .submit-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 .loading-spinner {

@@ -254,6 +254,20 @@ onMounted(() => {
   box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
 }
 
+/* 移动端编辑头像按钮优化 */
+@media (hover: none) {
+  .edit-avatar-btn:active {
+    background: #004494;
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
+
+  .edit-avatar-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 .user-name {
   font-size: 2rem;
   font-weight: 700;
@@ -331,6 +345,21 @@ onMounted(() => {
   outline: none;
   background: rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端菜单项优化 */
+@media (hover: none) {
+  .menu-item:active {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  .menu-item:focus {
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+  }
 }
 
 .menu-icon {

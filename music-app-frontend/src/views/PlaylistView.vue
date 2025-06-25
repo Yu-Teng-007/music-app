@@ -973,6 +973,30 @@ onMounted(() => {
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
 }
 
+/* 移动端按钮优化 */
+@media (hover: none) {
+  .cancel-btn:active {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
+
+  .cancel-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .confirm-btn:active:not(:disabled) {
+    transform: scale(0.95);
+    transition: all 0.1s ease;
+  }
+
+  .confirm-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 .confirm-btn:disabled {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.4);

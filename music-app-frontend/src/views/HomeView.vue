@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { genreApi } from '@/services'
 import type { Song } from '@/stores/music'
 import type { Genre } from '@/services/genre-api'
-import { Play, Heart, MoreHorizontal, ChevronRight } from 'lucide-vue-next'
+import { Play, ChevronRight } from 'lucide-vue-next'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -15,7 +15,7 @@ const authStore = useAuthStore()
 interface UserInfo {
   name?: string
   avatar: string
-  greeting: string  
+  greeting: string
   subGreeting: string
 }
 
@@ -425,9 +425,44 @@ onMounted(async () => {
   padding: 0.5rem;
 }
 
+.category-item {
+  /* 添加点击状态重置 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
 .category-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.category-item:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.category-item:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端分类项优化 */
+@media (hover: none) {
+  .category-item:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.1s ease;
+  }
+
+  .category-item:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 .category-icon {
@@ -458,6 +493,14 @@ onMounted(async () => {
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  /* 添加点击状态重置 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 .access-card:hover {
@@ -508,6 +551,30 @@ onMounted(async () => {
   transform: translateX(4px);
 }
 
+.access-card:active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(0);
+}
+
+.access-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端访问卡片优化 */
+@media (hover: none) {
+  .access-card:active {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  .access-card:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 /* 最近播放样式 */
 .recent-songs {
   display: flex;
@@ -532,6 +599,14 @@ onMounted(async () => {
   transition: transform 0.2s ease;
   position: relative;
   overflow: hidden;
+  /* 添加点击状态重置 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 .recent-card:hover {
@@ -612,6 +687,28 @@ onMounted(async () => {
   box-shadow: 0 6px 16px rgba(0, 122, 255, 0.5);
 }
 
+.recent-card:active {
+  transform: scale(0.98);
+}
+
+.recent-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端最近播放卡片优化 */
+@media (hover: none) {
+  .recent-card:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  .recent-card:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
 /* 排行榜样式 */
 .charts-grid {
   display: grid;
@@ -629,12 +726,42 @@ onMounted(async () => {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
 }
 
 .chart-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
   background: rgba(255, 255, 255, 0.15);
+}
+
+.chart-card:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.chart-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端卡片优化 */
+@media (hover: none) {
+  .chart-card:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.1s ease;
+  }
+
+  .chart-card:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 .chart-cover {
