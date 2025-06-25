@@ -1,11 +1,4 @@
 @import './base.css';
-@import '../styles/tap-highlight-fix.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  font-weight: normal;
-}
 
 a,
 .green {
@@ -49,17 +42,5 @@ a:focus {
 
   a:focus {
     background-color: transparent;
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
   }
 }
