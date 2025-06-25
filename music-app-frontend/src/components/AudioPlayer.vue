@@ -20,6 +20,8 @@ const audioRef = ref<HTMLAudioElement | null>(null)
 
 // 计算音频源
 const audioSrc = ref('')
+// 跟踪上一首歌曲ID，用于检测相同歌曲的切换
+const lastSongId = ref<string | null>(null)
 
 // 播放音频
 const playAudio = () => {
@@ -48,21 +50,47 @@ const pauseAudio = () => {
   }
 }
 
+// 重置并重新播放当前音频
+const resetAndPlayAudio = () => {
+  if (audioRef.value) {
+    audioRef.value.currentTime = 0
+    if (musicStore.isPlaying) {
+      playAudio()
+    }
+  }
+}
+
 // 监听当前歌曲变化
 watch(
   () => musicStore.currentSong,
   newSong => {
     if (newSong) {
+      const isSameSong = lastSongId.value === newSong.id
+
+      // 更新音频源
       audioSrc.value = 'src' + newSong.audioUrl
-      // 如果当前正在播放，则加载新歌曲后自动播放
-      if (musicStore.isPlaying) {
-        // 使用setTimeout等待DOM更新后再播放
+
+      // 更新上一首歌曲ID
+      lastSongId.value = newSong.id
+
+      // 如果是同一首歌切换，则重置播放位置并重新播放（除非是暂停状态）
+      if (isSameSong) {
+        // 使用setTimeout等待DOM更新后再操作
         setTimeout(() => {
-          playAudio()
+          resetAndPlayAudio()
         }, 0)
+      } else {
+        // 不同歌曲，如果当前正在播放，则加载新歌曲后自动播放
+        if (musicStore.isPlaying) {
+          // 使用setTimeout等待DOM更新后再播放
+          setTimeout(() => {
+            playAudio()
+          }, 0)
+        }
       }
     } else {
       audioSrc.value = ''
+      lastSongId.value = null
       pauseAudio()
     }
   },
