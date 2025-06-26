@@ -1,14 +1,33 @@
-import { IsString, IsOptional, IsEnum, IsUUID, IsBoolean, IsInt, Min, Max, IsNumber } from 'class-validator'
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsUUID,
+  IsBoolean,
+  IsInt,
+  Min,
+  Max,
+  IsNumber,
+} from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { AudioQuality, DownloadStatus } from '../entities/download.entity'
 
 // 创建下载任务DTO
 export class CreateDownloadDto {
-  @ApiProperty({ description: '歌曲ID' })
+  @ApiProperty({
+    description: '歌曲ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
   @IsUUID()
   songId: string
 
-  @ApiProperty({ description: '音质', enum: AudioQuality })
+  @ApiProperty({
+    description: '音质选择',
+    enum: AudioQuality,
+    example: AudioQuality.HIGH,
+    enumName: 'AudioQuality',
+  })
   @IsEnum(AudioQuality)
   quality: AudioQuality
 }
@@ -86,11 +105,26 @@ export class DownloadQueryDto {
 
 // 批量下载DTO
 export class BatchDownloadDto {
-  @ApiProperty({ description: '歌曲ID列表', type: [String] })
+  @ApiProperty({
+    description: '歌曲ID列表',
+    type: [String],
+    example: [
+      '123e4567-e89b-12d3-a456-426614174000',
+      '123e4567-e89b-12d3-a456-426614174001',
+      '123e4567-e89b-12d3-a456-426614174002',
+    ],
+    minItems: 1,
+    maxItems: 50,
+  })
   @IsUUID(4, { each: true })
   songIds: string[]
 
-  @ApiProperty({ description: '音质', enum: AudioQuality })
+  @ApiProperty({
+    description: '音质选择',
+    enum: AudioQuality,
+    example: AudioQuality.HIGH,
+    enumName: 'AudioQuality',
+  })
   @IsEnum(AudioQuality)
   quality: AudioQuality
 }
@@ -124,22 +158,47 @@ export class DownloadProgressDto {
 
 // 存储统计DTO
 export class StorageStatsDto {
-  @ApiProperty({ description: '已使用空间（字节）' })
+  @ApiProperty({
+    description: '已使用存储空间（字节）',
+    example: 1073741824,
+    minimum: 0,
+  })
   usedSpace: number
 
-  @ApiProperty({ description: '总空间（字节）' })
+  @ApiProperty({
+    description: '总存储空间（字节）',
+    example: 10737418240,
+    minimum: 0,
+  })
   totalSpace: number
 
-  @ApiProperty({ description: '可用空间（字节）' })
+  @ApiProperty({
+    description: '可用存储空间（字节）',
+    example: 9663676416,
+    minimum: 0,
+  })
   availableSpace: number
 
-  @ApiProperty({ description: '使用百分比' })
+  @ApiProperty({
+    description: '存储空间使用百分比',
+    example: 10.5,
+    minimum: 0,
+    maximum: 100,
+  })
   usagePercentage: number
 
-  @ApiProperty({ description: '下载文件数量' })
+  @ApiProperty({
+    description: '已下载文件数量',
+    example: 150,
+    minimum: 0,
+  })
   downloadCount: number
 
-  @ApiProperty({ description: '最大下载文件数' })
+  @ApiProperty({
+    description: '最大允许下载文件数',
+    example: 1000,
+    minimum: 0,
+  })
   maxDownloads: number
 }
 

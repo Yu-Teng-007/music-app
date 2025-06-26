@@ -4,38 +4,66 @@ import { FeedType } from '../entities/user-feed.entity'
 
 // 关注用户DTO
 export class FollowUserDto {
-  @ApiProperty({ description: '要关注的用户ID' })
+  @ApiProperty({
+    description: '要关注的用户ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
   @IsUUID()
   userId: string
 }
 
 // 创建动态DTO
 export class CreateFeedDto {
-  @ApiProperty({ description: '动态类型', enum: FeedType })
+  @ApiProperty({
+    description: '动态类型',
+    enum: FeedType,
+    example: 'SHARE_SONG',
+    enumName: 'FeedType',
+  })
   @IsEnum(FeedType)
   type: FeedType
 
-  @ApiPropertyOptional({ description: '动态内容' })
+  @ApiPropertyOptional({
+    description: '动态内容',
+    example: '分享一首好听的歌曲给大家！',
+    maxLength: 500,
+  })
   @IsOptional()
   @IsString()
   content?: string
 
-  @ApiPropertyOptional({ description: '相关歌曲ID' })
+  @ApiPropertyOptional({
+    description: '相关歌曲ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
   @IsOptional()
   @IsUUID()
   songId?: string
 
-  @ApiPropertyOptional({ description: '相关歌单ID' })
+  @ApiPropertyOptional({
+    description: '相关歌单ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
   @IsOptional()
   @IsUUID()
   playlistId?: string
 
-  @ApiPropertyOptional({ description: '目标用户ID' })
+  @ApiPropertyOptional({
+    description: '目标用户ID（用于关注、提及等操作）',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
   @IsOptional()
   @IsUUID()
   targetUserId?: string
 
-  @ApiPropertyOptional({ description: '额外元数据' })
+  @ApiPropertyOptional({
+    description: '额外元数据',
+    example: { location: '北京', mood: 'happy' },
+  })
   @IsOptional()
   metadata?: any
 }

@@ -1,17 +1,25 @@
-import { IsString, IsOptional, IsBoolean, IsNumber, IsHexColor, Min, Max } from 'class-validator'
+import { IsString, IsOptional, IsBoolean, IsNumber, IsUrl, Min, Max } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-export class CreateGenreDto {
+export class CreateChartDto {
   @ApiProperty({
-    description: '流派名称',
-    example: 'pop',
+    description: '排行榜名称',
+    example: '新歌榜',
   })
   @IsString()
   name: string
 
   @ApiProperty({
-    description: '流派描述',
-    example: '流行音乐',
+    description: '排行榜类型',
+    example: 'new',
+    enum: ['new', 'hot', 'trending', 'original', 'kpop', 'electronic', 'folk', 'ancient', 'mv'],
+  })
+  @IsString()
+  type: string
+
+  @ApiProperty({
+    description: '排行榜描述',
+    example: '最新发布的热门歌曲，每小时更新',
     required: false,
   })
   @IsOptional()
@@ -19,22 +27,23 @@ export class CreateGenreDto {
   description?: string
 
   @ApiProperty({
-    description: '流派主题色',
-    example: '#FF5722',
+    description: '排行榜封面图片URL',
+    example: 'https://example.com/chart-cover.jpg',
     required: false,
   })
   @IsOptional()
-  @IsHexColor()
-  color?: string
+  @IsUrl()
+  coverUrl?: string
 
   @ApiProperty({
-    description: '流派图标',
-    example: 'music-note',
+    description: '更新频率',
+    example: '每小时更新',
+    default: '每日更新',
     required: false,
   })
   @IsOptional()
   @IsString()
-  icon?: string
+  updateFrequency?: string
 
   @ApiProperty({
     description: '是否激活',
@@ -49,17 +58,20 @@ export class CreateGenreDto {
   @ApiProperty({
     description: '排序顺序',
     example: 1,
+    minimum: 0,
+    default: 0,
     required: false,
   })
   @IsOptional()
   @IsNumber()
+  @Min(0)
   sortOrder?: number
 }
 
-export class UpdateGenreDto {
+export class UpdateChartDto {
   @ApiProperty({
-    description: '流派名称',
-    example: 'pop',
+    description: '排行榜名称',
+    example: '新歌榜',
     required: false,
   })
   @IsOptional()
@@ -67,8 +79,18 @@ export class UpdateGenreDto {
   name?: string
 
   @ApiProperty({
-    description: '流派描述',
-    example: '流行音乐',
+    description: '排行榜类型',
+    example: 'new',
+    enum: ['new', 'hot', 'trending', 'original', 'kpop', 'electronic', 'folk', 'ancient', 'mv'],
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  type?: string
+
+  @ApiProperty({
+    description: '排行榜描述',
+    example: '最新发布的热门歌曲，每小时更新',
     required: false,
   })
   @IsOptional()
@@ -76,22 +98,22 @@ export class UpdateGenreDto {
   description?: string
 
   @ApiProperty({
-    description: '流派主题色',
-    example: '#FF5722',
+    description: '排行榜封面图片URL',
+    example: 'https://example.com/chart-cover.jpg',
     required: false,
   })
   @IsOptional()
-  @IsHexColor()
-  color?: string
+  @IsUrl()
+  coverUrl?: string
 
   @ApiProperty({
-    description: '流派图标',
-    example: 'music-note',
+    description: '更新频率',
+    example: '每小时更新',
     required: false,
   })
   @IsOptional()
   @IsString()
-  icon?: string
+  updateFrequency?: string
 
   @ApiProperty({
     description: '是否激活',
@@ -105,16 +127,28 @@ export class UpdateGenreDto {
   @ApiProperty({
     description: '排序顺序',
     example: 1,
+    minimum: 0,
     required: false,
   })
   @IsOptional()
   @IsNumber()
+  @Min(0)
   sortOrder?: number
 }
 
-export class QueryGenresDto {
+export class QueryChartsDto {
   @ApiProperty({
-    description: '是否只显示激活的流派',
+    description: '排行榜类型筛选',
+    example: 'new',
+    enum: ['new', 'hot', 'trending', 'original', 'kpop', 'electronic', 'folk', 'ancient', 'mv'],
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  type?: string
+
+  @ApiProperty({
+    description: '是否只显示激活的排行榜',
     example: true,
     required: false,
   })
@@ -124,7 +158,7 @@ export class QueryGenresDto {
 
   @ApiProperty({
     description: '搜索关键词',
-    example: 'pop',
+    example: '新歌',
     required: false,
   })
   @IsOptional()
@@ -160,7 +194,7 @@ export class QueryGenresDto {
   @ApiProperty({
     description: '排序字段',
     example: 'sortOrder',
-    enum: ['sortOrder', 'name', 'createdAt'],
+    enum: ['sortOrder', 'name', 'createdAt', 'type'],
     default: 'sortOrder',
     required: false,
   })
@@ -178,4 +212,25 @@ export class QueryGenresDto {
   @IsOptional()
   @IsString()
   sortOrder?: 'ASC' | 'DESC' = 'ASC'
+}
+
+export class AddSongToChartDto {
+  @ApiProperty({
+    description: '歌曲ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
+  @IsString()
+  songId: string
+
+  @ApiProperty({
+    description: '在排行榜中的位置',
+    example: 1,
+    minimum: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  position?: number
 }

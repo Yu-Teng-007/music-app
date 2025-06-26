@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsUUID } from 'class-validator'
+import { IsString, IsOptional, IsBoolean, IsUUID, IsNumber, Min, Max } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class CreatePlaylistDto {
@@ -87,11 +87,47 @@ export class AddSongToPlaylistDto {
 }
 
 export class QueryPlaylistsDto {
+  @ApiProperty({
+    description: '搜索关键词',
+    example: '我的最爱',
+    required: false,
+  })
   @IsOptional()
   @IsString({ message: '搜索关键词必须是字符串' })
   search?: string
 
+  @ApiProperty({
+    description: '是否为私有歌单',
+    example: false,
+    required: false,
+  })
   @IsOptional()
   @IsBoolean({ message: '私有状态必须是布尔值' })
   isPrivate?: boolean
+
+  @ApiProperty({
+    description: '页码',
+    example: 1,
+    minimum: 1,
+    default: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber({}, { message: '页码必须是数字' })
+  @Min(1, { message: '页码必须大于0' })
+  page?: number
+
+  @ApiProperty({
+    description: '每页数量',
+    example: 10,
+    minimum: 1,
+    maximum: 100,
+    default: 10,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber({}, { message: '每页数量必须是数字' })
+  @Min(1, { message: '每页数量必须大于0' })
+  @Max(100, { message: '每页数量不能超过100' })
+  limit?: number
 }
