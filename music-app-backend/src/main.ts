@@ -1,4 +1,5 @@
-// 导入polyfill
+/* eslint-disable no-console */
+
 import './polyfill'
 
 import { NestFactory } from '@nestjs/core'
@@ -13,6 +14,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   const configService = app.get(ConfigService)
+  let SwaggerAddress = ''
 
   // 启用CORS
   app.enableCors({
@@ -84,24 +86,19 @@ async function bootstrap() {
       },
     })
 
-    // eslint-disable-next-line no-console
-    console.log(
-      'Swagger文档已启用: http://localhost:' +
-        (configService.get<number>('app.port') || 3000) +
-        '/api/docs'
-    )
+    SwaggerAddress =
+      'http://localhost:' + (configService.get<number>('app.port') || 3000) + '/api/docs'
   }
 
   const port = configService.get<number>('app.port') || 3000
   await app.listen(port)
 
-  // eslint-disable-next-line no-console
-  console.log(`🚀 Application is running on: http://localhost:${port}/api`)
+  console.log(`🚀 后端服务已启动: http://localhost:${port}/api`)
+  console.log(`🚀 Swagger文档已启用: ${SwaggerAddress}`)
 }
 
 // 启动应用并处理错误
 void bootstrap().catch(error => {
-  // eslint-disable-next-line no-console
-  console.error('Failed to start application:', error)
+  console.error('后端服务启动失败:', error)
   process.exit(1)
 })
