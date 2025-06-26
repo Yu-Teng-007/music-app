@@ -172,11 +172,11 @@ const handlePlay = () => {
   color: #909399;
 }
 
-:deep(.el-dropdown-menu__item) {
+:deep(.mobile-dropdown-item) {
   padding: 8px 16px;
 }
 
-:deep(.el-button--small) {
+:deep(.mobile-btn--small) {
   padding: 5px 11px;
   font-size: 12px;
 }

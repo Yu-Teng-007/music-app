@@ -263,7 +263,7 @@ const handleClose = () => {
   text-align: right;
 }
 
-:deep(.el-alert) {
+:deep(.mobile-alert) {
   margin-top: 20px;
 }
 </style>

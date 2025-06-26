@@ -3,19 +3,19 @@
     <!-- 顶部导航 -->
     <div class="downloads-header">
       <h1 class="page-title">
-        <i class="el-icon-download"></i>
+        <MobileIcon name="download" :size="24" />
         离线音乐
       </h1>
 
       <div class="header-actions">
-        <el-button
+        <MobileButton
           @click="showCleanupDialog = true"
           type="warning"
           :loading="downloadStore.isLoading"
         >
-          <i class="el-icon-delete"></i>
+          <MobileIcon name="trash-2" :size="16" />
           清理空间
-        </el-button>
+        </MobileButton>
       </div>
     </div>
 
@@ -28,7 +28,7 @@
         </div>
 
         <div class="progress-bar">
-          <el-progress
+          <MobileProgress
             :percentage="storageStats.usagePercentage"
             :color="getProgressColor(storageStats.usagePercentage)"
             :show-text="false"
@@ -99,9 +99,9 @@
 
       <!-- 加载更多 -->
       <div v-if="downloadStore.hasMoreDownloads" class="load-more">
-        <el-button @click="loadMoreDownloads" :loading="downloadStore.isLoading" type="text">
+        <MobileButton @click="loadMoreDownloads" :loading="downloadStore.isLoading" type="text">
           加载更多
-        </el-button>
+        </MobileButton>
       </div>
     </div>
 
@@ -120,6 +120,8 @@ import {
   MobileSelect,
   MobileRadioGroup,
   MobileMessage,
+  MobileIcon,
+  MobileProgress,
   createSelectOptions,
 } from '@/components/ui'
 import { useDownloadStore } from '@/stores/download'
