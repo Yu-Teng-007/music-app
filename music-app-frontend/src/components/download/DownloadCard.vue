@@ -3,13 +3,19 @@
     <!-- 歌曲信息 -->
     <div class="song-info">
       <div class="song-cover">
-        <el-image :src="download.song?.coverUrl" fit="cover" class="cover-image">
+        <MobileImage
+          :src="download.song?.coverUrl"
+          :alt="download.song?.title || '歌曲封面'"
+          fit="cover"
+          width="60"
+          height="60"
+          border-radius="8"
+          class="cover-image"
+        >
           <template #error>
-            <div class="cover-placeholder">
-              <i class="el-icon-headset"></i>
-            </div>
+            <MobileIcon name="headset" :size="24" />
           </template>
-        </el-image>
+        </MobileImage>
 
         <!-- 播放按钮覆盖层 -->
         <div
@@ -17,7 +23,7 @@
           class="play-overlay"
           @click="$emit('play', download)"
         >
-          <i class="el-icon-video-play"></i>
+          <MobileIcon name="play" :size="24" />
         </div>
       </div>
 
@@ -42,11 +48,11 @@
 
       <!-- 进度条 -->
       <div v-if="showProgress" class="progress-container">
-        <el-progress
+        <MobileProgress
           :percentage="download.progress"
           :color="getProgressColor(download.status)"
-          :show-text="false"
           :stroke-width="6"
+          :show-text="false"
         />
         <div class="progress-text">
           <span>{{ download.progress }}%</span>
@@ -58,7 +64,7 @@
 
       <!-- 错误信息 -->
       <div v-if="download.status === 'failed' && download.errorMessage" class="error-message">
-        <i class="el-icon-warning"></i>
+        <MobileIcon name="alert-triangle" :size="16" />
         {{ download.errorMessage }}
       </div>
     </div>
@@ -163,7 +169,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MobileButton } from '@/components/ui'
+import { MobileButton, MobileImage, MobileProgress, MobileIcon } from '@/components/ui'
 import { downloadApi } from '@/services'
 import type { Download, DownloadStatus, AudioQuality } from '@/services/download-api'
 
@@ -188,6 +194,7 @@ const showProgress = computed(() => {
 })
 
 // 方法
+
 const formatFileSize = (bytes: number): string => {
   return downloadApi.formatFileSize(bytes)
 }
@@ -276,17 +283,6 @@ const formatTime = (time: string): string => {
 .cover-image {
   width: 100%;
   height: 100%;
-}
-
-.cover-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #e4e7ed;
-  color: #909399;
-  font-size: 20px;
 }
 
 .play-overlay {

@@ -324,6 +324,7 @@ const slots = defineSlots<{
   font-size: inherit;
   padding: 12px 16px;
   min-height: 44px; /* 移动端最小触摸目标 */
+  appearance: none;
   -webkit-appearance: none;
 }
 

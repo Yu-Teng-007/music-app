@@ -12,6 +12,11 @@ export { default as MobileDropdown } from './Dropdown.vue'
 export { default as MobileDropdownMenu } from './DropdownMenu.vue'
 export { default as MobileDropdownItem } from './DropdownItem.vue'
 export { default as MobileRadioGroup } from './RadioGroup.vue'
+
+// 新增的原生DOM组件
+export { default as MobileImage } from './Image.vue'
+export { default as MobileProgress } from './Progress.vue'
+export { default as MobileIcon } from './Icon.vue'
 export { default as MobileCheckbox } from './Checkbox.vue'
 export { default as MobileSwitch } from './Switch.vue'
 export { default as MobileAlert } from './Alert.vue'
