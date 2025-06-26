@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { musicApi } from '@/services/music-api'
+import errorService from '@/services/ErrorService'
+import { formatTime } from '@/utils/formatters'
 
 export interface Song {
   id: string
@@ -73,11 +75,15 @@ export const useMusicStore = defineStore('music', () => {
     return formatTime(duration.value)
   })
 
-  // 工具函数
-  function formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
+  // 错误处理
+  function setError(errorMessage: string) {
+    error.value = errorMessage
+    // 使用错误服务显示错误
+    errorService.handleError(errorMessage, 'MUSIC_ERROR')
+  }
+
+  function clearError() {
+    error.value = null
   }
 
   // 播放控制
@@ -127,6 +133,9 @@ export const useMusicStore = defineStore('music', () => {
 
     // 重置播放开始时间
     playStartTime.value = isPlaying.value ? Date.now() : null
+
+    // 清除错误状态
+    clearError()
   }
 
   function nextSong() {
@@ -139,6 +148,9 @@ export const useMusicStore = defineStore('music', () => {
 
     currentIndex.value = nextIndex
     currentSong.value = playlist.value[nextIndex]
+
+    // 清除错误状态
+    clearError()
   }
 
   function previousSong() {
@@ -151,6 +163,9 @@ export const useMusicStore = defineStore('music', () => {
 
     currentIndex.value = prevIndex
     currentSong.value = playlist.value[prevIndex]
+
+    // 清除错误状态
+    clearError()
   }
 
   function setVolume(newVolume: number) {
@@ -198,12 +213,12 @@ export const useMusicStore = defineStore('music', () => {
   async function loadSongs(params?: any) {
     try {
       isLoading.value = true
-      error.value = null
-      const response = await musicApi.getSongs(params)
-      return response || []
-    } catch (err: any) {
-      error.value = err.message || '加载歌曲失败'
-      console.error('Failed to load songs:', err)
+      clearError()
+      const songs = await musicApi.getSongs(params)
+      return songs
+    } catch (err) {
+      const appError = errorService.handleApiError(err, 'music')
+      setError(appError.message)
       return []
     } finally {
       isLoading.value = false
@@ -213,12 +228,12 @@ export const useMusicStore = defineStore('music', () => {
   async function loadRecommendedSongs(limit?: number) {
     try {
       isLoading.value = true
-      error.value = null
-      const response = await musicApi.getRecommendedSongs(limit)
-      return response || []
-    } catch (err: any) {
-      error.value = err.message || '加载推荐歌曲失败'
-      console.error('Failed to load recommended songs:', err)
+      clearError()
+      const songs = await musicApi.getRecommendedSongs(limit)
+      return songs
+    } catch (err) {
+      const appError = errorService.handleApiError(err, 'music')
+      setError(appError.message)
       return []
     } finally {
       isLoading.value = false
@@ -228,12 +243,12 @@ export const useMusicStore = defineStore('music', () => {
   async function loadPopularSongs(limit?: number) {
     try {
       isLoading.value = true
-      error.value = null
-      const response = await musicApi.getPopularSongs(limit)
-      return response || []
-    } catch (err: any) {
-      error.value = err.message || '加载热门歌曲失败'
-      console.error('Failed to load popular songs:', err)
+      clearError()
+      const songs = await musicApi.getPopularSongs(limit)
+      return songs
+    } catch (err) {
+      const appError = errorService.handleApiError(err, 'music')
+      setError(appError.message)
       return []
     } finally {
       isLoading.value = false
@@ -243,12 +258,12 @@ export const useMusicStore = defineStore('music', () => {
   async function searchSongs(keyword: string, limit?: number) {
     try {
       isLoading.value = true
-      error.value = null
-      const response = await musicApi.searchSongs(keyword, limit)
-      return response || []
-    } catch (err: any) {
-      error.value = err.message || '搜索歌曲失败'
-      console.error('Failed to search songs:', err)
+      clearError()
+      const songs = await musicApi.searchSongs(keyword, limit)
+      return songs
+    } catch (err) {
+      const appError = errorService.handleApiError(err, 'music')
+      setError(appError.message)
       return []
     } finally {
       isLoading.value = false
@@ -388,5 +403,7 @@ export const useMusicStore = defineStore('music', () => {
     clearPlayHistory,
     getPlayHistory,
     initializePlayHistory,
+    setError,
+    clearError,
   }
 })

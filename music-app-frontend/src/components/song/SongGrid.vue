@@ -1,21 +1,19 @@
 <template>
-  <div class="song-list">
+  <div class="song-grid">
     <div v-if="isLoading" class="loading-container">
       <div class="loading-spinner"></div>
       <p>{{ loadingText }}</p>
     </div>
-    <div v-else-if="songs.length > 0">
-      <div v-for="song in songs" :key="song.id" class="song-item" @click="onSongClick(song)">
+    <div v-else-if="songs.length > 0" class="grid-container">
+      <div v-for="song in songs" :key="song.id" class="song-card" @click="onSongClick(song)">
         <div class="song-cover">
           <img :src="getImageUrl(song.coverUrl)" :alt="song.title" v-img-fallback="'cover'" />
+          <div class="play-overlay">
+            <component :is="isCurrentSong(song) && isPlaying ? Pause : Play" :size="24" />
+          </div>
         </div>
-        <div class="song-info">
-          <h3 class="song-title">{{ song.title }}</h3>
-          <p class="song-artist">{{ song.artist }}</p>
-        </div>
-        <button class="play-btn">
-          <component :is="isCurrentSong(song) && isPlaying ? Pause : Play" :size="16" />
-        </button>
+        <h3 class="song-title">{{ song.title }}</h3>
+        <p class="song-artist">{{ song.artist }}</p>
       </div>
     </div>
     <div v-else class="empty-state">
@@ -48,6 +46,10 @@ const props = defineProps({
     type: String,
     default: '暂无歌曲',
   },
+  columns: {
+    type: Number,
+    default: 2,
+  },
 })
 
 const emit = defineEmits(['song-click'])
@@ -69,42 +71,62 @@ const onSongClick = (song: Song) => {
 </script>
 
 <style scoped>
-.song-list {
+.song-grid {
   width: 100%;
 }
 
-.song-item {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem;
-  border-radius: 8px;
-  transition: background-color 0.2s;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(v-bind(columns), 1fr);
+  gap: 1rem;
 }
 
-.song-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+.song-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.song-card:hover {
+  transform: translateY(-5px);
+}
+
+.song-card:hover .play-overlay {
+  opacity: 1;
 }
 
 .song-cover {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* 1:1 宽高比 */
+  border-radius: 8px;
   overflow: hidden;
-  margin-right: 1rem;
-  flex-shrink: 0;
+  margin-bottom: 0.75rem;
 }
 
 .song-cover img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.song-info {
-  flex: 1;
-  min-width: 0;
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: white;
 }
 
 .song-title {
@@ -123,30 +145,6 @@ const onSongClick = (song: Song) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.play-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
-  margin-left: 0.5rem;
-}
-
-.play-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.play-btn:active {
-  transform: scale(0.95);
 }
 
 .loading-container {
@@ -176,6 +174,20 @@ const onSongClick = (song: Song) => {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 }
 </style>

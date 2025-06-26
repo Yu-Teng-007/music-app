@@ -6,6 +6,7 @@ import BottomNavigation from './components/BottomNavigation.vue'
 import MiniPlayer from './components/MiniPlayer.vue'
 import AudioPlayer from './components/AudioPlayer.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
+import ErrorNotification from './components/ErrorNotification.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -45,6 +46,8 @@ onMounted(() => {
       <BottomNavigation v-if="showBottomNav" />
       <!-- 全局音频播放器 -->
       <AudioPlayer />
+      <!-- 全局错误提示 -->
+      <ErrorNotification />
     </ErrorBoundary>
   </div>
 </template>

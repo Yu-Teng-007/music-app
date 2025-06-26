@@ -8,11 +8,15 @@ import router from './router'
 import './styles/main.css'
 import { useAuthStore } from './stores/auth'
 import { realtimeService } from './services'
+import { imgFallbackDirective } from './utils/imageHandlers'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+
+// 注册全局指令
+app.directive('img-fallback', imgFallbackDirective)
 
 app.mount('#app')
 
