@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -90,11 +91,21 @@ async function bootstrap() {
       .build()
 
     const document = SwaggerModule.createDocument(app, config)
-    SwaggerModule.setup('api/docs', app, document, {
+
+    // 配置 FLATTOP 扁平主题
+    const theme = new SwaggerTheme()
+    const options = {
+      explorer: true,
       swaggerOptions: {
         persistAuthorization: true,
+        docExpansion: 'none', // 控制文档展开方式
+        filter: true, // 启用搜索过滤
       },
-    })
+      customCss: theme.getBuffer(SwaggerThemeNameEnum.FLATTOP),
+      customSiteTitle: 'Music App API Documentation',
+    }
+
+    SwaggerModule.setup('api/docs', app, document, options)
 
     SwaggerAddress =
       'http://localhost:' + (configService.get<number>('app.port') || 3000) + '/api/docs'
