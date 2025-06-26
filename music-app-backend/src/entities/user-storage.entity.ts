@@ -11,7 +11,6 @@ import {
 import { User } from './user.entity'
 
 @Entity('user_storage')
-@Index(['userId'])
 export class UserStorage {
   @PrimaryGeneratedColumn('uuid')
   id: string
@@ -61,9 +60,6 @@ export class UserStorage {
   }
 
   canDownload(fileSize: number): boolean {
-    return (
-      this.usedSpace + fileSize <= this.totalSpace &&
-      this.downloadCount < this.maxDownloads
-    )
+    return this.usedSpace + fileSize <= this.totalSpace && this.downloadCount < this.maxDownloads
   }
 }

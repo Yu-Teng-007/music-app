@@ -6,6 +6,6 @@ import { RealtimeService } from './realtime.service'
 @Module({
   imports: [JwtModule],
   providers: [RealtimeGateway, RealtimeService],
-  exports: [RealtimeService],
+  exports: [RealtimeService, RealtimeGateway],
 })
 export class RealtimeModule {}

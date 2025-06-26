@@ -21,9 +21,9 @@ export enum DownloadStatus {
 }
 
 export enum AudioQuality {
-  LOW = 'low',      // 64kbps
+  LOW = 'low', // 64kbps
   MEDIUM = 'medium', // 128kbps
-  HIGH = 'high',    // 320kbps
+  HIGH = 'high', // 320kbps
   LOSSLESS = 'lossless', // FLAC
 }
 

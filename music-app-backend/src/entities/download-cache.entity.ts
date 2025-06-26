@@ -14,7 +14,6 @@ export enum CacheType {
 }
 
 @Entity('download_cache')
-@Index(['cacheKey'])
 @Index(['type'])
 @Index(['createdAt'])
 @Index(['lastAccessedAt'])

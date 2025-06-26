@@ -17,6 +17,6 @@ export { FeedLike } from './feed-like.entity'
 export { FeedComment } from './feed-comment.entity'
 
 // 离线下载功能实体
-export { Download } from './download.entity'
+export { Download, DownloadStatus, AudioQuality } from './download.entity'
 export { DownloadCache } from './download-cache.entity'
 export { UserStorage } from './user-storage.entity'
