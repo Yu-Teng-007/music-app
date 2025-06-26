@@ -116,6 +116,42 @@ export const realtimeService = {
     return this.emit('message', { to, content })
   },
 
+  // 社交功能相关的便捷方法
+
+  // 监听新动态
+  onNewFeed(callback: (data: any) => void) {
+    this.on('new_feed', callback)
+  },
+
+  // 监听动态更新
+  onFeedUpdate(callback: (data: any) => void) {
+    this.on('feed_update', callback)
+  },
+
+  // 监听点赞通知
+  onFeedLiked(callback: (data: any) => void) {
+    this.on('feed_liked', callback)
+  },
+
+  // 监听新关注者
+  onNewFollower(callback: (data: any) => void) {
+    this.on('new_follower', callback)
+  },
+
+  // 监听新评论
+  onNewComment(callback: (data: any) => void) {
+    this.on('new_comment', callback)
+  },
+
+  // 取消监听社交事件
+  offSocialEvents() {
+    this.off('new_feed')
+    this.off('feed_update')
+    this.off('feed_liked')
+    this.off('new_follower')
+    this.off('new_comment')
+  },
+
   // 重新绑定所有事件监听器
   rebindListeners() {
     if (!this.socket) return

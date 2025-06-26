@@ -3,10 +3,13 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, SelectQueryBuilder } from 'typeorm'
 import { UserFollow, UserFeed, FeedLike, FeedComment, User, Song, Playlist } from '../entities'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 import {
   CreateFeedDto,
   UpdateFeedDto,
@@ -34,7 +37,9 @@ export class SocialService {
     @InjectRepository(Song)
     private readonly songRepository: Repository<Song>,
     @InjectRepository(Playlist)
-    private readonly playlistRepository: Repository<Playlist>
+    private readonly playlistRepository: Repository<Playlist>,
+    @Inject(forwardRef(() => RealtimeGateway))
+    private readonly realtimeGateway: RealtimeGateway
   ) {}
 
   // 关注用户
@@ -73,6 +78,16 @@ export class SocialService {
       },
       followerId
     )
+
+    // 发送实时通知
+    try {
+      this.realtimeGateway.sendFollowNotification(followingId, {
+        followerId,
+        follower: await this.userRepository.findOne({ where: { id: followerId } }),
+      })
+    } catch (error) {
+      console.error('发送关注通知失败:', error)
+    }
 
     return savedFollow
   }
@@ -197,7 +212,19 @@ export class SocialService {
       userId,
     })
 
-    return await this.feedRepository.save(feed)
+    const savedFeed = await this.feedRepository.save(feed)
+
+    // 获取关注者列表并广播动态
+    try {
+      const followerIds = await this.getFollowerIds(userId)
+      if (followerIds.length > 0) {
+        this.realtimeGateway.broadcastFeedToFollowers(followerIds, savedFeed)
+      }
+    } catch (error) {
+      console.error('广播动态失败:', error)
+    }
+
+    return savedFeed
   }
 
   // 获取动态列表
@@ -260,6 +287,15 @@ export class SocialService {
     return follows.map(follow => follow.followingId)
   }
 
+  // 获取粉丝用户ID列表
+  private async getFollowerIds(userId: string): Promise<string[]> {
+    const follows = await this.followRepository.find({
+      where: { followingId: userId },
+      select: ['followerId'],
+    })
+    return follows.map(follow => follow.followerId)
+  }
+
   // 删除动态
   async deleteFeed(feedId: string, userId: string): Promise<void> {
     const feed = await this.feedRepository.findOne({
@@ -302,6 +338,19 @@ export class SocialService {
 
     // 更新动态点赞数
     await this.feedRepository.increment({ id: feedId }, 'likeCount', 1)
+
+    // 发送点赞通知（如果不是自己的动态）
+    if (feed.userId !== userId) {
+      try {
+        this.realtimeGateway.sendLikeNotification(feed.userId, {
+          feedId,
+          userId,
+          user: await this.userRepository.findOne({ where: { id: userId } }),
+        })
+      } catch (error) {
+        console.error('发送点赞通知失败:', error)
+      }
+    }
 
     return savedLike
   }

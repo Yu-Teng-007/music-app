@@ -6,10 +6,10 @@
         <i class="el-icon-user-solid"></i>
         社交动态
       </h1>
-      
+
       <div class="header-actions">
-        <el-button 
-          type="primary" 
+        <el-button
+          type="primary"
           @click="showCreateFeedDialog = true"
           :loading="socialStore.isLoading"
         >
@@ -81,29 +81,23 @@
 
       <!-- 加载更多 -->
       <div v-if="socialStore.hasMoreFeeds" class="load-more">
-        <el-button 
-          @click="loadMoreFeeds" 
-          :loading="socialStore.isLoading"
-          type="text"
-        >
+        <el-button @click="loadMoreFeeds" :loading="socialStore.isLoading" type="text">
           加载更多
         </el-button>
       </div>
     </div>
 
     <!-- 发布动态对话框 -->
-    <CreateFeedDialog
-      v-model="showCreateFeedDialog"
-      @created="handleFeedCreated"
-    />
+    <CreateFeedDialog v-model="showCreateFeedDialog" @created="handleFeedCreated" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useSocialStore } from '@/stores/social'
+import { realtimeService } from '@/services'
 import FeedCard from '@/components/social/FeedCard.vue'
 import CreateFeedDialog from '@/components/social/CreateFeedDialog.vue'
 import type { UserFeed, FeedType } from '@/services/social-api'
@@ -122,7 +116,7 @@ const socialStats = computed(() => socialStore.socialStats)
 // 处理筛选变化
 const handleFilterChange = (filter: string) => {
   const params: any = { page: 1, limit: 20 }
-  
+
   if (filter !== 'all') {
     if (filter === 'following') {
       // 只显示关注用户的动态，这个在后端已经处理
@@ -130,22 +124,22 @@ const handleFilterChange = (filter: string) => {
       params.type = filter as FeedType
     }
   }
-  
+
   socialStore.getFeeds(params)
 }
 
 // 加载更多动态
 const loadMoreFeeds = () => {
   const nextPage = socialStore.feedsMeta.page + 1
-  const params: any = { 
-    page: nextPage, 
-    limit: 20 
+  const params: any = {
+    page: nextPage,
+    limit: 20,
   }
-  
+
   if (currentFilter.value !== 'all' && currentFilter.value !== 'following') {
     params.type = currentFilter.value as FeedType
   }
-  
+
   socialStore.getFeeds(params, true) // append = true
 }
 
@@ -190,13 +184,60 @@ const handleFeedCreated = (feed: UserFeed) => {
   ElMessage.success('发布成功')
 }
 
+// 设置实时通信监听
+const setupRealtimeListeners = () => {
+  // 监听新动态
+  realtimeService.onNewFeed(data => {
+    console.log('收到新动态:', data)
+    ElMessage.info('有新动态发布')
+  })
+
+  // 监听动态更新
+  realtimeService.onFeedUpdate(data => {
+    console.log('动态更新:', data)
+    // 将新动态添加到列表开头
+    if (data.data) {
+      socialStore.feeds.unshift(data.data)
+    }
+  })
+
+  // 监听点赞通知
+  realtimeService.onFeedLiked(data => {
+    console.log('收到点赞通知:', data)
+    ElMessage.success('有人点赞了你的动态')
+  })
+
+  // 监听新关注者
+  realtimeService.onNewFollower(data => {
+    console.log('收到关注通知:', data)
+    ElMessage.success('有新的关注者')
+    // 更新统计数据
+    if (socialStats.value) {
+      socialStats.value.followerCount++
+    }
+  })
+}
+
+// 清理实时通信监听
+const cleanupRealtimeListeners = () => {
+  realtimeService.offSocialEvents()
+}
+
 // 初始化
 onMounted(async () => {
   // 获取我的社交统计
   await socialStore.getMySocialStats()
-  
+
   // 获取动态列表
   await socialStore.getFeeds({ page: 1, limit: 20 })
+
+  // 设置实时通信监听
+  setupRealtimeListeners()
+})
+
+// 清理
+onUnmounted(() => {
+  cleanupRealtimeListeners()
 })
 </script>
 
@@ -283,18 +324,18 @@ onMounted(async () => {
   .social-container {
     padding: 16px;
   }
-  
+
   .social-header {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-  
+
   .feed-filters {
     overflow-x: auto;
   }

@@ -118,4 +118,53 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
     return { event: 'message:sent', data: { to, success: true } }
   }
+
+  // 社交功能相关的实时通信方法
+
+  // 发送新动态通知
+  sendNewFeedNotification(userId: string, feed: any) {
+    this.server.to(`user:${userId}`).emit('new_feed', {
+      type: 'new_feed',
+      data: feed,
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // 发送点赞通知
+  sendLikeNotification(userId: string, like: any) {
+    this.server.to(`user:${userId}`).emit('feed_liked', {
+      type: 'feed_liked',
+      data: like,
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // 发送关注通知
+  sendFollowNotification(userId: string, follower: any) {
+    this.server.to(`user:${userId}`).emit('new_follower', {
+      type: 'new_follower',
+      data: follower,
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // 发送评论通知
+  sendCommentNotification(userId: string, comment: any) {
+    this.server.to(`user:${userId}`).emit('new_comment', {
+      type: 'new_comment',
+      data: comment,
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  // 广播动态到关注者
+  broadcastFeedToFollowers(followerIds: string[], feed: any) {
+    followerIds.forEach(followerId => {
+      this.server.to(`user:${followerId}`).emit('feed_update', {
+        type: 'feed_update',
+        data: feed,
+        timestamp: new Date().toISOString(),
+      })
+    })
+  }
 }
