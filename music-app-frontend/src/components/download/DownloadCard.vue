@@ -3,24 +3,24 @@
     <!-- 歌曲信息 -->
     <div class="song-info">
       <div class="song-cover">
-        <el-image 
-          :src="download.song?.coverUrl" 
-          fit="cover"
-          class="cover-image"
-        >
+        <el-image :src="download.song?.coverUrl" fit="cover" class="cover-image">
           <template #error>
             <div class="cover-placeholder">
               <i class="el-icon-headset"></i>
             </div>
           </template>
         </el-image>
-        
+
         <!-- 播放按钮覆盖层 -->
-        <div v-if="download.status === 'completed'" class="play-overlay" @click="$emit('play', download)">
+        <div
+          v-if="download.status === 'completed'"
+          class="play-overlay"
+          @click="$emit('play', download)"
+        >
           <i class="el-icon-video-play"></i>
         </div>
       </div>
-      
+
       <div class="song-details">
         <div class="song-title">{{ download.song?.title || '未知歌曲' }}</div>
         <div class="song-artist">{{ download.song?.artist || '未知艺人' }}</div>
@@ -39,11 +39,11 @@
         </span>
         <span class="download-time">{{ formatTime(download.createdAt) }}</span>
       </div>
-      
+
       <!-- 进度条 -->
       <div v-if="showProgress" class="progress-container">
-        <el-progress 
-          :percentage="download.progress" 
+        <el-progress
+          :percentage="download.progress"
           :color="getProgressColor(download.status)"
           :show-text="false"
           :stroke-width="6"
@@ -55,7 +55,7 @@
           </span>
         </div>
       </div>
-      
+
       <!-- 错误信息 -->
       <div v-if="download.status === 'failed' && download.errorMessage" class="error-message">
         <i class="el-icon-warning"></i>
@@ -67,52 +67,103 @@
     <div class="download-actions">
       <!-- 下载中状态的按钮 -->
       <template v-if="download.status === 'downloading'">
-        <el-button size="small" @click="$emit('pause', download.id)">
-          <i class="el-icon-video-pause"></i>
+        <MobileButton size="small" @click="$emit('pause', download.id)">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
           暂停
-        </el-button>
+        </MobileButton>
       </template>
-      
+
       <!-- 暂停状态的按钮 -->
       <template v-else-if="download.status === 'paused'">
-        <el-button size="small" type="primary" @click="$emit('resume', download.id)">
-          <i class="el-icon-video-play"></i>
+        <MobileButton size="small" type="primary" @click="$emit('resume', download.id)">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon points="5,3 19,12 5,21"></polygon>
+          </svg>
           继续
-        </el-button>
+        </MobileButton>
       </template>
-      
+
       <!-- 失败状态的按钮 -->
       <template v-else-if="download.status === 'failed'">
-        <el-button size="small" type="primary" @click="$emit('retry', download.id)">
-          <i class="el-icon-refresh"></i>
+        <MobileButton size="small" type="primary" @click="$emit('retry', download.id)">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="23,4 23,10 17,10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
           重试
-        </el-button>
+        </MobileButton>
       </template>
-      
+
       <!-- 已完成状态的按钮 -->
       <template v-else-if="download.status === 'completed'">
-        <el-button size="small" type="success" @click="$emit('play', download)">
-          <i class="el-icon-video-play"></i>
+        <MobileButton size="small" type="success" @click="$emit('play', download)">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon points="5,3 19,12 5,21"></polygon>
+          </svg>
           播放
-        </el-button>
+        </MobileButton>
       </template>
-      
+
       <!-- 删除按钮 -->
-      <el-button 
-        size="small" 
-        type="danger" 
+      <MobileButton
+        size="small"
+        type="danger"
         @click="$emit('delete', download.id)"
         :disabled="download.status === 'downloading'"
       >
-        <i class="el-icon-delete"></i>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="3,6 5,6 21,6"></polyline>
+          <path
+            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+          ></path>
+        </svg>
         删除
-      </el-button>
+      </MobileButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { MobileButton } from '@/components/ui'
 import { downloadApi } from '@/services'
 import type { Download, DownloadStatus, AudioQuality } from '@/services/download-api'
 
@@ -175,16 +226,16 @@ const formatTime = (time: string): string => {
   const date = new Date(time)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-  
+
   const minutes = Math.floor(diff / (1000 * 60))
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  
+
   if (minutes < 1) return '刚刚'
   if (minutes < 60) return `${minutes}分钟前`
   if (hours < 24) return `${hours}小时前`
   if (days < 7) return `${days}天前`
-  
+
   return date.toLocaleDateString('zh-CN')
 }
 </script>
@@ -320,11 +371,21 @@ const formatTime = (time: string): string => {
   font-weight: 500;
 }
 
-.status-pending { color: #909399; }
-.status-downloading { color: #409eff; }
-.status-completed { color: #67c23a; }
-.status-failed { color: #f56c6c; }
-.status-paused { color: #e6a23c; }
+.status-pending {
+  color: #909399;
+}
+.status-downloading {
+  color: #409eff;
+}
+.status-completed {
+  color: #67c23a;
+}
+.status-failed {
+  color: #f56c6c;
+}
+.status-paused {
+  color: #e6a23c;
+}
 
 .download-time {
   font-size: 12px;
@@ -361,23 +422,157 @@ const formatTime = (time: string): string => {
   flex-shrink: 0;
 }
 
+/* 移动端优化 */
 @media (max-width: 768px) {
   .download-card {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
   }
-  
+
   .song-info {
     gap: 12px;
   }
-  
+
+  .song-cover {
+    width: 60px;
+    height: 60px;
+  }
+
+  .song-title {
+    font-size: 15px;
+  }
+
+  .song-artist {
+    font-size: 13px;
+  }
+
   .download-status {
     min-width: auto;
+    margin-top: 8px;
   }
-  
+
+  .status-badge {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .download-progress {
+    margin-top: 8px;
+  }
+
+  .progress-info {
+    font-size: 11px;
+  }
+
   .download-actions {
     justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .download-actions button {
+    min-height: 44px; /* 移动端最小触摸目标 */
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .download-card {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .song-info {
+    gap: 10px;
+  }
+
+  .song-cover {
+    width: 50px;
+    height: 50px;
+  }
+
+  .song-title {
+    font-size: 14px;
+  }
+
+  .song-artist {
+    font-size: 12px;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .progress-info {
+    font-size: 10px;
+  }
+
+  .download-actions {
+    gap: 8px;
+  }
+
+  .download-actions button {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+  .download-card {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+  }
+
+  .song-title {
+    color: #ffffff;
+  }
+
+  .song-artist {
+    color: #999999;
+  }
+
+  .status-badge {
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    color: #ffffff;
+  }
+
+  .status-completed {
+    background: rgba(103, 194, 58, 0.2);
+    color: #67c23a;
+  }
+
+  .status-downloading {
+    background: rgba(64, 158, 255, 0.2);
+    color: #409eff;
+  }
+
+  .status-failed {
+    background: rgba(245, 108, 108, 0.2);
+    color: #f56c6c;
+  }
+
+  .status-paused {
+    background: rgba(230, 162, 60, 0.2);
+    color: #e6a23c;
+  }
+
+  .progress-info {
+    color: #999999;
+  }
+
+  .error-message {
+    background: rgba(245, 108, 108, 0.1);
+    border: 1px solid rgba(245, 108, 108, 0.3);
   }
 }
 </style>

@@ -1,32 +1,38 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="选择歌单"
-    width="800px"
-  >
+  <MobileDialog v-model="dialogVisible" title="选择歌单" width="90%">
     <div class="playlist-selector-content">
       <!-- 搜索框 -->
       <div class="search-section">
-        <el-input
+        <MobileInput
           v-model="searchKeyword"
           placeholder="搜索歌单..."
           @input="handleSearch"
           clearable
         >
           <template #prefix>
-            <i class="el-icon-search"></i>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
           </template>
-        </el-input>
+        </MobileInput>
       </div>
 
       <!-- 歌单列表 -->
       <div class="playlists-list">
         <div v-if="isLoading" class="loading-container">
-          <el-skeleton :rows="5" animated />
+          <MobileSkeleton :rows="5" animated />
         </div>
 
         <div v-else-if="playlists.length === 0" class="empty-container">
-          <el-empty description="暂无歌单" />
+          <MobileEmpty description="暂无歌单" />
         </div>
 
         <div v-else class="playlists-grid">
@@ -37,17 +43,26 @@
             @click="handleSelect(playlist)"
           >
             <div class="playlist-cover">
-              <el-image 
-                :src="playlist.coverUrl" 
-                fit="cover"
+              <img
+                :src="playlist.coverUrl"
+                :alt="playlist.title"
                 class="cover-image"
-              >
-                <template #error>
-                  <div class="cover-placeholder">
-                    <i class="el-icon-menu"></i>
-                  </div>
-                </template>
-              </el-image>
+                @error="handleImageError"
+              />
+              <div v-if="!playlist.coverUrl" class="cover-placeholder">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 12h18l-3-3m0 6l3-3"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M3 18h18"></path>
+                </svg>
+              </div>
             </div>
             <div class="playlist-info">
               <div class="playlist-title">{{ playlist.title }}</div>
@@ -61,16 +76,31 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <MobileButton @click="dialogVisible = false">取消</MobileButton>
       </div>
     </template>
-  </el-dialog>
+  </MobileDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import {
+  MobileDialog,
+  MobileInput,
+  MobileSkeleton,
+  MobileEmpty,
+  MobileButton,
+} from '@/components/ui'
 import { playlistApi } from '@/services'
-import type { Playlist } from '@/types/playlist'
+
+// 临时类型定义
+interface Playlist {
+  id: string
+  title: string
+  description?: string
+  coverUrl?: string
+  songCount?: number
+}
 
 interface Props {
   modelValue: boolean
@@ -92,11 +122,11 @@ const isLoading = ref(false)
 // 计算属性
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value),
 })
 
 // 监听对话框显示状态
-watch(dialogVisible, (visible) => {
+watch(dialogVisible, visible => {
   if (visible) {
     loadPlaylists()
   }
@@ -125,9 +155,11 @@ const handleSearch = async () => {
     isLoading.value = true
     // 简单的本地搜索
     const allPlaylists = await playlistApi.getMyPlaylists({ page: 1, limit: 100 })
-    playlists.value = allPlaylists.items.filter(playlist =>
-      playlist.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-      (playlist.description && playlist.description.toLowerCase().includes(searchKeyword.value.toLowerCase()))
+    playlists.value = allPlaylists.items.filter(
+      playlist =>
+        playlist.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+        (playlist.description &&
+          playlist.description.toLowerCase().includes(searchKeyword.value.toLowerCase()))
     )
   } catch (error) {
     console.error('搜索歌单失败:', error)
@@ -138,6 +170,11 @@ const handleSearch = async () => {
 
 const handleSelect = (playlist: Playlist) => {
   emit('select', playlist)
+}
+
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  target.style.display = 'none'
 }
 
 // 初始化

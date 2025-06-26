@@ -56,33 +56,32 @@
 
     <!-- 下载筛选 -->
     <div class="download-filters">
-      <el-radio-group v-model="currentFilter" @change="handleFilterChange">
-        <el-radio-button label="all">全部下载</el-radio-button>
-        <el-radio-button label="completed">已完成</el-radio-button>
-        <el-radio-button label="downloading">下载中</el-radio-button>
-        <el-radio-button label="failed">下载失败</el-radio-button>
-        <el-radio-button label="paused">已暂停</el-radio-button>
-      </el-radio-group>
+      <MobileRadioGroup
+        v-model="currentFilter"
+        :options="filterOptions"
+        @change="handleFilterChange"
+      />
 
-      <el-select v-model="qualityFilter" placeholder="音质筛选" style="width: 150px">
-        <el-option label="全部音质" value="" />
-        <el-option label="省流量" value="low" />
-        <el-option label="标准音质" value="medium" />
-        <el-option label="高音质" value="high" />
-        <el-option label="无损音质" value="lossless" />
-      </el-select>
+      <MobileSelect
+        v-model="qualityFilter"
+        placeholder="音质筛选"
+        :options="qualityOptions"
+        style="width: 150px"
+      />
     </div>
 
     <!-- 下载列表 -->
     <div class="downloads-list-container">
       <div v-if="downloadStore.isLoading && downloads.length === 0" class="loading-container">
-        <el-skeleton :rows="5" animated />
+        <MobileSkeleton :rows="5" animated />
       </div>
 
       <div v-else-if="downloads.length === 0" class="empty-container">
-        <el-empty description="暂无下载文件">
-          <el-button type="primary" @click="$router.push('/discover')"> 去发现音乐 </el-button>
-        </el-empty>
+        <MobileEmpty description="暂无下载文件">
+          <MobileButton type="primary" @click="$router.push('/discover')">
+            去发现音乐
+          </MobileButton>
+        </MobileEmpty>
       </div>
 
       <div v-else class="downloads-list">
@@ -114,7 +113,15 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  MobileButton,
+  MobileSkeleton,
+  MobileEmpty,
+  MobileSelect,
+  MobileRadioGroup,
+  MobileMessage,
+  createSelectOptions,
+} from '@/components/ui'
 import { useDownloadStore } from '@/stores/download'
 import { downloadApi } from '@/services'
 import DownloadCard from '@/components/download/DownloadCard.vue'
@@ -128,6 +135,23 @@ const downloadStore = useDownloadStore()
 const showCleanupDialog = ref(false)
 const currentFilter = ref<string>('all')
 const qualityFilter = ref<string>('')
+
+// 筛选选项
+const filterOptions = [
+  { label: '全部下载', value: 'all' },
+  { label: '已完成', value: 'completed' },
+  { label: '下载中', value: 'downloading' },
+  { label: '下载失败', value: 'failed' },
+  { label: '已暂停', value: 'paused' },
+]
+
+const qualityOptions = createSelectOptions([
+  { label: '全部音质', value: '' },
+  { label: '省流量', value: 'low' },
+  { label: '标准音质', value: 'medium' },
+  { label: '高音质', value: 'high' },
+  { label: '无损音质', value: 'lossless' },
+])
 
 // 计算属性
 const downloads = computed(() => downloadStore.downloads)
@@ -193,7 +217,7 @@ const loadMoreDownloads = () => {
 const handlePauseDownload = async (downloadId: string) => {
   const success = await downloadStore.pauseDownload(downloadId)
   if (success) {
-    ElMessage.success('下载已暂停')
+    MobileMessage.success('下载已暂停')
   }
 }
 
@@ -201,7 +225,7 @@ const handlePauseDownload = async (downloadId: string) => {
 const handleResumeDownload = async (downloadId: string) => {
   const success = await downloadStore.resumeDownload(downloadId)
   if (success) {
-    ElMessage.success('下载已恢复')
+    MobileMessage.success('下载已恢复')
   }
 }
 
@@ -209,22 +233,21 @@ const handleResumeDownload = async (downloadId: string) => {
 const handleRetryDownload = async (downloadId: string) => {
   const success = await downloadStore.retryDownload(downloadId)
   if (success) {
-    ElMessage.success('重新开始下载')
+    MobileMessage.success('重新开始下载')
   }
 }
 
 // 处理删除下载
 const handleDeleteDownload = async (downloadId: string) => {
   try {
-    await ElMessageBox.confirm('确定要删除这个下载任务吗？本地文件也会被删除。', '确认删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    })
+    // 简单的确认对话框替代
+    if (!confirm('确定要删除这个下载任务吗？本地文件也会被删除。')) {
+      return
+    }
 
     const success = await downloadStore.deleteDownload(downloadId)
     if (success) {
-      ElMessage.success('删除成功')
+      MobileMessage.success('删除成功')
     }
   } catch {
     // 用户取消删除
@@ -234,14 +257,14 @@ const handleDeleteDownload = async (downloadId: string) => {
 // 处理播放歌曲
 const handlePlaySong = (download: any) => {
   // TODO: 实现离线播放功能
-  ElMessage.info('离线播放功能开发中')
+  MobileMessage.info('离线播放功能开发中')
 }
 
 // 处理清理
 const handleCleanup = async (options: CleanupOptions) => {
   const result = await downloadStore.cleanupDownloads(options)
   if (result) {
-    ElMessage.success(
+    MobileMessage.success(
       `清理完成：删除了 ${result.cleaned} 个文件，释放了 ${formatFileSize(result.freedSpace)} 空间`
     )
     showCleanupDialog.value = false
@@ -367,15 +390,46 @@ onMounted(async () => {
   padding: 20px;
 }
 
+/* 移动端优化 */
 @media (max-width: 768px) {
   .downloads-container {
     padding: 16px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 为底部导航留空间 */
   }
 
   .downloads-header {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .header-actions button {
+    flex: 1;
+    min-height: 48px; /* 移动端最小触摸目标 */
+  }
+
+  .stats-card {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .stats-header h3 {
+    font-size: 16px;
+  }
+
+  .usage-percentage {
+    font-size: 20px;
   }
 
   .stats-details {
@@ -383,10 +437,94 @@ onMounted(async () => {
     gap: 12px;
   }
 
+  .stat-item .label {
+    font-size: 13px;
+  }
+
   .download-filters {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .loading-container,
+  .empty-container {
+    padding: 60px 20px;
+  }
+
+  .downloads-list {
+    gap: 12px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .downloads-container {
+    padding: 12px;
+  }
+
+  .downloads-header {
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stats-card {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stats-header h3 {
+    font-size: 15px;
+  }
+
+  .usage-percentage {
+    font-size: 18px;
+  }
+
+  .download-filters {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+  .downloads-container {
+    background-color: #1a1a1a;
+  }
+
+  .page-title {
+    color: #ffffff;
+  }
+
+  .stats-card {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+  }
+
+  .stats-header h3 {
+    color: #ffffff;
+  }
+
+  .usage-percentage {
+    color: #409eff;
+  }
+
+  .stat-item .label {
+    color: #999999;
+  }
+
+  .stat-item .value {
+    color: #ffffff;
   }
 }
 </style>

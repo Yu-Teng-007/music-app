@@ -1,54 +1,51 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="选择用户"
-    width="600px"
-  >
+  <MobileDialog v-model="dialogVisible" title="选择用户" width="90%">
     <div class="user-selector-content">
       <!-- 搜索框 -->
       <div class="search-section">
-        <el-input
+        <MobileInput
           v-model="searchKeyword"
           placeholder="搜索用户..."
           @input="handleSearch"
           clearable
         >
           <template #prefix>
-            <i class="el-icon-search"></i>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
           </template>
-        </el-input>
+        </MobileInput>
       </div>
 
       <!-- 用户列表 -->
       <div class="users-list">
         <div v-if="isLoading" class="loading-container">
-          <el-skeleton :rows="5" animated />
+          <MobileSkeleton :rows="5" animated />
         </div>
 
         <div v-else-if="users.length === 0" class="empty-container">
-          <el-empty description="暂无用户" />
+          <MobileEmpty description="暂无用户" />
         </div>
 
         <div v-else class="users-container">
-          <div
-            v-for="user in users"
-            :key="user.id"
-            class="user-item"
-            @click="handleSelect(user)"
-          >
-            <el-avatar 
-              :src="user.avatar" 
-              :size="48"
-              class="user-avatar"
-            >
+          <div v-for="user in users" :key="user.id" class="user-item" @click="handleSelect(user)">
+            <MobileAvatar :src="user.avatar" :size="48" class="user-avatar">
               {{ user.username?.charAt(0) }}
-            </el-avatar>
+            </MobileAvatar>
             <div class="user-info">
               <div class="username">{{ user.username }}</div>
               <div class="user-phone">{{ user.phone }}</div>
             </div>
             <div class="select-button">
-              <el-button type="primary" size="small">选择</el-button>
+              <MobileButton type="primary" size="small">选择</MobileButton>
             </div>
           </div>
         </div>
@@ -57,15 +54,30 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <MobileButton @click="dialogVisible = false">取消</MobileButton>
       </div>
     </template>
-  </el-dialog>
+  </MobileDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import type { User } from '@/types/user'
+import {
+  MobileDialog,
+  MobileInput,
+  MobileSkeleton,
+  MobileEmpty,
+  MobileAvatar,
+  MobileButton,
+} from '@/components/ui'
+
+// 临时类型定义
+interface User {
+  id: string
+  username: string
+  phone: string
+  avatar?: string
+}
 
 interface Props {
   modelValue: boolean
@@ -87,11 +99,11 @@ const isLoading = ref(false)
 // 计算属性
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value),
 })
 
 // 监听对话框显示状态
-watch(dialogVisible, (visible) => {
+watch(dialogVisible, visible => {
   if (visible) {
     loadUsers()
   }
@@ -139,9 +151,10 @@ const handleSearch = async () => {
     isLoading.value = true
     // 简单的本地搜索
     await loadUsers()
-    users.value = users.value.filter(user =>
-      user.username.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-      user.phone.includes(searchKeyword.value)
+    users.value = users.value.filter(
+      (user: User) =>
+        user.username.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+        user.phone.includes(searchKeyword.value)
     )
   } catch (error) {
     console.error('搜索用户失败:', error)

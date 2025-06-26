@@ -8,14 +8,24 @@
       </h1>
 
       <div class="header-actions">
-        <el-button
+        <MobileButton
           type="primary"
           @click="showCreateFeedDialog = true"
           :loading="socialStore.isLoading"
         >
-          <i class="el-icon-edit"></i>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
           发布动态
-        </el-button>
+        </MobileButton>
       </div>
     </div>
 
@@ -55,15 +65,15 @@
     <!-- 动态列表 -->
     <div class="feeds-container">
       <div v-if="socialStore.isLoading && feeds.length === 0" class="loading-container">
-        <el-skeleton :rows="3" animated />
+        <MobileSkeleton :rows="3" animated />
       </div>
 
       <div v-else-if="feeds.length === 0" class="empty-container">
-        <el-empty description="暂无动态">
-          <el-button type="primary" @click="showCreateFeedDialog = true">
+        <MobileEmpty description="暂无动态">
+          <MobileButton type="primary" @click="showCreateFeedDialog = true">
             发布第一条动态
-          </el-button>
-        </el-empty>
+          </MobileButton>
+        </MobileEmpty>
       </div>
 
       <div v-else class="feeds-list">
@@ -95,7 +105,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { MobileButton, MobileSkeleton, MobileEmpty, MobileMessage } from '@/components/ui'
 import { useSocialStore } from '@/stores/social'
 import { realtimeService } from '@/services'
 import FeedCard from '@/components/social/FeedCard.vue'
@@ -147,7 +157,7 @@ const loadMoreFeeds = () => {
 const handleLikeFeed = async (feedId: string) => {
   const success = await socialStore.likeFeed(feedId)
   if (success) {
-    ElMessage.success('点赞成功')
+    MobileMessage.success('点赞成功')
   }
 }
 
@@ -155,7 +165,7 @@ const handleLikeFeed = async (feedId: string) => {
 const handleUnlikeFeed = async (feedId: string) => {
   const success = await socialStore.unlikeFeed(feedId)
   if (success) {
-    ElMessage.success('取消点赞成功')
+    MobileMessage.success('取消点赞成功')
   }
 }
 
@@ -163,14 +173,14 @@ const handleUnlikeFeed = async (feedId: string) => {
 const handleDeleteFeed = async (feedId: string) => {
   const success = await socialStore.deleteFeed(feedId)
   if (success) {
-    ElMessage.success('删除成功')
+    MobileMessage.success('删除成功')
   }
 }
 
 // 处理分享动态
 const handleShareFeed = (feed: UserFeed) => {
   // TODO: 实现分享功能
-  ElMessage.info('分享功能开发中')
+  MobileMessage.info('分享功能开发中')
 }
 
 // 处理用户点击
@@ -181,7 +191,7 @@ const handleUserClick = (userId: string) => {
 // 处理动态创建成功
 const handleFeedCreated = (feed: UserFeed) => {
   showCreateFeedDialog.value = false
-  ElMessage.success('发布成功')
+  MobileMessage.success('发布成功')
 }
 
 // 设置实时通信监听
@@ -189,7 +199,7 @@ const setupRealtimeListeners = () => {
   // 监听新动态
   realtimeService.onNewFeed(data => {
     console.log('收到新动态:', data)
-    ElMessage.info('有新动态发布')
+    MobileMessage.info('有新动态发布')
   })
 
   // 监听动态更新
@@ -204,13 +214,13 @@ const setupRealtimeListeners = () => {
   // 监听点赞通知
   realtimeService.onFeedLiked(data => {
     console.log('收到点赞通知:', data)
-    ElMessage.success('有人点赞了你的动态')
+    MobileMessage.success('有人点赞了你的动态')
   })
 
   // 监听新关注者
   realtimeService.onNewFollower(data => {
     console.log('收到关注通知:', data)
-    ElMessage.success('有新的关注者')
+    MobileMessage.success('有新的关注者')
     // 更新统计数据
     if (socialStats.value) {
       socialStats.value.followerCount++
@@ -320,15 +330,37 @@ onUnmounted(() => {
   padding: 20px;
 }
 
+/* 移动端优化 */
 @media (max-width: 768px) {
   .social-container {
     padding: 16px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 为底部导航留空间 */
   }
 
   .social-header {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions button {
+    width: 100%;
+    min-height: 48px; /* 移动端最小触摸目标 */
+  }
+
+  .social-stats {
+    padding: 16px;
+    margin-bottom: 20px;
   }
 
   .stats-grid {
@@ -336,8 +368,83 @@ onUnmounted(() => {
     gap: 16px;
   }
 
+  .stat-number {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+  }
+
   .feed-filters {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .loading-container,
+  .empty-container {
+    padding: 60px 20px;
+  }
+
+  .feeds-list {
+    gap: 12px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .social-container {
+    padding: 12px;
+  }
+
+  .social-header {
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .social-stats {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stats-grid {
+    gap: 12px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+  .social-container {
+    background-color: #1a1a1a;
+  }
+
+  .page-title {
+    color: #ffffff;
+  }
+
+  .social-stats {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+  }
+
+  .stat-number {
+    color: #409eff;
+  }
+
+  .stat-label {
+    color: #999999;
   }
 }
 </style>

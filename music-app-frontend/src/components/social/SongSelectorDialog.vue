@@ -1,53 +1,63 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="选择歌曲"
-    width="800px"
-  >
+  <MobileDialog v-model="dialogVisible" title="选择歌曲" width="90%">
     <div class="song-selector-content">
       <!-- 搜索框 -->
       <div class="search-section">
-        <el-input
+        <MobileInput
           v-model="searchKeyword"
           placeholder="搜索歌曲..."
           @input="handleSearch"
           clearable
         >
           <template #prefix>
-            <i class="el-icon-search"></i>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
           </template>
-        </el-input>
+        </MobileInput>
       </div>
 
       <!-- 歌曲列表 -->
       <div class="songs-list">
         <div v-if="isLoading" class="loading-container">
-          <el-skeleton :rows="5" animated />
+          <MobileSkeleton :rows="5" animated />
         </div>
 
         <div v-else-if="songs.length === 0" class="empty-container">
-          <el-empty description="暂无歌曲" />
+          <MobileEmpty description="暂无歌曲" />
         </div>
 
         <div v-else class="songs-grid">
-          <div
-            v-for="song in songs"
-            :key="song.id"
-            class="song-item"
-            @click="handleSelect(song)"
-          >
+          <div v-for="song in songs" :key="song.id" class="song-item" @click="handleSelect(song)">
             <div class="song-cover">
-              <el-image 
-                :src="song.coverUrl" 
-                fit="cover"
+              <img
+                :src="song.coverUrl"
+                :alt="song.title"
                 class="cover-image"
-              >
-                <template #error>
-                  <div class="cover-placeholder">
-                    <i class="el-icon-headset"></i>
-                  </div>
-                </template>
-              </el-image>
+                @error="handleImageError"
+              />
+              <div v-if="!song.coverUrl" class="cover-placeholder">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+              </div>
             </div>
             <div class="song-info">
               <div class="song-title">{{ song.title }}</div>
@@ -60,16 +70,30 @@
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <MobileButton @click="dialogVisible = false">取消</MobileButton>
       </div>
     </template>
-  </el-dialog>
+  </MobileDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import {
+  MobileDialog,
+  MobileInput,
+  MobileSkeleton,
+  MobileEmpty,
+  MobileButton,
+} from '@/components/ui'
 import { musicApi } from '@/services'
-import type { Song } from '@/types/song'
+
+// 临时类型定义
+interface Song {
+  id: string
+  title: string
+  artist: string
+  coverUrl?: string
+}
 
 interface Props {
   modelValue: boolean
@@ -91,11 +115,11 @@ const isLoading = ref(false)
 // 计算属性
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value),
 })
 
 // 监听对话框显示状态
-watch(dialogVisible, (visible) => {
+watch(dialogVisible, visible => {
   if (visible) {
     loadSongs()
   }
@@ -133,6 +157,11 @@ const handleSearch = async () => {
 
 const handleSelect = (song: Song) => {
   emit('select', song)
+}
+
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  target.style.display = 'none'
 }
 
 // 初始化

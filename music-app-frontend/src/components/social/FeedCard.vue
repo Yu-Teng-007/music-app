@@ -3,9 +3,9 @@
     <!-- 用户信息 -->
     <div class="feed-header">
       <div class="user-info" @click="$emit('user-click', feed.user?.id)">
-        <el-avatar :src="feed.user?.avatar" :size="40" class="user-avatar">
+        <MobileAvatar :src="feed.user?.avatar" :size="40" class="user-avatar">
           {{ feed.user?.username?.charAt(0) }}
-        </el-avatar>
+        </MobileAvatar>
         <div class="user-details">
           <div class="username">{{ feed.user?.username }}</div>
           <div class="feed-time">{{ formatTime(feed.createdAt) }}</div>
@@ -13,16 +13,27 @@
       </div>
 
       <div class="feed-actions">
-        <el-dropdown v-if="isMyFeed" @command="handleCommand">
-          <el-button type="text" size="small">
-            <i class="el-icon-more"></i>
-          </el-button>
+        <MobileDropdown v-if="isMyFeed" @command="handleCommand">
+          <MobileButton type="text" size="small">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+            </svg>
+          </MobileButton>
           <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="delete">删除</el-dropdown-item>
-            </el-dropdown-menu>
+            <MobileDropdownMenu>
+              <MobileDropdownItem command="delete">删除</MobileDropdownItem>
+            </MobileDropdownMenu>
           </template>
-        </el-dropdown>
+        </MobileDropdown>
       </div>
     </div>
 
@@ -42,15 +53,37 @@
       <!-- 歌曲信息 -->
       <div v-if="feed.song" class="feed-song" @click="handleSongClick">
         <div class="song-cover">
-          <el-image :src="feed.song.coverUrl" fit="cover" class="cover-image">
-            <template #error>
-              <div class="cover-placeholder">
-                <i class="el-icon-picture-outline"></i>
-              </div>
-            </template>
-          </el-image>
+          <img
+            :src="feed.song.coverUrl"
+            :alt="feed.song.title"
+            class="cover-image"
+            @error="handleImageError"
+          />
+          <div v-if="!feed.song.coverUrl" class="cover-placeholder">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+          </div>
           <div class="play-overlay">
-            <i class="el-icon-video-play"></i>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon points="5,3 19,12 5,21"></polygon>
+            </svg>
           </div>
         </div>
         <div class="song-info">
@@ -62,13 +95,26 @@
       <!-- 歌单信息 -->
       <div v-if="feed.playlist" class="feed-playlist" @click="handlePlaylistClick">
         <div class="playlist-cover">
-          <el-image :src="feed.playlist.coverUrl" fit="cover" class="cover-image">
-            <template #error>
-              <div class="cover-placeholder">
-                <i class="el-icon-menu"></i>
-              </div>
-            </template>
-          </el-image>
+          <img
+            :src="feed.playlist.coverUrl"
+            :alt="feed.playlist.title"
+            class="cover-image"
+            @error="handleImageError"
+          />
+          <div v-if="!feed.playlist.coverUrl" class="cover-placeholder">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 12h18l-3-3m0 6l3-3"></path>
+              <path d="M3 6h18"></path>
+              <path d="M3 18h18"></path>
+            </svg>
+          </div>
         </div>
         <div class="playlist-info">
           <div class="playlist-title">{{ feed.playlist.title }}</div>
@@ -82,9 +128,9 @@
         class="feed-target-user"
         @click="$emit('user-click', feed.targetUser.id)"
       >
-        <el-avatar :src="feed.targetUser.avatar" :size="32">
+        <MobileAvatar :src="feed.targetUser.avatar" :size="32">
           {{ feed.targetUser.username?.charAt(0) }}
-        </el-avatar>
+        </MobileAvatar>
         <span class="target-username">{{ feed.targetUser.username }}</span>
       </div>
     </div>
@@ -92,20 +138,67 @@
     <!-- 互动区域 -->
     <div class="feed-interactions">
       <div class="interaction-buttons">
-        <el-button type="text" size="small" :class="{ 'is-liked': isLiked }" @click="handleLike">
-          <i :class="isLiked ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
+        <MobileButton type="text" size="small" :class="{ 'is-liked': isLiked }" @click="handleLike">
+          <svg
+            v-if="isLiked"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon
+              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+            ></polygon>
+          </svg>
+          <svg
+            v-else
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon
+              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+            ></polygon>
+          </svg>
           {{ feed.likeCount || 0 }}
-        </el-button>
+        </MobileButton>
 
-        <el-button type="text" size="small" @click="handleComment">
-          <i class="el-icon-chat-line-round"></i>
+        <MobileButton type="text" size="small" @click="handleComment">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
           {{ feed.commentCount || 0 }}
-        </el-button>
+        </MobileButton>
 
-        <el-button type="text" size="small" @click="handleShare">
-          <i class="el-icon-share"></i>
+        <MobileButton type="text" size="small" @click="handleShare">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
           {{ feed.shareCount || 0 }}
-        </el-button>
+        </MobileButton>
       </div>
     </div>
   </div>
@@ -114,6 +207,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import {
+  MobileAvatar,
+  MobileButton,
+  MobileDropdown,
+  MobileDropdownMenu,
+  MobileDropdownItem,
+} from '@/components/ui'
 import { useAuthStore } from '@/stores/auth'
 import type { UserFeed } from '@/services/social-api'
 // import { formatDistanceToNow } from 'date-fns'
@@ -207,6 +307,11 @@ const handleCommand = (command: string) => {
   if (command === 'delete') {
     emit('delete', props.feed.id)
   }
+}
+
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  target.style.display = 'none'
 }
 
 const handleLike = () => {
@@ -425,26 +530,202 @@ const handlePlaylistClick = () => {
   gap: 24px;
 }
 
-.interaction-buttons .el-button {
+.interaction-buttons button {
   color: #606266;
-  padding: 4px 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  min-height: 44px; /* 移动端最小触摸目标 */
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.interaction-buttons .el-button:hover {
+.interaction-buttons button:hover {
   color: #409eff;
+  background-color: rgba(64, 158, 255, 0.1);
 }
 
-.interaction-buttons .el-button.is-liked {
+.interaction-buttons button:active {
+  transform: scale(0.98);
+}
+
+.interaction-buttons button.is-liked {
   color: #f56c6c;
 }
 
+.interaction-buttons button.is-liked:hover {
+  background-color: rgba(245, 108, 108, 0.1);
+}
+
+/* 移动端优化 */
 @media (max-width: 768px) {
   .feed-card {
     padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .feed-header {
+    margin-bottom: 12px;
+  }
+
+  .user-info {
+    gap: 10px;
+  }
+
+  .username {
+    font-size: 15px;
+  }
+
+  .feed-time {
+    font-size: 12px;
+  }
+
+  .feed-content {
+    margin-bottom: 12px;
+  }
+
+  .content-text {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .feed-song,
+  .feed-playlist {
+    padding: 12px;
+  }
+
+  .song-cover,
+  .playlist-cover {
+    width: 60px;
+    height: 60px;
+  }
+
+  .song-title,
+  .playlist-title {
+    font-size: 15px;
+  }
+
+  .song-artist,
+  .playlist-desc {
+    font-size: 13px;
   }
 
   .interaction-buttons {
     gap: 16px;
+    justify-content: space-around;
+  }
+
+  .interaction-buttons button {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .feed-card {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .user-info {
+    gap: 8px;
+  }
+
+  .username {
+    font-size: 14px;
+  }
+
+  .feed-time {
+    font-size: 11px;
+  }
+
+  .content-text {
+    font-size: 14px;
+  }
+
+  .feed-song,
+  .feed-playlist {
+    padding: 10px;
+  }
+
+  .song-cover,
+  .playlist-cover {
+    width: 50px;
+    height: 50px;
+  }
+
+  .song-title,
+  .playlist-title {
+    font-size: 14px;
+  }
+
+  .song-artist,
+  .playlist-desc {
+    font-size: 12px;
+  }
+
+  .interaction-buttons button {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+  .feed-card {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+  }
+
+  .username {
+    color: #ffffff;
+  }
+
+  .feed-time {
+    color: #999999;
+  }
+
+  .content-text {
+    color: #ffffff;
+  }
+
+  .feed-song,
+  .feed-playlist {
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+  }
+
+  .song-title,
+  .playlist-title {
+    color: #ffffff;
+  }
+
+  .song-artist,
+  .playlist-desc {
+    color: #999999;
+  }
+
+  .feed-target-user {
+    background: rgba(64, 158, 255, 0.1);
+  }
+
+  .feed-interactions {
+    border-top-color: #3a3a3a;
+  }
+
+  .interaction-buttons button {
+    color: #999999;
+  }
+
+  .interaction-buttons button:hover {
+    color: #409eff;
+    background-color: rgba(64, 158, 255, 0.1);
   }
 }
 </style>

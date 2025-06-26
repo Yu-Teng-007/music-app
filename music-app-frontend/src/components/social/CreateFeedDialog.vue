@@ -1,150 +1,178 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="发布动态"
-    width="600px"
-    :before-close="handleClose"
-  >
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="80px"
-    >
-      <el-form-item label="动态类型" prop="type">
-        <el-select v-model="form.type" placeholder="选择动态类型" @change="handleTypeChange">
-          <el-option label="分享歌曲" value="share_song" />
-          <el-option label="分享歌单" value="share_playlist" />
-          <el-option label="喜欢歌曲" value="like_song" />
-          <el-option label="创建歌单" value="create_playlist" />
-          <el-option label="关注用户" value="follow_user" />
-        </el-select>
-      </el-form-item>
+  <MobileDialog v-model="dialogVisible" title="发布动态" width="90%" :before-close="handleClose">
+    <MobileForm ref="formRef" :model="form" :rules="rules">
+      <MobileFormItem label="动态类型" prop="type">
+        <MobileSelect
+          v-model="form.type"
+          placeholder="选择动态类型"
+          :options="typeOptions"
+          @change="handleTypeChange"
+        />
+      </MobileFormItem>
 
-      <el-form-item label="动态内容" prop="content">
-        <el-input
+      <MobileFormItem label="动态内容" prop="content">
+        <MobileInput
           v-model="form.content"
           type="textarea"
           :rows="4"
           placeholder="分享你的想法..."
-          maxlength="500"
+          :maxlength="500"
           show-word-limit
         />
-      </el-form-item>
+      </MobileFormItem>
 
       <!-- 选择歌曲 -->
-      <el-form-item 
-        v-if="form.type === 'share_song' || form.type === 'like_song'" 
-        label="选择歌曲" 
+      <MobileFormItem
+        v-if="form.type === 'share_song' || form.type === 'like_song'"
+        label="选择歌曲"
         prop="songId"
       >
         <div class="song-selector">
-          <el-button @click="showSongSelector = true" type="primary" plain>
+          <MobileButton @click="showSongSelector = true" type="primary" plain>
             {{ selectedSong ? selectedSong.title : '点击选择歌曲' }}
-          </el-button>
+          </MobileButton>
           <div v-if="selectedSong" class="selected-item">
             <div class="item-info">
               <div class="item-title">{{ selectedSong.title }}</div>
               <div class="item-subtitle">{{ selectedSong.artist }}</div>
             </div>
-            <el-button @click="clearSong" type="text" size="small">
-              <i class="el-icon-close"></i>
-            </el-button>
+            <MobileButton @click="clearSong" type="text" size="small">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </MobileButton>
           </div>
         </div>
-      </el-form-item>
+      </MobileFormItem>
 
       <!-- 选择歌单 -->
-      <el-form-item 
-        v-if="form.type === 'share_playlist' || form.type === 'create_playlist'" 
-        label="选择歌单" 
+      <MobileFormItem
+        v-if="form.type === 'share_playlist' || form.type === 'create_playlist'"
+        label="选择歌单"
         prop="playlistId"
       >
         <div class="playlist-selector">
-          <el-button @click="showPlaylistSelector = true" type="primary" plain>
+          <MobileButton @click="showPlaylistSelector = true" type="primary" plain>
             {{ selectedPlaylist ? selectedPlaylist.title : '点击选择歌单' }}
-          </el-button>
+          </MobileButton>
           <div v-if="selectedPlaylist" class="selected-item">
             <div class="item-info">
               <div class="item-title">{{ selectedPlaylist.title }}</div>
               <div class="item-subtitle">{{ selectedPlaylist.description }}</div>
             </div>
-            <el-button @click="clearPlaylist" type="text" size="small">
-              <i class="el-icon-close"></i>
-            </el-button>
+            <MobileButton @click="clearPlaylist" type="text" size="small">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </MobileButton>
           </div>
         </div>
-      </el-form-item>
+      </MobileFormItem>
 
       <!-- 选择用户 -->
-      <el-form-item 
-        v-if="form.type === 'follow_user'" 
-        label="选择用户" 
-        prop="targetUserId"
-      >
+      <MobileFormItem v-if="form.type === 'follow_user'" label="选择用户" prop="targetUserId">
         <div class="user-selector">
-          <el-button @click="showUserSelector = true" type="primary" plain>
+          <MobileButton @click="showUserSelector = true" type="primary" plain>
             {{ selectedUser ? selectedUser.username : '点击选择用户' }}
-          </el-button>
+          </MobileButton>
           <div v-if="selectedUser" class="selected-item">
-            <el-avatar :src="selectedUser.avatar" :size="32">
+            <MobileAvatar :src="selectedUser.avatar" :size="32">
               {{ selectedUser.username?.charAt(0) }}
-            </el-avatar>
+            </MobileAvatar>
             <div class="item-info">
               <div class="item-title">{{ selectedUser.username }}</div>
             </div>
-            <el-button @click="clearUser" type="text" size="small">
-              <i class="el-icon-close"></i>
-            </el-button>
+            <MobileButton @click="clearUser" type="text" size="small">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </MobileButton>
           </div>
         </div>
-      </el-form-item>
-    </el-form>
+      </MobileFormItem>
+    </MobileForm>
 
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="handleClose">取消</el-button>
-        <el-button 
-          type="primary" 
-          @click="handleSubmit"
-          :loading="isSubmitting"
-        >
+        <MobileButton @click="handleClose">取消</MobileButton>
+        <MobileButton type="primary" @click="handleSubmit" :loading="isSubmitting">
           发布
-        </el-button>
+        </MobileButton>
       </div>
     </template>
 
     <!-- 歌曲选择器对话框 -->
-    <SongSelectorDialog
-      v-model="showSongSelector"
-      @select="handleSongSelect"
-    />
+    <SongSelectorDialog v-model="showSongSelector" @select="handleSongSelect" />
 
     <!-- 歌单选择器对话框 -->
-    <PlaylistSelectorDialog
-      v-model="showPlaylistSelector"
-      @select="handlePlaylistSelect"
-    />
+    <PlaylistSelectorDialog v-model="showPlaylistSelector" @select="handlePlaylistSelect" />
 
     <!-- 用户选择器对话框 -->
-    <UserSelectorDialog
-      v-model="showUserSelector"
-      @select="handleUserSelect"
-    />
-  </el-dialog>
+    <UserSelectorDialog v-model="showUserSelector" @select="handleUserSelect" />
+  </MobileDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import {
+  MobileDialog,
+  MobileForm,
+  MobileFormItem,
+  MobileInput,
+  MobileSelect,
+  MobileButton,
+  MobileAvatar,
+  MobileMessage,
+  createSelectOptions,
+} from '@/components/ui'
 import { useSocialStore } from '@/stores/social'
 import { FeedType, type CreateFeedDto } from '@/services/social-api'
 import SongSelectorDialog from './SongSelectorDialog.vue'
 import PlaylistSelectorDialog from './PlaylistSelectorDialog.vue'
 import UserSelectorDialog from './UserSelectorDialog.vue'
-import type { Song } from '@/types/song'
-import type { Playlist } from '@/types/playlist'
-import type { User } from '@/types/user'
+
+// 临时类型定义，直到创建正确的类型文件
+interface Song {
+  id: string
+  title: string
+  artist: string
+}
+
+interface Playlist {
+  id: string
+  title: string
+  description: string
+}
+
+interface User {
+  id: string
+  username: string
+  avatar?: string
+}
 
 interface Props {
   modelValue: boolean
@@ -159,7 +187,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const socialStore = useSocialStore()
-const formRef = ref<FormInstance>()
+const formRef = ref()
 
 // 响应式数据
 const isSubmitting = ref(false)
@@ -179,60 +207,65 @@ const form = reactive({
   targetUserId: '',
 })
 
+// 动态类型选项
+const typeOptions = createSelectOptions([
+  { label: '分享歌曲', value: 'share_song' },
+  { label: '分享歌单', value: 'share_playlist' },
+  { label: '喜欢歌曲', value: 'like_song' },
+  { label: '创建歌单', value: 'create_playlist' },
+  { label: '关注用户', value: 'follow_user' },
+])
+
 // 表单验证规则
-const rules: FormRules = {
-  type: [
-    { required: true, message: '请选择动态类型', trigger: 'change' }
-  ],
-  content: [
-    { max: 500, message: '内容不能超过500个字符', trigger: 'blur' }
-  ],
+const rules = {
+  type: [{ required: true, message: '请选择动态类型', trigger: 'change' }],
+  content: [{ max: 500, message: '内容不能超过500个字符', trigger: 'blur' }],
   songId: [
-    { 
-      validator: (rule, value, callback) => {
+    {
+      validator: (_rule: any, value: any, callback: any) => {
         if ((form.type === 'share_song' || form.type === 'like_song') && !value) {
           callback(new Error('请选择歌曲'))
         } else {
           callback()
         }
-      }, 
-      trigger: 'change' 
-    }
+      },
+      trigger: 'change',
+    },
   ],
   playlistId: [
-    { 
-      validator: (rule, value, callback) => {
+    {
+      validator: (_rule: any, value: any, callback: any) => {
         if ((form.type === 'share_playlist' || form.type === 'create_playlist') && !value) {
           callback(new Error('请选择歌单'))
         } else {
           callback()
         }
-      }, 
-      trigger: 'change' 
-    }
+      },
+      trigger: 'change',
+    },
   ],
   targetUserId: [
-    { 
-      validator: (rule, value, callback) => {
+    {
+      validator: (_rule: any, value: any, callback: any) => {
         if (form.type === 'follow_user' && !value) {
           callback(new Error('请选择用户'))
         } else {
           callback()
         }
-      }, 
-      trigger: 'change' 
-    }
+      },
+      trigger: 'change',
+    },
   ],
 }
 
 // 计算属性
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value),
 })
 
 // 监听对话框显示状态
-watch(dialogVisible, (visible) => {
+watch(dialogVisible, visible => {
   if (visible) {
     resetForm()
   }
@@ -245,11 +278,11 @@ const resetForm = () => {
   form.songId = ''
   form.playlistId = ''
   form.targetUserId = ''
-  
+
   selectedSong.value = null
   selectedPlaylist.value = null
   selectedUser.value = null
-  
+
   formRef.value?.clearValidate()
 }
 
@@ -258,7 +291,7 @@ const handleTypeChange = () => {
   form.songId = ''
   form.playlistId = ''
   form.targetUserId = ''
-  
+
   selectedSong.value = null
   selectedPlaylist.value = null
   selectedUser.value = null
@@ -299,12 +332,12 @@ const clearUser = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   try {
     await formRef.value.validate()
-    
+
     isSubmitting.value = true
-    
+
     const feedData: CreateFeedDto = {
       type: form.type,
       content: form.content || undefined,
@@ -312,12 +345,12 @@ const handleSubmit = async () => {
       playlistId: form.playlistId || undefined,
       targetUserId: form.targetUserId || undefined,
     }
-    
+
     const newFeed = await socialStore.createFeed(feedData)
-    
+
     if (newFeed) {
       emit('created', newFeed)
-      ElMessage.success('发布成功')
+      MobileMessage.success('发布成功')
       dialogVisible.value = false
     }
   } catch (error) {

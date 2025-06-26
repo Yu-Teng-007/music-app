@@ -1,57 +1,87 @@
 <template>
   <div class="download-button">
     <!-- 未下载状态 -->
-    <el-dropdown v-if="!isDownloaded && !isDownloading" @command="handleDownload" trigger="click">
-      <el-button type="primary" size="small" :loading="isLoading">
-        <i class="el-icon-download"></i>
+    <MobileDropdown
+      v-if="!isDownloaded && !isDownloading"
+      @command="handleDownload"
+      trigger="click"
+    >
+      <MobileButton type="primary" size="small" :loading="isLoading">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7,10 12,15 17,10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
         下载
-      </el-button>
+      </MobileButton>
       <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="high">
+        <MobileDropdownMenu>
+          <MobileDropdownItem command="high">
             <div class="quality-option">
               <span class="quality-name">高音质</span>
               <span class="quality-desc">320kbps</span>
             </div>
-          </el-dropdown-item>
-          <el-dropdown-item command="medium">
+          </MobileDropdownItem>
+          <MobileDropdownItem command="medium">
             <div class="quality-option">
               <span class="quality-name">标准音质</span>
               <span class="quality-desc">128kbps</span>
             </div>
-          </el-dropdown-item>
-          <el-dropdown-item command="low">
+          </MobileDropdownItem>
+          <MobileDropdownItem command="low">
             <div class="quality-option">
               <span class="quality-name">省流量</span>
               <span class="quality-desc">64kbps</span>
             </div>
-          </el-dropdown-item>
-          <el-dropdown-item command="lossless" divided>
+          </MobileDropdownItem>
+          <MobileDropdownItem command="lossless" divided>
             <div class="quality-option">
               <span class="quality-name">无损音质</span>
               <span class="quality-desc">FLAC</span>
             </div>
-          </el-dropdown-item>
-        </el-dropdown-menu>
+          </MobileDropdownItem>
+        </MobileDropdownMenu>
       </template>
-    </el-dropdown>
-    
+    </MobileDropdown>
+
     <!-- 下载中状态 -->
-    <el-button v-else-if="isDownloading" size="small" :loading="true">
+    <MobileButton v-else-if="isDownloading" size="small" :loading="true">
       <span>{{ downloadProgress }}%</span>
-    </el-button>
-    
+    </MobileButton>
+
     <!-- 已下载状态 -->
-    <el-button v-else type="success" size="small" @click="handlePlay">
-      <i class="el-icon-check"></i>
+    <MobileButton v-else type="success" size="small" @click="handlePlay">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <polyline points="20,6 9,17 4,12"></polyline>
+      </svg>
       已下载
-    </el-button>
+    </MobileButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ElMessage } from 'element-plus'
+import {
+  MobileButton,
+  MobileDropdown,
+  MobileDropdownMenu,
+  MobileDropdownItem,
+  MobileMessage,
+} from '@/components/ui'
 import { useDownloadStore } from '@/stores/download'
 import { AudioQuality, DownloadStatus } from '@/services/download-api'
 
@@ -88,16 +118,27 @@ const downloadProgress = computed(() => {
 })
 
 // 方法
-const handleDownload = async (quality: AudioQuality) => {
+const handleDownload = async (command: string) => {
   if (props.disabled) {
-    ElMessage.warning('当前无法下载')
+    MobileMessage.warning('当前无法下载')
     return
   }
+
+  // 将command转换为AudioQuality
+  const qualityMap: Record<string, AudioQuality> = {
+    high: AudioQuality.HIGH,
+    medium: AudioQuality.MEDIUM,
+    low: AudioQuality.LOW,
+    lossless: AudioQuality.LOSSLESS,
+  }
+
+  const quality = qualityMap[command]
+  if (!quality) return
 
   try {
     const download = await downloadStore.downloadSong(props.songId, quality)
     if (download) {
-      ElMessage.success(`开始下载 ${props.songTitle || '歌曲'}`)
+      MobileMessage.success(`开始下载 ${props.songTitle || '歌曲'}`)
       emit('download-started', props.songId, quality)
     }
   } catch (error) {
