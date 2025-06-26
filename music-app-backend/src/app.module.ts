@@ -13,7 +13,9 @@ import { UploadModule } from './upload/upload.module'
 import { DatabaseModule } from './database/database.module'
 import { FavoritesModule } from './favorites/favorites.module'
 import { GenresModule } from './genres/genres.module'
-import { User, Song, Playlist, Favorite, Genre, Chart } from './entities'
+import { CommentsModule } from './comments/comments.module'
+import { CacheModule } from './common/cache/cache.module'
+import { User, Song, Playlist, Favorite, Genre, Chart, Comment } from './entities'
 
 @Module({
   imports: [
@@ -40,7 +42,7 @@ import { User, Song, Playlist, Favorite, Genre, Chart } from './entities'
     }),
 
     // 注册所有实体以便在种子脚本中使用
-    TypeOrmModule.forFeature([User, Song, Playlist, Favorite, Genre, Chart]),
+    TypeOrmModule.forFeature([User, Song, Playlist, Favorite, Genre, Chart, Comment]),
 
     // 静态文件服务
     ServeStaticModule.forRootAsync({
@@ -66,6 +68,8 @@ import { User, Song, Playlist, Favorite, Genre, Chart } from './entities'
     GenresModule,
     UploadModule,
     DatabaseModule,
+    CommentsModule,
+    CacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],

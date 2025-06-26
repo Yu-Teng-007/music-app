@@ -30,59 +30,23 @@
         <!-- 我的歌单 -->
         <div class="section" v-if="authStore.isAuthenticated">
           <h2>我的歌单</h2>
-          <div v-if="filteredMyPlaylists.length > 0" class="playlist-grid">
-            <div
-              v-for="playlist in filteredMyPlaylists"
-              :key="playlist.id"
-              class="playlist-item"
-              @click="openPlaylist(playlist)"
-            >
-              <div class="playlist-cover">
-                <img
-                  :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=118'"
-                  :alt="playlist.name"
-                  @error="handleImageError"
-                />
-                <div class="playlist-overlay">
-                  <Play :size="24" />
-                </div>
-              </div>
-              <h3 class="playlist-name">{{ playlist.name }}</h3>
-              <p class="playlist-info">{{ playlist.songCount }}首歌曲</p>
-            </div>
-          </div>
-          <div v-else class="empty-playlists">
-            <p>正在为您创建默认歌单...</p>
-          </div>
+          <PlaylistGrid
+            :playlists="filteredMyPlaylists"
+            :loading="isLoading"
+            emptyText="正在为您创建默认歌单..."
+            @playlist-click="openPlaylist"
+          />
         </div>
 
         <!-- 推荐歌单 -->
         <div class="section">
           <h2>推荐歌单</h2>
-          <div v-if="filteredRecommendedPlaylists.length > 0" class="playlist-grid">
-            <div
-              v-for="playlist in filteredRecommendedPlaylists"
-              :key="playlist.id"
-              class="playlist-item"
-              @click="openPlaylist(playlist)"
-            >
-              <div class="playlist-cover">
-                <img
-                  :src="playlist.coverUrl || 'https://picsum.photos/300/300?random=119'"
-                  :alt="playlist.name"
-                  @error="handleImageError"
-                />
-                <div class="playlist-overlay">
-                  <Play :size="24" />
-                </div>
-              </div>
-              <h3 class="playlist-name">{{ playlist.name }}</h3>
-              <p class="playlist-info">by {{ playlist.creator }}</p>
-            </div>
-          </div>
-          <div v-else class="empty-playlists">
-            <p>暂无推荐歌单</p>
-          </div>
+          <PlaylistGrid
+            :playlists="filteredRecommendedPlaylists"
+            :loading="isLoading"
+            emptyText="暂无推荐歌单"
+            @playlist-click="openPlaylist"
+          />
         </div>
 
         <!-- 空状态 -->
@@ -110,94 +74,12 @@
     </div>
 
     <!-- 创建歌单模态框 -->
-    <div v-if="showCreateModal" class="modal-overlay" @click="showCreateModal = false">
-      <div class="modal-content" @click.stop>
-        <!-- 模态框头部 -->
-        <div class="modal-header">
-          <h3>创建新歌单</h3>
-          <button @click="showCreateModal = false" class="close-btn">
-            <X :size="20" />
-          </button>
-        </div>
-
-        <!-- 歌单封面选择 -->
-        <div class="cover-section">
-          <div class="cover-preview">
-            <img
-              :src="selectedCover || 'https://picsum.photos/300/300?random=200'"
-              alt="歌单封面"
-              class="cover-image"
-            />
-            <div class="cover-overlay">
-              <Camera :size="24" />
-              <span>选择封面</span>
-            </div>
-          </div>
-          <div class="cover-options">
-            <button
-              v-for="cover in coverOptions"
-              :key="cover.id"
-              @click="selectedCover = cover.url"
-              class="cover-option"
-              :class="{ active: selectedCover === cover.url }"
-            >
-              <img :src="cover.url" :alt="`封面 ${cover.id}`" />
-            </button>
-          </div>
-        </div>
-
-        <!-- 表单内容 -->
-        <div class="form-section">
-          <div class="form-group">
-            <label>歌单名称</label>
-            <input
-              type="text"
-              v-model="newPlaylistName"
-              placeholder="给你的歌单起个好听的名字"
-              @keyup.enter="createPlaylist"
-              class="playlist-name-input"
-              maxlength="50"
-            />
-            <div class="input-counter">{{ newPlaylistName.length }}/50</div>
-          </div>
-
-          <div class="form-group">
-            <label>歌单描述 <span class="optional">(可选)</span></label>
-            <textarea
-              v-model="newPlaylistDescription"
-              placeholder="介绍一下这个歌单的特色..."
-              class="playlist-description-input"
-              maxlength="200"
-              rows="3"
-            ></textarea>
-            <div class="input-counter">{{ newPlaylistDescription.length }}/200</div>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-label">
-              <span class="checkbox-custom"></span>
-              <span class="checkbox-text">设为私密歌单</span>
-            </label>
-            <div class="checkbox-desc">
-              <input type="checkbox" v-model="isPrivate" class="checkbox-input" />
-              <span>私密歌单只有你可以看到</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 模态框底部 -->
-        <div class="modal-footer">
-          <button @click="showCreateModal = false" class="cancel-btn">取消</button>
-          <button
-            @click="createPlaylist"
-            class="confirm-btn"
-            :disabled="!newPlaylistName.trim() || isCreating"
-          >
-            {{ isCreating ? '创建中...' : '创建歌单' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <CreatePlaylistModal
+      v-if="showCreateModal"
+      :isCreating="isCreating"
+      @close="showCreateModal = false"
+      @create="handleCreatePlaylist"
+    />
   </div>
 </template>
 
@@ -207,6 +89,8 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { playlistApi } from '@/services/playlist-api'
 import { Plus, Play, Search, X, Camera } from 'lucide-vue-next'
+import PlaylistGrid from '@/components/playlist/PlaylistGrid.vue'
+import CreatePlaylistModal from '@/components/playlist/CreatePlaylistModal.vue'
 
 interface Playlist {
   id: string
@@ -214,6 +98,15 @@ interface Playlist {
   coverUrl: string
   songCount?: number
   creator?: string
+  isPrivate?: boolean
+  description?: string
+}
+
+interface PlaylistCreateData {
+  name: string
+  description: string
+  isPrivate: boolean
+  coverUrl: string
 }
 
 const router = useRouter()
@@ -357,6 +250,39 @@ const clearSearch = () => {
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = 'https://picsum.photos/300/300?random=127'
+}
+
+const handleCreatePlaylist = async (playlistData: PlaylistCreateData) => {
+  isCreating.value = true
+
+  try {
+    // 模拟API调用
+    await new Promise(resolve => setTimeout(resolve, 1500))
+
+    // 添加到我的歌单列表
+    const newPlaylist: Playlist = {
+      id: `new-${Date.now()}`,
+      name: playlistData.name,
+      coverUrl: playlistData.coverUrl,
+      songCount: 0,
+      isPrivate: playlistData.isPrivate,
+      description: playlistData.description,
+    }
+
+    myPlaylists.value.unshift(newPlaylist)
+    showCreateModal.value = false
+
+    // 显示成功消息
+    alert('歌单创建成功!')
+
+    // 跳转到新创建的歌单
+    router.push(`/playlist/${newPlaylist.id}`)
+  } catch (error) {
+    console.error('创建歌单失败:', error)
+    alert('创建歌单失败，请重试')
+  } finally {
+    isCreating.value = false
+  }
 }
 
 onMounted(() => {
