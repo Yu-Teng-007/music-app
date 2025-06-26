@@ -47,6 +47,14 @@ async function bootstrap() {
     prefix: '/static/',
   })
 
+  // 添加Chrome开发者工具端点处理（在设置全局前缀之前）
+  app.use('/.well-known/appspecific/com.chrome.devtools.json', (_req: any, res: any) => {
+    res.json({
+      message: 'Chrome DevTools configuration not available',
+      status: 'ok',
+    })
+  })
+
   // 设置全局前缀
   app.setGlobalPrefix('api')
 
