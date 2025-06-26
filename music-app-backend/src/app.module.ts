@@ -16,6 +16,11 @@ import { GenresModule } from './genres/genres.module'
 import { CommentsModule } from './comments/comments.module'
 import { CacheModule } from './common/cache/cache.module'
 import { User, Song, Playlist, Favorite, Genre, Chart, Comment } from './entities'
+import { SmsModule } from './sms/sms.module'
+import { HistoryModule } from './history/history.module'
+import { SearchHistoryModule } from './search-history/search-history.module'
+import { UserPreferencesModule } from './user-preferences/user-preferences.module'
+import { RealtimeModule } from './realtime/realtime.module'
 
 @Module({
   imports: [
@@ -70,6 +75,11 @@ import { User, Song, Playlist, Favorite, Genre, Chart, Comment } from './entitie
     DatabaseModule,
     CommentsModule,
     CacheModule,
+    SmsModule,
+    HistoryModule,
+    SearchHistoryModule,
+    UserPreferencesModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
