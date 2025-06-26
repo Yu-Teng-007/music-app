@@ -5,7 +5,6 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import './styles/main.css'
 import { useAuthStore } from './stores/auth'
 import { realtimeService } from './services'
 import { imgFallbackDirective } from './utils/imageHandlers'

@@ -1,3 +1,6 @@
+// 导入polyfill
+import './polyfill'
+
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'

@@ -9,7 +9,7 @@ import * as path from 'path'
 export class UploadService {
   constructor(private configService: ConfigService) {}
 
-  uploadMusic(file: Express.Multer.File): { url: string; filename: string } {
+  uploadMusic(file: any): { url: string; filename: string } {
     if (!file) {
       throw new BadRequestException('请选择要上传的音乐文件')
     }
@@ -48,7 +48,7 @@ export class UploadService {
     }
   }
 
-  uploadCover(file: Express.Multer.File): { url: string; filename: string } {
+  uploadCover(file: any): { url: string; filename: string } {
     if (!file) {
       throw new BadRequestException('请选择要上传的封面图片')
     }

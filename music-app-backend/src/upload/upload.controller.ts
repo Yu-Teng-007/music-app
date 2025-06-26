@@ -17,7 +17,7 @@ export class UploadController {
 
   @Post('music')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadMusic(@UploadedFile() file: Express.Multer.File) {
+  async uploadMusic(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('请选择要上传的音乐文件')
     }
@@ -32,7 +32,7 @@ export class UploadController {
 
   @Post('cover')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadCover(@UploadedFile() file: Express.Multer.File) {
+  async uploadCover(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('请选择要上传的封面图片')
     }
