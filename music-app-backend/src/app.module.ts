@@ -15,12 +15,25 @@ import { FavoritesModule } from './favorites/favorites.module'
 import { GenresModule } from './genres/genres.module'
 import { CommentsModule } from './comments/comments.module'
 import { CacheModule } from './common/cache/cache.module'
-import { User, Song, Playlist, Favorite, Genre, Chart, Comment } from './entities'
+import {
+  User,
+  Song,
+  Playlist,
+  Favorite,
+  Genre,
+  Chart,
+  Comment,
+  UserFollow,
+  UserFeed,
+  FeedLike,
+  FeedComment,
+} from './entities'
 import { SmsModule } from './sms/sms.module'
 import { HistoryModule } from './history/history.module'
 import { SearchHistoryModule } from './search-history/search-history.module'
 import { UserPreferencesModule } from './user-preferences/user-preferences.module'
 import { RealtimeModule } from './realtime/realtime.module'
+import { SocialModule } from './social/social.module'
 import { AppThrottlerModule } from './common/throttler/throttler.module'
 import { SecurityModule } from './common/security/security.module'
 import { LoggerModule } from './common/logger/logger.module'
@@ -57,7 +70,19 @@ import { LoggerModule } from './common/logger/logger.module'
     }),
 
     // 注册所有实体以便在种子脚本中使用
-    TypeOrmModule.forFeature([User, Song, Playlist, Favorite, Genre, Chart, Comment]),
+    TypeOrmModule.forFeature([
+      User,
+      Song,
+      Playlist,
+      Favorite,
+      Genre,
+      Chart,
+      Comment,
+      UserFollow,
+      UserFeed,
+      FeedLike,
+      FeedComment,
+    ]),
 
     // 静态文件服务
     ServeStaticModule.forRootAsync({
@@ -98,6 +123,7 @@ import { LoggerModule } from './common/logger/logger.module'
     SearchHistoryModule,
     UserPreferencesModule,
     RealtimeModule,
+    SocialModule,
   ],
   controllers: [AppController],
   providers: [AppService],

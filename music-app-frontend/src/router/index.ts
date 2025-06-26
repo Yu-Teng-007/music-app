@@ -141,6 +141,13 @@ const router = createRouter({
       component: () => import('../views/AccountView.vue'),
       meta: { requiresAuth: true },
     },
+    // 社交功能页面
+    {
+      path: '/social',
+      name: 'social',
+      component: () => import('../views/SocialView.vue'),
+      meta: { requiresAuth: true },
+    },
     // 开发工具页面（仅开发环境）
     {
       path: '/dev-tools',

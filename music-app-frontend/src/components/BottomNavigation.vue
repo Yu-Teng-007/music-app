@@ -40,6 +40,12 @@ const navigationItems: NavigationItem[] = [
     icon: Compass,
   },
   {
+    name: 'social',
+    label: '社交',
+    path: '/social',
+    icon: User,
+  },
+  {
     name: 'playlist',
     label: '歌单',
     path: '/playlist',

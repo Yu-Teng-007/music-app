@@ -9,3 +9,9 @@ export { Comment } from './comment.entity'
 export { History } from './history.entity'
 export { SearchHistory } from './search-history.entity'
 export { UserPreference } from './user-preference.entity'
+
+// 社交功能实体
+export { UserFollow } from './user-follow.entity'
+export { UserFeed } from './user-feed.entity'
+export { FeedLike } from './feed-like.entity'
+export { FeedComment } from './feed-comment.entity'
