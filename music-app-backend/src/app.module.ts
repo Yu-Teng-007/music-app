@@ -27,6 +27,9 @@ import {
   UserFeed,
   FeedLike,
   FeedComment,
+  Download,
+  DownloadCache,
+  UserStorage,
 } from './entities'
 import { SmsModule } from './sms/sms.module'
 import { HistoryModule } from './history/history.module'
@@ -34,6 +37,7 @@ import { SearchHistoryModule } from './search-history/search-history.module'
 import { UserPreferencesModule } from './user-preferences/user-preferences.module'
 import { RealtimeModule } from './realtime/realtime.module'
 import { SocialModule } from './social/social.module'
+import { DownloadModule } from './download/download.module'
 import { AppThrottlerModule } from './common/throttler/throttler.module'
 import { SecurityModule } from './common/security/security.module'
 import { LoggerModule } from './common/logger/logger.module'
@@ -82,6 +86,9 @@ import { LoggerModule } from './common/logger/logger.module'
       UserFeed,
       FeedLike,
       FeedComment,
+      Download,
+      DownloadCache,
+      UserStorage,
     ]),
 
     // 静态文件服务
@@ -124,6 +131,7 @@ import { LoggerModule } from './common/logger/logger.module'
     UserPreferencesModule,
     RealtimeModule,
     SocialModule,
+    DownloadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

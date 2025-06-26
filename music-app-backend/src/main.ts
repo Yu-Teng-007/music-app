@@ -67,6 +67,7 @@ async function bootstrap() {
       .addTag('search-history', '搜索历史相关接口')
       .addTag('user-preferences', '用户偏好相关接口')
       .addTag('social', '社交功能相关接口')
+      .addTag('download', '离线下载相关接口')
       .addBearerAuth(
         {
           type: 'http',
