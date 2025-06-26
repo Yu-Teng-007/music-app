@@ -69,10 +69,30 @@ export class GenresController {
 
   @Get()
   @ApiOperation({ summary: '获取音乐流派列表', description: '获取所有音乐流派，支持分页和筛选' })
-  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 10 })
-  @ApiQuery({ name: 'search', required: false, description: '搜索关键词' })
-  @ApiQuery({ name: 'isActive', required: false, description: '是否激活', example: true })
+  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1, type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 20, type: Number })
+  @ApiQuery({ name: 'search', required: false, description: '搜索关键词', example: 'pop' })
+  @ApiQuery({
+    name: 'isActive',
+    required: false,
+    description: '是否只显示激活的流派',
+    example: true,
+    type: Boolean,
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: '排序字段',
+    example: 'sortOrder',
+    enum: ['sortOrder', 'name', 'createdAt'],
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: '排序方向',
+    example: 'ASC',
+    enum: ['ASC', 'DESC'],
+  })
   @ApiResponse({
     status: 200,
     description: '获取分类列表成功',

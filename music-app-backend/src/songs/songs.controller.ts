@@ -72,11 +72,30 @@ export class SongsController {
 
   @Get()
   @ApiOperation({ summary: '获取歌曲列表', description: '分页获取歌曲列表，支持搜索和筛选' })
-  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 10 })
-  @ApiQuery({ name: 'search', required: false, description: '搜索关键词' })
-  @ApiQuery({ name: 'genre', required: false, description: '音乐流派' })
-  @ApiQuery({ name: 'artist', required: false, description: '艺术家' })
+  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1, type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 20, type: Number })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: '搜索关键词，可搜索歌曲标题、艺术家、专辑等',
+    example: '周杰伦',
+  })
+  @ApiQuery({ name: 'genre', required: false, description: '音乐流派筛选', example: 'pop' })
+  @ApiQuery({ name: 'artist', required: false, description: '艺术家筛选', example: '周杰伦' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: '排序字段',
+    example: 'createdAt',
+    enum: ['createdAt', 'title', 'artist', 'playCount', 'duration'],
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: '排序方向',
+    example: 'DESC',
+    enum: ['ASC', 'DESC'],
+  })
   @ApiResponse({
     status: 200,
     description: '获取歌曲列表成功',

@@ -92,10 +92,16 @@ export class PlaylistsController {
 
   @Get()
   @ApiOperation({ summary: '获取歌单列表', description: '获取歌单列表，支持分页和筛选' })
-  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 10 })
-  @ApiQuery({ name: 'search', required: false, description: '搜索关键词' })
-  @ApiQuery({ name: 'isPublic', required: false, description: '是否公开', example: true })
+  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1, type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 10, type: Number })
+  @ApiQuery({ name: 'search', required: false, description: '搜索关键词', example: '我的最爱' })
+  @ApiQuery({
+    name: 'isPrivate',
+    required: false,
+    description: '是否为私有歌单',
+    example: false,
+    type: Boolean,
+  })
   @ApiResponse({
     status: 200,
     description: '获取播放列表成功',
