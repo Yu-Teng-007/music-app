@@ -148,6 +148,13 @@ const router = createRouter({
       component: () => import('../views/SocialView.vue'),
       meta: { requiresAuth: true },
     },
+    // 下载管理页面
+    {
+      path: '/downloads',
+      name: 'downloads',
+      component: () => import('../views/DownloadsView.vue'),
+      meta: { requiresAuth: true },
+    },
     // 开发工具页面（仅开发环境）
     {
       path: '/dev-tools',

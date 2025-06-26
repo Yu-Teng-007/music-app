@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { Home, Compass, Music, User } from 'lucide-vue-next'
+import { Home, Compass, Music, User, Download } from 'lucide-vue-next'
 
 interface NavigationItem {
   name: string
@@ -44,6 +44,12 @@ const navigationItems: NavigationItem[] = [
     label: '社交',
     path: '/social',
     icon: User,
+  },
+  {
+    name: 'downloads',
+    label: '下载',
+    path: '/downloads',
+    icon: Download,
   },
   {
     name: 'playlist',
