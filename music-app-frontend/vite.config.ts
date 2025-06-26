@@ -18,9 +18,22 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173, // 固定前端端口为5173，避免与后端3000端口冲突
+    port: 5188, // 固定前端端口为5188，避免与后端3000端口冲突
     host: true, // 允许外部访问
     open: true, // 自动打开浏览器
+    strictPort: false, // 如果端口被占用，自动尝试下一个可用端口
+    // 添加代理配置，当后端不可用时提供更好的错误处理
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        timeout: 5000,
+        // 当后端不可用时的错误处理
+        onError: (err, req, res) => {
+          console.warn('API代理错误:', err.message)
+        },
+      },
+    },
   },
   preview: {
     port: 4173, // 预览模式端口

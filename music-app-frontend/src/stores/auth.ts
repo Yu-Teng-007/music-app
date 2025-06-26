@@ -62,6 +62,21 @@ export const useAuthStore = defineStore('auth', () => {
       const storedUser = localStorage.getItem('auth_user')
 
       if (storedToken && storedUser) {
+        // 检查token是否过期
+        try {
+          const payload = JSON.parse(atob(storedToken.split('.')[1]))
+          const currentTime = Date.now() / 1000
+          if (payload.exp < currentTime) {
+            console.log('存储的token已过期，清除认证状态')
+            clearAuth()
+            return
+          }
+        } catch (tokenError) {
+          console.log('token格式无效，清除认证状态')
+          clearAuth()
+          return
+        }
+
         token.value = storedToken
         refreshToken.value = storedRefreshToken
         user.value = JSON.parse(storedUser)

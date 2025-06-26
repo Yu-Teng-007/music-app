@@ -876,7 +876,7 @@ async function seedRecommendedSongs() {
       const baseUrl = app
         .get(ConfigService)
         .get('app.frontendUrl')
-        .replace('localhost:5173', 'localhost:3000')
+        .replace('localhost:5188', 'localhost:3000')
 
       // 创建歌曲
       const newSong = songRepository.create({

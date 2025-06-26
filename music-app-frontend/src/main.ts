@@ -8,6 +8,11 @@ import router from './router'
 import { useAuthStore } from './stores/auth'
 import { realtimeService } from './services'
 import { imgFallbackDirective } from './utils/imageHandlers'
+import {
+  initNetworkStatusMonitor,
+  onNetworkStatusChange,
+  showNetworkStatusNotification,
+} from './utils/networkStatus'
 
 const app = createApp(App)
 
@@ -23,7 +28,12 @@ app.mount('#app')
 const initializeWebSocket = () => {
   const authStore = useAuthStore()
   if (authStore.isAuthenticated && authStore.token) {
-    realtimeService.connect(authStore.token, import.meta.env.VITE_API_URL || '/api')
+    try {
+      realtimeService.connect(authStore.token, import.meta.env.VITE_API_URL || '/api')
+    } catch (error) {
+      console.warn('WebSocket连接失败:', error)
+      // WebSocket连接失败不应该阻止应用启动
+    }
   }
 }
 
@@ -36,7 +46,27 @@ document.addEventListener('auth:logout', () => {
   realtimeService.disconnect()
 })
 
+// 初始化网络状态监控
+const cleanupNetworkMonitor = initNetworkStatusMonitor()
+
+// 监听网络状态变化
+const unsubscribeNetworkStatus = onNetworkStatusChange(status => {
+  showNetworkStatusNotification(status)
+
+  // 当后端服务恢复时，重新初始化WebSocket连接
+  if (status.backendAvailable && useAuthStore().isAuthenticated) {
+    initializeWebSocket()
+  }
+})
+
 // 如果用户已经登录，初始化WebSocket连接
 if (useAuthStore().isAuthenticated) {
   initializeWebSocket()
 }
+
+// 应用卸载时清理资源
+window.addEventListener('beforeunload', () => {
+  cleanupNetworkMonitor()
+  unsubscribeNetworkStatus()
+  realtimeService.disconnect()
+})

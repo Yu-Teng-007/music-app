@@ -68,7 +68,7 @@ Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd music-app-fron
 
 Write-Host ""
 Write-Host "Development environment started successfully!" -ForegroundColor Green
-Write-Host "Frontend URL: http://localhost:5173" -ForegroundColor Blue
+Write-Host "Frontend URL: http://localhost:5188" -ForegroundColor Blue
 Write-Host "Backend URL: http://localhost:3000" -ForegroundColor Blue
 Write-Host ""
 Write-Host "Press Enter to close this window..." -ForegroundColor Yellow
