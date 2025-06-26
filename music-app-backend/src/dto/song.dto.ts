@@ -1,44 +1,100 @@
 import { IsString, IsNumber, IsOptional, Min, Max, IsUrl } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class CreateSongDto {
+  @ApiProperty({
+    description: '歌曲标题',
+    example: '青花瓷',
+  })
   @IsString({ message: '歌曲标题必须是字符串' })
   title: string
 
+  @ApiProperty({
+    description: '艺术家',
+    example: '周杰伦',
+  })
   @IsString({ message: '艺术家必须是字符串' })
   artist: string
 
+  @ApiProperty({
+    description: '专辑名称',
+    example: '我很忙',
+  })
   @IsString({ message: '专辑名必须是字符串' })
   album: string
 
+  @ApiProperty({
+    description: '歌曲时长（秒）',
+    example: 240,
+    minimum: 1,
+  })
   @IsNumber({}, { message: '持续时间必须是数字' })
   @Min(1, { message: '持续时间必须大于0' })
   duration: number
 
+  @ApiProperty({
+    description: '封面图片URL',
+    example: 'https://example.com/cover.jpg',
+    format: 'url',
+  })
   @IsUrl({}, { message: '封面URL格式不正确' })
   coverUrl: string
 
+  @ApiProperty({
+    description: '音频文件URL',
+    example: 'https://example.com/audio.mp3',
+    format: 'url',
+  })
   @IsUrl({}, { message: '音频URL格式不正确' })
   audioUrl: string
 
+  @ApiProperty({
+    description: '音乐流派',
+    example: 'pop',
+    required: false,
+  })
   @IsOptional()
   @IsString({ message: '音乐类型必须是字符串' })
   genre?: string
 
+  @ApiProperty({
+    description: '发行年份',
+    example: 2007,
+    minimum: 1900,
+    maximum: new Date().getFullYear(),
+    required: false,
+  })
   @IsOptional()
   @IsNumber({}, { message: '年份必须是数字' })
   @Min(1900, { message: '年份不能早于1900年' })
   @Max(new Date().getFullYear(), { message: '年份不能超过当前年份' })
   year?: number
 
+  @ApiProperty({
+    description: '歌词',
+    example: '素胚勾勒出青花笔锋浓转淡...',
+    required: false,
+  })
   @IsOptional()
   @IsString({ message: '歌词必须是字符串' })
   lyrics?: string
 
+  @ApiProperty({
+    description: '文件大小（字节）',
+    example: 5242880,
+    minimum: 1,
+    required: false,
+  })
   @IsOptional()
   @IsNumber({}, { message: '文件大小必须是数字' })
   @Min(1, { message: '文件大小必须大于0' })
   fileSize?: number
 
+  @ApiProperty({
+    description: '原始文件名',
+    example: 'qinghuaci.mp3',
+    required: false,
+  })
   @IsOptional()
   @IsString({ message: '原始文件名必须是字符串' })
   originalFileName?: string

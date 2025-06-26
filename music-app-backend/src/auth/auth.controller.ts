@@ -10,6 +10,14 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common'
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger'
 import { AuthService } from './auth.service'
 import { SmsService } from '../sms/sms.service'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
@@ -30,6 +38,7 @@ interface AuthenticatedRequest extends Request {
   }
 }
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -38,6 +47,40 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @ApiOperation({ summary: '用户注册', description: '支持手机号注册，需要短信验证码' })
+  @ApiBody({ type: RegisterDto, description: '注册信息' })
+  @ApiResponse({
+    status: 201,
+    description: '注册成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            token: { type: 'string', description: 'JWT访问令牌' },
+            refreshToken: { type: 'string', description: '刷新令牌' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', description: '用户ID' },
+                phone: { type: 'string', description: '手机号' },
+                username: { type: 'string', description: '用户名' },
+                avatar: { type: 'string', description: '头像URL' },
+                isActive: { type: 'boolean', description: '是否激活' },
+                createdAt: { type: 'string', format: 'date-time', description: '创建时间' },
+                updatedAt: { type: 'string', format: 'date-time', description: '更新时间' },
+              },
+            },
+          },
+        },
+        message: { type: 'string', example: '注册成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误' })
+  @ApiResponse({ status: 409, description: '用户已存在' })
   async register(@Body() registerDto: RegisterDto) {
     const result = await this.authService.register(registerDto)
     return {
@@ -49,6 +92,40 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '用户登录', description: '支持手机号验证码登录和用户名密码登录' })
+  @ApiBody({ type: LoginDto, description: '登录信息' })
+  @ApiResponse({
+    status: 200,
+    description: '登录成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            token: { type: 'string', description: 'JWT访问令牌' },
+            refreshToken: { type: 'string', description: '刷新令牌' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', description: '用户ID' },
+                phone: { type: 'string', description: '手机号' },
+                username: { type: 'string', description: '用户名' },
+                avatar: { type: 'string', description: '头像URL' },
+                isActive: { type: 'boolean', description: '是否激活' },
+                createdAt: { type: 'string', format: 'date-time', description: '创建时间' },
+                updatedAt: { type: 'string', format: 'date-time', description: '更新时间' },
+              },
+            },
+          },
+        },
+        message: { type: 'string', example: '登录成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误' })
+  @ApiResponse({ status: 401, description: '登录失败，用户名或密码错误' })
   async login(@Body() loginDto: LoginDto) {
     const result = await this.authService.login(loginDto)
     return {
@@ -60,6 +137,28 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '刷新访问令牌', description: '使用刷新令牌获取新的访问令牌' })
+  @ApiBody({ type: RefreshTokenDto, description: '刷新令牌信息' })
+  @ApiResponse({
+    status: 200,
+    description: 'Token刷新成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            token: { type: 'string', description: '新的JWT访问令牌' },
+            refreshToken: { type: 'string', description: '新的刷新令牌' },
+          },
+        },
+        message: { type: 'string', example: 'Token刷新成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误' })
+  @ApiResponse({ status: 401, description: '刷新令牌无效或已过期' })
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     const result = await this.authService.refreshToken(refreshTokenDto)
     return {
@@ -71,6 +170,32 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '获取当前用户信息', description: '获取当前登录用户的基本信息' })
+  @ApiResponse({
+    status: 200,
+    description: '获取用户信息成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: '用户ID' },
+            phone: { type: 'string', description: '手机号' },
+            username: { type: 'string', description: '用户名' },
+            avatar: { type: 'string', description: '头像URL' },
+            isActive: { type: 'boolean', description: '是否激活' },
+            createdAt: { type: 'string', format: 'date-time', description: '创建时间' },
+            updatedAt: { type: 'string', format: 'date-time', description: '更新时间' },
+          },
+        },
+        message: { type: 'string', example: '获取用户信息成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
   async getCurrentUser(@Request() req: AuthenticatedRequest) {
     const result = await this.authService.getCurrentUser(req.user.id)
     return {
@@ -82,6 +207,34 @@ export class AuthController {
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '获取用户档案', description: '获取用户详细档案信息，包含个性化问候语' })
+  @ApiResponse({
+    status: 200,
+    description: '获取用户档案成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: '用户ID' },
+            phone: { type: 'string', description: '手机号' },
+            username: { type: 'string', description: '用户名' },
+            avatar: { type: 'string', description: '头像URL' },
+            isActive: { type: 'boolean', description: '是否激活' },
+            greeting: { type: 'string', description: '个性化问候语' },
+            subGreeting: { type: 'string', description: '副问候语' },
+            createdAt: { type: 'string', format: 'date-time', description: '创建时间' },
+            updatedAt: { type: 'string', format: 'date-time', description: '更新时间' },
+          },
+        },
+        message: { type: 'string', example: '获取用户档案成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
   async getUserProfile(@Request() req: AuthenticatedRequest) {
     const user = await this.authService.getCurrentUser(req.user.id)
 
@@ -119,6 +272,34 @@ export class AuthController {
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '更新用户档案', description: '更新用户的基本信息' })
+  @ApiBody({ type: UpdateProfileDto, description: '更新的用户信息' })
+  @ApiResponse({
+    status: 200,
+    description: '更新用户信息成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: '用户ID' },
+            phone: { type: 'string', description: '手机号' },
+            username: { type: 'string', description: '用户名' },
+            avatar: { type: 'string', description: '头像URL' },
+            isActive: { type: 'boolean', description: '是否激活' },
+            createdAt: { type: 'string', format: 'date-time', description: '创建时间' },
+            updatedAt: { type: 'string', format: 'date-time', description: '更新时间' },
+          },
+        },
+        message: { type: 'string', example: '更新用户信息成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误' })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
   async updateProfile(
     @Request() req: AuthenticatedRequest,
     @Body() updateProfileDto: UpdateProfileDto
@@ -133,6 +314,23 @@ export class AuthController {
 
   @Put('change-password')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '修改密码', description: '修改用户登录密码' })
+  @ApiBody({ type: ChangePasswordDto, description: '密码修改信息' })
+  @ApiResponse({
+    status: 200,
+    description: '密码修改成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: { type: 'object', description: '返回数据' },
+        message: { type: 'string', example: '密码修改成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误或原密码不正确' })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
   async changePassword(
     @Request() req: AuthenticatedRequest,
     @Body() changePasswordDto: ChangePasswordDto
@@ -147,6 +345,27 @@ export class AuthController {
 
   @Post('send-sms')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '发送短信验证码', description: '向指定手机号发送验证码' })
+  @ApiBody({ type: SendSmsDto, description: '短信发送信息' })
+  @ApiResponse({
+    status: 200,
+    description: '短信发送成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            message: { type: 'string', description: '发送结果消息' },
+          },
+        },
+        message: { type: 'string', example: '短信发送成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: '请求参数错误' })
+  @ApiResponse({ status: 429, description: '发送频率过快，请稍后再试' })
   async sendSmsCode(@Body() sendSmsDto: SendSmsDto) {
     const result = await this.authService.sendSmsCode(sendSmsDto)
     return {
@@ -158,6 +377,24 @@ export class AuthController {
 
   @Get('get-sms-code')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: '获取验证码（开发用）',
+    description: '开发环境下获取指定手机号的验证码',
+  })
+  @ApiQuery({ name: 'phone', description: '手机号', example: '13800138000' })
+  @ApiQuery({ name: 'type', description: '验证码类型', enum: ['register', 'login'] })
+  @ApiResponse({
+    status: 200,
+    description: '获取验证码成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: { type: 'string', description: '验证码' },
+        message: { type: 'string', example: '获取验证码成功' },
+      },
+    },
+  })
   async getSmsCode(@Query('phone') phone: string, @Query('type') type: 'register' | 'login') {
     const result = await this.smsService.getSmsCode(phone, type)
     return {
@@ -169,6 +406,19 @@ export class AuthController {
 
   @Get('get-all-sms-codes')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '获取所有验证码（开发用）', description: '开发环境下获取所有验证码' })
+  @ApiResponse({
+    status: 200,
+    description: '获取所有验证码成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: { type: 'object', description: '所有验证码数据' },
+        message: { type: 'string', example: '获取所有验证码成功' },
+      },
+    },
+  })
   async getAllSmsCodes() {
     const result = await this.smsService.getAllSmsCodes()
     return {
@@ -181,6 +431,20 @@ export class AuthController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '用户登出', description: '用户登出，前端需要清除本地token' })
+  @ApiResponse({
+    status: 200,
+    description: '登出成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: { type: 'string', example: '登出成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
   logout() {
     // 在实际应用中，这里可以将token加入黑名单
     // 目前只是返回成功响应，让前端清除本地token

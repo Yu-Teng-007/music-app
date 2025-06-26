@@ -8,44 +8,81 @@ import {
   Length,
   ValidateIf,
 } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 // 发送短信验证码DTO
 export class SendSmsDto {
+  @ApiProperty({
+    description: '手机号',
+    example: '13800138000',
+    pattern: '^1[3-9]\\d{9}$',
+  })
   @IsString({ message: '手机号必须是字符串' })
   @Matches(/^1[3-9]\d{9}$/, { message: '请输入有效的手机号' })
   phone: string
 
+  @ApiProperty({
+    description: '验证码类型',
+    enum: ['register', 'login'],
+    example: 'register',
+  })
   @IsString({ message: '验证码类型必须是字符串' })
   @IsIn(['register', 'login'], { message: '验证码类型只能是register或login' })
   type: 'register' | 'login'
 }
 
 export class LoginDto {
-  // 登录方式：'phone' 或 'username'
+  @ApiProperty({
+    description: '登录方式',
+    enum: ['phone', 'username'],
+    example: 'phone',
+  })
   @IsString({ message: '登录方式必须是字符串' })
   @IsIn(['phone', 'username'], { message: '登录方式只能是phone或username' })
   loginType: 'phone' | 'username'
 
-  // 手机号（手机号登录时必填）
+  @ApiProperty({
+    description: '手机号（手机号登录时必填）',
+    example: '13800138000',
+    required: false,
+    pattern: '^1[3-9]\\d{9}$',
+  })
   @ValidateIf(o => o.loginType === 'phone')
   @IsString({ message: '手机号必须是字符串' })
   @Matches(/^1[3-9]\d{9}$/, { message: '请输入有效的手机号' })
   phone?: string
 
-  // 短信验证码（手机号登录时必填）
+  @ApiProperty({
+    description: '短信验证码（手机号登录时必填）',
+    example: '123456',
+    required: false,
+    minLength: 6,
+    maxLength: 6,
+  })
   @ValidateIf(o => o.loginType === 'phone')
   @IsString({ message: '验证码必须是字符串' })
   @Length(6, 6, { message: '验证码必须是6位数字' })
   smsCode?: string
 
-  // 用户名（用户名登录时必填）
+  @ApiProperty({
+    description: '用户名（用户名登录时必填）',
+    example: 'testuser',
+    required: false,
+    minLength: 3,
+    maxLength: 20,
+  })
   @ValidateIf(o => o.loginType === 'username')
   @IsString({ message: '用户名必须是字符串' })
   @MinLength(3, { message: '用户名长度至少3位' })
   @MaxLength(20, { message: '用户名长度不能超过20位' })
   username?: string
 
-  // 密码（用户名登录时必填）
+  @ApiProperty({
+    description: '密码（用户名登录时必填）',
+    example: 'password123',
+    required: false,
+    minLength: 6,
+  })
   @ValidateIf(o => o.loginType === 'username')
   @IsString({ message: '密码必须是字符串' })
   @MinLength(6, { message: '密码长度至少6位' })
