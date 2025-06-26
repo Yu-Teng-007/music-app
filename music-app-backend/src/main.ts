@@ -5,6 +5,7 @@ import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
@@ -43,6 +44,50 @@ async function bootstrap() {
 
   // 设置全局前缀
   app.setGlobalPrefix('api')
+
+  // 配置Swagger
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Music App API')
+      .setDescription('Music App API 文档')
+      .setVersion('1.0')
+      .addTag('auth', '认证相关接口')
+      .addTag('songs', '歌曲相关接口')
+      .addTag('playlists', '歌单相关接口')
+      .addTag('favorites', '收藏相关接口')
+      .addTag('upload', '上传相关接口')
+      .addTag('genres', '音乐流派相关接口')
+      .addTag('comments', '评论相关接口')
+      .addTag('history', '历史记录相关接口')
+      .addTag('search-history', '搜索历史相关接口')
+      .addTag('user-preferences', '用户偏好相关接口')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: '输入JWT token',
+          in: 'header',
+        },
+        'JWT-auth'
+      )
+      .build()
+
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    })
+
+    // eslint-disable-next-line no-console
+    console.log(
+      'Swagger文档已启用: http://localhost:' +
+        (configService.get<number>('app.port') || 3000) +
+        '/api/docs'
+    )
+  }
 
   const port = configService.get<number>('app.port') || 3000
   await app.listen(port)

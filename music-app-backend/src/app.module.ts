@@ -5,7 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { databaseConfig, jwtConfig, appConfig } from './config'
+import { databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig } from './config'
 import { AuthModule } from './auth/auth.module'
 import { SongsModule } from './songs/songs.module'
 import { PlaylistsModule } from './playlists/playlists.module'
@@ -21,29 +21,39 @@ import { HistoryModule } from './history/history.module'
 import { SearchHistoryModule } from './search-history/search-history.module'
 import { UserPreferencesModule } from './user-preferences/user-preferences.module'
 import { RealtimeModule } from './realtime/realtime.module'
+import { AppThrottlerModule } from './common/throttler/throttler.module'
+import { SecurityModule } from './common/security/security.module'
+import { LoggerModule } from './common/logger/logger.module'
 
 @Module({
   imports: [
     // 配置模块
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, jwtConfig, appConfig],
+      load: [databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig],
       envFilePath: ['.env.local', '.env'],
     }),
 
+    // 日志模块
+    LoggerModule,
+
     // 数据库模块
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '3306', 10),
-      username: process.env.DB_USERNAME || 'root',
-      password: process.env.DB_PASSWORD || '123456',
-      database: process.env.DB_DATABASE || 'music_app',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV === 'development',
-      logging: process.env.NODE_ENV === 'development',
-      charset: 'utf8mb4',
-      timezone: '+08:00',
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get('database.host'),
+        port: configService.get('database.port'),
+        username: configService.get('database.username'),
+        password: configService.get('database.password'),
+        database: configService.get('database.database'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: configService.get('database.synchronize'),
+        logging: configService.get('database.logging'),
+        charset: configService.get('database.charset'),
+        timezone: configService.get('database.timezone'),
+      }),
     }),
 
     // 注册所有实体以便在种子脚本中使用
@@ -65,6 +75,15 @@ import { RealtimeModule } from './realtime/realtime.module'
       inject: [ConfigService],
     }),
 
+    // 安全模块
+    SecurityModule,
+
+    // 请求速率限制模块
+    AppThrottlerModule,
+
+    // 缓存模块
+    CacheModule,
+
     // 功能模块
     AuthModule,
     SongsModule,
@@ -74,7 +93,6 @@ import { RealtimeModule } from './realtime/realtime.module'
     UploadModule,
     DatabaseModule,
     CommentsModule,
-    CacheModule,
     SmsModule,
     HistoryModule,
     SearchHistoryModule,

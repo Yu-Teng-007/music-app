@@ -6,4 +6,6 @@ export default registerAs('app', () => ({
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
   maxFileSize: process.env.MAX_FILE_SIZE || '50MB',
+  logDir: process.env.LOG_DIR || 'logs',
+  logLevel: process.env.LOG_LEVEL || 'debug',
 }))

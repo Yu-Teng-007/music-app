@@ -1,3 +1,7 @@
-export { default as databaseConfig } from './database.config'
-export { default as jwtConfig } from './jwt.config'
-export { default as appConfig } from './app.config'
+import databaseConfig from './database.config'
+import jwtConfig from './jwt.config'
+import appConfig from './app.config'
+import throttleConfig from './throttle.config'
+import cacheConfig from './cache.config'
+
+export { databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig }
