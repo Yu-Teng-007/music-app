@@ -8,7 +8,13 @@ export class CsrfService {
 
   constructor() {
     this.csrfInstance = doubleCsrf({
-      getSecret: () => process.env.CSRF_SECRET || 'csrf-secret-key',
+      getSecret: () => {
+        const secret = process.env.CSRF_SECRET
+        if (!secret) {
+          throw new Error('CSRF_SECRET environment variable is required')
+        }
+        return secret
+      },
       cookieName: 'csrf-token',
       cookieOptions: {
         secure: process.env.NODE_ENV === 'production',

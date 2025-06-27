@@ -52,7 +52,7 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       this.realtimeService.registerUser(userId, client.id)
 
       // 加入用户自己的房间
-      void client.join(`user:${userId}`)
+      await client.join(`user:${userId}`)
 
       this.logger.log(`用户 ${userId} 已连接，Socket ID: ${client.id}`)
 
