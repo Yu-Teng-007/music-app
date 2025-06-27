@@ -21,7 +21,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 import { DownloadService } from './download.service'
 import {
   CreateDownloadDto,
@@ -30,7 +30,7 @@ import {
   BatchDownloadDto,
   StorageStatsDto,
   CleanupOptionsDto,
-} from '../dto'
+} from '../../dto'
 
 @ApiTags('download')
 @Controller('download')

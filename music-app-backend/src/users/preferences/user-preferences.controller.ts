@@ -7,10 +7,10 @@ import {
   ApiBody,
   ApiParam,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
-import { CurrentUser } from '../auth/decorators/current-user.decorator'
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
+import { CurrentUser } from '../../auth/decorators/current-user.decorator'
 import { UserPreferencesService } from './user-preferences.service'
-import { UpsertPreferenceDto, BulkUpsertPreferencesDto } from '../dto/user-preferences.dto'
+import { UpsertPreferenceDto, BulkUpsertPreferencesDto } from '../../dto/user-preferences.dto'
 
 @ApiTags('user-preferences')
 @Controller('user-preferences')

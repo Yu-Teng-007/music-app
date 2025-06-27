@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import axios from 'axios'
-import { Download, DownloadStatus, AudioQuality, Song, User, UserStorage } from '../entities'
+import { Download, DownloadStatus, AudioQuality, Song, User, UserStorage } from '../../entities'
 import {
   CreateDownloadDto,
   UpdateDownloadDto,
@@ -14,7 +14,7 @@ import {
   BatchDownloadDto,
   StorageStatsDto,
   CleanupOptionsDto,
-} from '../dto'
+} from '../../dto'
 
 @Injectable()
 export class DownloadService {

@@ -9,7 +9,7 @@ import { databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig } fro
 import { AuthModule } from './auth/auth.module'
 import { SongsModule } from './songs/songs.module'
 import { PlaylistsModule } from './playlists/playlists.module'
-import { UploadModule } from './upload/upload.module'
+import { MediaModule } from './media/media.module'
 import { DatabaseModule } from './database/database.module'
 import { FavoritesModule } from './favorites/favorites.module'
 import { GenresModule } from './genres/genres.module'
@@ -34,10 +34,10 @@ import {
 import { SmsModule } from './sms/sms.module'
 import { HistoryModule } from './history/history.module'
 import { SearchHistoryModule } from './search-history/search-history.module'
-import { UserPreferencesModule } from './user-preferences/user-preferences.module'
+import { UsersModule } from './users/users.module'
 import { RealtimeModule } from './realtime/realtime.module'
 import { SocialModule } from './social/social.module'
-import { DownloadModule } from './download/download.module'
+
 import { AppThrottlerModule } from './common/throttler/throttler.module'
 import { SecurityModule } from './common/security/security.module'
 import { LoggerModule } from './common/logger/logger.module'
@@ -122,16 +122,15 @@ import { LoggerModule } from './common/logger/logger.module'
     PlaylistsModule,
     FavoritesModule,
     GenresModule,
-    UploadModule,
+    MediaModule,
     DatabaseModule,
     CommentsModule,
     SmsModule,
     HistoryModule,
     SearchHistoryModule,
-    UserPreferencesModule,
+    UsersModule,
     RealtimeModule,
     SocialModule,
-    DownloadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
