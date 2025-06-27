@@ -52,7 +52,7 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       this.realtimeService.registerUser(userId, client.id)
 
       // 加入用户自己的房间
-      client.join(`user:${userId}`)
+      void client.join(`user:${userId}`)
 
       this.logger.log(`用户 ${userId} 已连接，Socket ID: ${client.id}`)
 
@@ -89,13 +89,13 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   @SubscribeMessage('join:room')
   handleJoinRoom(client: Socket, payload: { room: string }) {
-    client.join(payload.room)
+    void client.join(payload.room)
     return { event: 'join:room', data: { room: payload.room, success: true } }
   }
 
   @SubscribeMessage('leave:room')
   handleLeaveRoom(client: Socket, payload: { room: string }) {
-    client.leave(payload.room)
+    void client.leave(payload.room)
     return { event: 'leave:room', data: { room: payload.room, success: true } }
   }
 
