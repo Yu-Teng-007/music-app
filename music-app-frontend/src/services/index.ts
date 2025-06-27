@@ -5,6 +5,7 @@ export { apiClient } from './http'
 
 // API服务
 export { authApi } from './auth-api'
+export { csrfApi, csrfService } from './csrf-api'
 export { musicApi } from './music-api'
 export { favoritesApi } from './favorites-api'
 export { playlistApi } from './playlist-api'

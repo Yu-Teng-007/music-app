@@ -1,12 +1,17 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common'
+import { Module, NestModule, MiddlewareConsumer, Global } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import * as session from 'express-session'
 import * as cookieParser from 'cookie-parser'
 import { doubleCsrf } from 'csrf-csrf'
 import helmet from 'helmet'
 import { Request } from 'express'
+import { CsrfService } from './csrf.service'
 
-@Module({})
+@Global()
+@Module({
+  providers: [CsrfService],
+  exports: [CsrfService],
+})
 export class SecurityModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
@@ -38,7 +43,7 @@ export class SecurityModule implements NestModule {
             maxAge: 24 * 60 * 60 * 1000, // 1 day
           },
         }),
-        (req, res, next) => {
+        (req: Request, res: any, next: any) => {
           const { doubleCsrfProtection } = doubleCsrf({
             getSecret: () => process.env.CSRF_SECRET || 'csrf-secret-key',
             cookieName: 'csrf-token',
@@ -52,11 +57,16 @@ export class SecurityModule implements NestModule {
               // 使用会话ID作为标识符
               return req.sessionID || ''
             },
-            getCsrfTokenFromRequest: req => req.headers['x-csrf-token'] as string,
+            getCsrfTokenFromRequest: req => req.headers['x-csrf-token'],
           })
 
           // 排除不需要CSRF保护的路由
-          const excludedPaths = ['/api/auth/login', '/api/auth/register', '/api/auth/send-sms']
+          const excludedPaths = [
+            '/api/auth/login',
+            '/api/auth/register',
+            '/api/auth/send-sms',
+            '/api/csrf-token',
+          ]
 
           // 检查是否为排除的路径
 

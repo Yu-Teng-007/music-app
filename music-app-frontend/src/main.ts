@@ -6,7 +6,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from './stores/auth'
-import { realtimeService } from './services'
+import { realtimeService, csrfService } from './services'
 import { imgFallbackDirective } from './utils/imageHandlers'
 import {
   initNetworkStatusMonitor,
@@ -23,6 +23,17 @@ app.use(router)
 app.directive('img-fallback', imgFallbackDirective)
 
 app.mount('#app')
+
+// 初始化CSRF token
+const initializeCsrf = async () => {
+  try {
+    await csrfService.getToken()
+    console.log('CSRF token初始化成功')
+  } catch (error) {
+    console.warn('CSRF token初始化失败:', error)
+    // CSRF初始化失败不应该阻止应用启动
+  }
+}
 
 // 初始化WebSocket连接
 const initializeWebSocket = () => {
@@ -45,6 +56,9 @@ document.addEventListener('auth:refresh', initializeWebSocket)
 document.addEventListener('auth:logout', () => {
   realtimeService.disconnect()
 })
+
+// 启动应用时初始化CSRF token
+initializeCsrf()
 
 // 初始化网络状态监控
 const cleanupNetworkMonitor = initNetworkStatusMonitor()
