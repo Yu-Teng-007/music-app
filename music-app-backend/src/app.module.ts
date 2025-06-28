@@ -58,19 +58,13 @@ import { LoggerModule } from './common/logger/logger.module'
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('database.host'),
-        port: configService.get('database.port'),
-        username: configService.get('database.username'),
-        password: configService.get('database.password'),
-        database: configService.get('database.database'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('database.synchronize'),
-        logging: configService.get('database.logging'),
-        charset: configService.get('database.charset'),
-        timezone: configService.get('database.timezone'),
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.get('database')
+        return {
+          ...dbConfig,
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        }
+      },
     }),
 
     // 注册所有实体以便在种子脚本中使用
