@@ -3,6 +3,8 @@ services:
     name: music-app-backend
     env: node
     plan: free
+    # 指定后端代码的相对路径
+    rootDir: music-app-backend
     buildCommand: npm install && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /api/health
