@@ -24,24 +24,36 @@ export const realtimeService = {
 
     this.socket = io(baseUrl, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      timeout: 10000,
+      forceNew: true,
     })
 
     this.socket.on('connect', () => {
       this.isConnected.value = true
-      console.log('WebSocket连接已建立')
+      console.log('WebSocket连接已建立，Socket ID:', this.socket?.id)
     })
 
-    this.socket.on('disconnect', () => {
+    this.socket.on('disconnect', reason => {
       this.isConnected.value = false
-      console.log('WebSocket连接已断开')
+      console.log('WebSocket连接已断开，原因:', reason)
     })
 
     this.socket.on('connect_error', error => {
       console.error('WebSocket连接错误:', error)
+      console.error('错误详情:', {
+        message: error.message,
+        description: error.description,
+        context: error.context,
+        type: error.type,
+      })
+    })
+
+    this.socket.on('error', error => {
+      console.error('WebSocket运行时错误:', error)
     })
 
     // 重新绑定所有事件监听器

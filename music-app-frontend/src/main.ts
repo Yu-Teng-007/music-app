@@ -40,7 +40,10 @@ const initializeWebSocket = () => {
   const authStore = useAuthStore()
   if (authStore.isAuthenticated && authStore.token) {
     try {
-      realtimeService.connect(authStore.token, import.meta.env.VITE_API_URL || '/api')
+      realtimeService.connect(
+        authStore.token,
+        import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+      )
     } catch (error) {
       console.warn('WebSocket连接失败:', error)
       // WebSocket连接失败不应该阻止应用启动

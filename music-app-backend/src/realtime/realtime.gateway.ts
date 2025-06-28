@@ -14,8 +14,12 @@ import { JwtService } from '@nestjs/jwt'
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: ['http://localhost:5188', 'http://localhost:5189', 'http://localhost:3000'],
+    credentials: true,
   },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000,
 })
 export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(RealtimeGateway.name)
