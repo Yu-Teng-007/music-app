@@ -17,7 +17,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
     | 'mysql'
     | 'postgres'
 
-  // 如果有 DATABASE_URL（Railway/Render 等云服务），使用它
+  // 如果有 DATABASE_URL（Render/Cloudflare 等云服务），使用它
   if (process.env.DATABASE_URL) {
     return {
       type: 'postgres',
@@ -40,7 +40,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
   }
 
   // 本地开发配置
-  const config: TypeOrmModuleOptions = {
+  const config: any = {
     type: dbType,
     host: process.env.DB_HOST || process.env.DATABASE_HOST || 'localhost',
     port: parseInt(
@@ -67,5 +67,5 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
     config.timezone = '+08:00'
   }
 
-  return config
+  return config as TypeOrmModuleOptions
 })
