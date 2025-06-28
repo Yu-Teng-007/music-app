@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="itemClasses"
-    @click="handleClick"
-  >
+  <div :class="itemClasses" @click="handleClick">
     <slot></slot>
   </div>
 </template>
@@ -18,22 +15,25 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
-  divided: false
+  divided: false,
 })
 
-const dropdownContext = inject('mobileDropdown', null)
+const dropdownContext = inject<{ handleCommand: (command: any) => void } | null>(
+  'mobileDropdown',
+  null
+)
 
 const itemClasses = computed(() => [
   'mobile-dropdown-item',
   {
     'mobile-dropdown-item--disabled': props.disabled,
-    'mobile-dropdown-item--divided': props.divided
-  }
+    'mobile-dropdown-item--divided': props.divided,
+  },
 ])
 
 const handleClick = () => {
   if (props.disabled) return
-  
+
   if (props.command && dropdownContext) {
     dropdownContext.handleCommand(props.command)
   }

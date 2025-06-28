@@ -46,9 +46,9 @@ export const realtimeService = {
       console.error('WebSocket连接错误:', error)
       console.error('错误详情:', {
         message: error.message,
-        description: error.description,
-        context: error.context,
-        type: error.type,
+        description: (error as any).description,
+        context: (error as any).context,
+        type: (error as any).type,
       })
     })
 
@@ -157,11 +157,20 @@ export const realtimeService = {
 
   // 取消监听社交事件
   offSocialEvents() {
-    this.off('new_feed')
-    this.off('feed_update')
-    this.off('feed_liked')
-    this.off('new_follower')
-    this.off('new_comment')
+    // 移除所有监听器
+    if (this.socket) {
+      this.socket.off('new_feed')
+      this.socket.off('feed_update')
+      this.socket.off('feed_liked')
+      this.socket.off('new_follower')
+      this.socket.off('new_comment')
+    }
+    // 清除本地监听器缓存
+    this.listeners.delete('new_feed')
+    this.listeners.delete('feed_update')
+    this.listeners.delete('feed_liked')
+    this.listeners.delete('new_follower')
+    this.listeners.delete('new_comment')
   },
 
   // 重新绑定所有事件监听器

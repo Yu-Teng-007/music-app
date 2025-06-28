@@ -80,7 +80,13 @@
         <FeedCard
           v-for="feed in feeds"
           :key="feed.id"
-          :feed="feed"
+          :feed="{
+            ...feed,
+            likeCount: feed.likeCount || 0,
+            commentCount: feed.commentCount || 0,
+            shareCount: feed.shareCount || 0,
+            isVisible: feed.isVisible !== false,
+          }"
           @like="handleLikeFeed"
           @unlike="handleUnlikeFeed"
           @delete="handleDeleteFeed"

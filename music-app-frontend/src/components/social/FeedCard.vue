@@ -2,7 +2,7 @@
   <div class="feed-card">
     <!-- 用户信息 -->
     <div class="feed-header">
-      <div class="user-info" @click="$emit('user-click', feed.user?.id)">
+      <div class="user-info" @click="feed.user?.id && $emit('user-click', feed.user.id)">
         <MobileAvatar :src="feed.user?.avatar" :size="40" class="user-avatar">
           {{ feed.user?.username?.charAt(0) }}
         </MobileAvatar>
@@ -97,7 +97,7 @@
         <div class="playlist-cover">
           <img
             :src="feed.playlist.coverUrl"
-            :alt="feed.playlist.title"
+            :alt="feed.playlist.title || feed.playlist.name"
             class="cover-image"
             @error="handleImageError"
           />
@@ -117,7 +117,7 @@
           </div>
         </div>
         <div class="playlist-info">
-          <div class="playlist-title">{{ feed.playlist.title }}</div>
+          <div class="playlist-title">{{ feed.playlist.title || feed.playlist.name }}</div>
           <div class="playlist-desc">{{ feed.playlist.description }}</div>
         </div>
       </div>

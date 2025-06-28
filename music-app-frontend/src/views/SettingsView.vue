@@ -217,6 +217,8 @@ const storage = reactive({
 // 表单数据
 const profileForm = reactive({
   name: '',
+  username: '',
+  avatar: '',
 })
 
 const passwordForm = reactive({
@@ -255,7 +257,10 @@ const clearCache = () => {
 // 处理个人资料更新
 const handleProfileUpdate = async () => {
   try {
-    await authStore.updateProfile(profileForm)
+    await authStore.updateProfile({
+      username: profileForm.username,
+      avatar: profileForm.avatar,
+    })
     showProfileEdit.value = false
     console.log('个人资料更新成功')
   } catch (error) {
@@ -289,7 +294,9 @@ const handleLogout = async () => {
 // 组件挂载时初始化数据
 onMounted(() => {
   if (authStore.user) {
-    profileForm.name = authStore.user.name
+    profileForm.name = (authStore.user as any).name || authStore.user.username || ''
+    profileForm.username = authStore.user.username || ''
+    profileForm.avatar = authStore.user.avatar || ''
   }
 })
 </script>

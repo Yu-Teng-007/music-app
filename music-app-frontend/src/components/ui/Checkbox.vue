@@ -9,7 +9,15 @@
       class="mobile-checkbox__input"
     />
     <span class="mobile-checkbox__indicator">
-      <svg v-if="checked" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+      <svg
+        v-if="checked"
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+      >
         <polyline points="20,6 9,17 4,12"></polyline>
       </svg>
     </span>
@@ -37,14 +45,16 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
-  size: 'default'
+  size: 'default',
 })
 
 const emit = defineEmits<Emits>()
 
 const checked = computed(() => {
   if (Array.isArray(props.modelValue)) {
-    return props.value !== undefined && props.modelValue.includes(props.value)
+    return (
+      props.value !== undefined && (props.modelValue as (string | number)[]).includes(props.value)
+    )
   }
   return Boolean(props.modelValue)
 })
@@ -54,8 +64,8 @@ const checkboxClasses = computed(() => [
   `mobile-checkbox--${props.size}`,
   {
     'mobile-checkbox--checked': checked.value,
-    'mobile-checkbox--disabled': props.disabled
-  }
+    'mobile-checkbox--disabled': props.disabled,
+  },
 ])
 
 const handleChange = (event: Event) => {
@@ -63,7 +73,7 @@ const handleChange = (event: Event) => {
   const isChecked = target.checked
 
   if (Array.isArray(props.modelValue)) {
-    const newValue = [...props.modelValue]
+    const newValue = [...(props.modelValue as (string | number)[])]
     if (props.value !== undefined) {
       if (isChecked) {
         if (!newValue.includes(props.value)) {
@@ -76,11 +86,11 @@ const handleChange = (event: Event) => {
         }
       }
     }
-    emit('update:modelValue', newValue)
+    emit('update:modelValue', newValue as string[] | number[])
   } else {
     emit('update:modelValue', isChecked)
   }
-  
+
   emit('change', isChecked)
 }
 </script>
@@ -174,12 +184,12 @@ const handleChange = (event: Event) => {
     min-height: 48px;
     padding: 12px 0;
   }
-  
+
   .mobile-checkbox__indicator {
     width: 22px;
     height: 22px;
   }
-  
+
   .mobile-checkbox__label {
     font-size: 16px; /* 防止iOS缩放 */
   }
@@ -191,16 +201,16 @@ const handleChange = (event: Event) => {
     border-color: #4c4d4f;
     background-color: #2a2a2a;
   }
-  
+
   .mobile-checkbox--checked .mobile-checkbox__indicator {
     background-color: #409eff;
     border-color: #409eff;
   }
-  
+
   .mobile-checkbox__label {
     color: #ffffff;
   }
-  
+
   .mobile-checkbox--disabled .mobile-checkbox__label {
     color: #666666;
   }

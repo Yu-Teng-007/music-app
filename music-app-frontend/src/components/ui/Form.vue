@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   size: 'default',
   disabled: false,
   validateOnRuleChange: true,
-  hideRequiredAsterisk: false
+  hideRequiredAsterisk: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -38,14 +38,14 @@ const formClasses = computed(() => [
   `mobile-form--label-${props.labelPosition}`,
   `mobile-form--${props.size}`,
   {
-    'mobile-form--disabled': props.disabled
-  }
+    'mobile-form--disabled': props.disabled,
+  },
 ])
 
 // 表单验证状态
 const formState = reactive({
   fields: new Map(),
-  errors: new Map()
+  errors: new Map(),
 })
 
 // 提供给子组件的上下文
@@ -66,40 +66,40 @@ provide('mobileForm', {
     if (!rules) return true
 
     const value = props.model?.[prop]
-    
+
     try {
       // 简单的验证逻辑
       for (const rule of Array.isArray(rules) ? rules : [rules]) {
         if (rule.required && (!value || value === '')) {
           throw new Error(rule.message || `${prop} is required`)
         }
-        
+
         if (rule.min && value && value.length < rule.min) {
           throw new Error(rule.message || `${prop} must be at least ${rule.min} characters`)
         }
-        
+
         if (rule.max && value && value.length > rule.max) {
           throw new Error(rule.message || `${prop} must be at most ${rule.max} characters`)
         }
-        
+
         if (rule.pattern && value && !rule.pattern.test(value)) {
           throw new Error(rule.message || `${prop} format is invalid`)
         }
-        
+
         if (rule.validator && typeof rule.validator === 'function') {
           await rule.validator(rule, value, (error?: Error) => {
             if (error) throw error
           })
         }
       }
-      
+
       formState.errors.delete(prop)
       return true
     } catch (error) {
-      formState.errors.set(prop, error.message)
+      formState.errors.set(prop, (error as Error).message)
       return false
     }
-  }
+  },
 })
 
 const handleSubmit = (event: Event) => {
@@ -109,14 +109,12 @@ const handleSubmit = (event: Event) => {
 // 暴露验证方法
 const validate = async (): Promise<boolean> => {
   const results = await Promise.all(
-    Array.from(formState.fields.keys()).map(prop => 
-      formState.fields.get(prop)?.validate?.()
-    )
+    Array.from(formState.fields.keys()).map(prop => formState.fields.get(prop)?.validate?.())
   )
-  
+
   const isValid = results.every(result => result === true)
   const invalidFields = isValid ? undefined : Object.fromEntries(formState.errors)
-  
+
   emit('validate', isValid, invalidFields)
   return isValid
 }
@@ -137,7 +135,7 @@ const clearValidate = (props?: string | string[]) => {
     formState.errors.clear()
     return
   }
-  
+
   const propsArray = Array.isArray(props) ? props : [props]
   propsArray.forEach(prop => {
     formState.errors.delete(prop)
@@ -148,7 +146,7 @@ defineExpose({
   validate,
   validateField,
   resetFields,
-  clearValidate
+  clearValidate,
 })
 </script>
 

@@ -70,14 +70,7 @@ import {
   MobileAvatar,
   MobileButton,
 } from '@/components/ui'
-
-// 临时类型定义
-interface User {
-  id: string
-  username: string
-  phone: string
-  avatar?: string
-}
+import type { User } from '@/types'
 
 interface Props {
   modelValue: boolean
@@ -153,8 +146,8 @@ const handleSearch = async () => {
     await loadUsers()
     users.value = users.value.filter(
       (user: User) =>
-        user.username.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
-        user.phone.includes(searchKeyword.value)
+        (user.username || '').toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+        (user.phone || '').includes(searchKeyword.value)
     )
   } catch (error) {
     console.error('搜索用户失败:', error)

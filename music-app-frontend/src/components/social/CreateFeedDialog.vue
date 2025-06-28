@@ -150,29 +150,11 @@ import {
   createSelectOptions,
 } from '@/components/ui'
 import { useSocialStore } from '@/stores/social'
-import { FeedType, type CreateFeedDto } from '@/services/social-api'
+import { type CreateFeedDto } from '@/services/social-api'
+import { FeedType, type Song, type Playlist, type User } from '@/types'
 import SongSelectorDialog from './SongSelectorDialog.vue'
 import PlaylistSelectorDialog from './PlaylistSelectorDialog.vue'
 import UserSelectorDialog from './UserSelectorDialog.vue'
-
-// 临时类型定义，直到创建正确的类型文件
-interface Song {
-  id: string
-  title: string
-  artist: string
-}
-
-interface Playlist {
-  id: string
-  title: string
-  description: string
-}
-
-interface User {
-  id: string
-  username: string
-  avatar?: string
-}
 
 interface Props {
   modelValue: boolean

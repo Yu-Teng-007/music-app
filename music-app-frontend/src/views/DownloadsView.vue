@@ -88,7 +88,10 @@
         <DownloadCard
           v-for="download in downloads"
           :key="download.id"
-          :download="download"
+          :download="{
+            ...download,
+            downloadedSize: download.downloadedSize || 0,
+          }"
           @pause="handlePauseDownload"
           @resume="handleResumeDownload"
           @retry="handleRetryDownload"
