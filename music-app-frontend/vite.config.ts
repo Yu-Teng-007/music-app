@@ -17,6 +17,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // GitHub Pages部署配置
+  base: process.env.NODE_ENV === 'production' ? '/music-app/' : '/',
   server: {
     port: 5188, // 固定前端端口为5188，避免与后端3000端口冲突
     host: true, // 允许外部访问

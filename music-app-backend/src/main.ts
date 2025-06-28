@@ -15,8 +15,26 @@ async function bootstrap() {
   let SwaggerAddress = ''
 
   // 启用CORS
+  const frontendUrls = configService.get<string>('app.frontendUrl')?.split(',') || [
+    'http://localhost:5188',
+  ]
   app.enableCors({
-    origin: configService.get<string>('app.frontendUrl'),
+    origin: (origin, callback) => {
+      // 允许没有origin的请求（如移动应用、Postman等）
+      if (!origin) return callback(null, true)
+
+      // 检查origin是否在允许列表中
+      if (frontendUrls.some(url => origin.startsWith(url.trim()))) {
+        return callback(null, true)
+      }
+
+      // 开发环境允许localhost的任何端口
+      if (process.env.NODE_ENV === 'development' && origin.includes('localhost')) {
+        return callback(null, true)
+      }
+
+      callback(new Error('Not allowed by CORS'))
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
     credentials: true,
