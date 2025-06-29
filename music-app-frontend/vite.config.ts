@@ -27,7 +27,7 @@ export default defineConfig({
     // 添加代理配置，当后端不可用时提供更好的错误处理
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://192.168.0.108:3000',
         changeOrigin: true,
         timeout: 5000,
         // 注意：onError 在新版本的 Vite 中已被移除
