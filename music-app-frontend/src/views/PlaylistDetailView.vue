@@ -389,7 +389,7 @@ onMounted(() => {
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
   padding: 1.5rem;
-  padding-bottom: 100px; /* 为底部导航留空间 */
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
   max-width: 1200px;
   margin: 0 auto;
 }

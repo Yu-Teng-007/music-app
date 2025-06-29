@@ -630,7 +630,7 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding-bottom: 100px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
 .header {

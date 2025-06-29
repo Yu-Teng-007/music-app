@@ -1,5 +1,5 @@
 <template>
-  <div class="downloads-container">
+  <div class="downloads-view">
     <!-- 顶部导航 -->
     <div class="downloads-header">
       <h1 class="page-title">
@@ -287,67 +287,72 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.downloads-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+.downloads-view {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding: 1.5rem;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
 .downloads-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #303133;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.75rem;
 }
 
 .storage-stats {
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
 }
 
 .stats-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stats-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .stats-header h3 {
   margin: 0;
-  font-size: 18px;
-  color: #303133;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
 }
 
 .usage-percentage {
-  font-size: 24px;
-  font-weight: 600;
-  color: #409eff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #64b5f6;
 }
 
 .progress-bar {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .stats-details {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 1rem;
 }
 
 .stat-item {
@@ -357,21 +362,21 @@ onMounted(async () => {
 }
 
 .stat-item .label {
-  color: #606266;
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
 }
 
 .stat-item .value {
-  color: #303133;
-  font-weight: 500;
+  color: white;
+  font-weight: 600;
 }
 
 .download-filters {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
 }
 
 .downloads-list-container {
@@ -380,43 +385,45 @@ onMounted(async () => {
 
 .loading-container,
 .empty-container {
-  padding: 40px 20px;
+  padding: 2.5rem 1.25rem;
   text-align: center;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .downloads-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .load-more {
   text-align: center;
-  padding: 20px;
+  padding: 1.25rem;
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
-  .downloads-container {
-    padding: 16px;
-    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 为底部导航留空间 */
+  .downloads-view {
+    padding: 1rem;
+    padding-bottom: calc(150px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
   }
 
   .downloads-header {
     flex-direction: column;
-    gap: 16px;
+    gap: 1rem;
     align-items: stretch;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
   }
 
   .page-title {
-    font-size: 20px;
+    font-size: 1.5rem;
     text-align: center;
   }
 
   .header-actions {
     display: flex;
-    gap: 12px;
+    justify-content: center;
+    gap: 0.75rem;
   }
 
   .header-actions button {
@@ -425,111 +432,79 @@ onMounted(async () => {
   }
 
   .stats-card {
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .stats-header h3 {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   .usage-percentage {
-    font-size: 20px;
+    font-size: 1.5rem;
   }
 
   .stats-details {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 0.75rem;
   }
 
   .stat-item .label {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .download-filters {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
   .loading-container,
   .empty-container {
-    padding: 60px 20px;
+    padding: 3.75rem 1.25rem;
   }
 
   .downloads-list {
-    gap: 12px;
+    gap: 0.75rem;
   }
 }
 
 /* 超小屏幕优化 */
 @media (max-width: 480px) {
-  .downloads-container {
-    padding: 12px;
+  .downloads-view {
+    padding: 0.75rem;
   }
 
   .downloads-header {
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
   }
 
   .page-title {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   .header-actions {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .stats-card {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .stats-header h3 {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
 
   .usage-percentage {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   .download-filters {
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-}
-
-/* 暗色主题适配 */
-@media (prefers-color-scheme: dark) {
-  .downloads-container {
-    background-color: #1a1a1a;
-  }
-
-  .page-title {
-    color: #ffffff;
-  }
-
-  .stats-card {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
-  }
-
-  .stats-header h3 {
-    color: #ffffff;
-  }
-
-  .usage-percentage {
-    color: #409eff;
-  }
-
-  .stat-item .label {
-    color: #999999;
-  }
-
-  .stat-item .value {
-    color: #ffffff;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 }
 </style>

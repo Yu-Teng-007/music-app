@@ -7,8 +7,8 @@
         'mobile-radio-button',
         {
           'mobile-radio-button--active': option.value === modelValue,
-          'mobile-radio-button--disabled': option.disabled
-        }
+          'mobile-radio-button--disabled': option.disabled,
+        },
       ]"
       @click="handleClick(option)"
     >
@@ -38,14 +38,14 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
-  size: 'default'
+  size: 'default',
 })
 
 const emit = defineEmits<Emits>()
 
 const handleClick = (option: RadioOption) => {
   if (props.disabled || option.disabled) return
-  
+
   emit('update:modelValue', option.value)
   emit('change', option.value)
 }
@@ -54,10 +54,11 @@ const handleClick = (option: RadioOption) => {
 <style scoped>
 .mobile-radio-group {
   display: inline-flex;
-  border: 1px solid #dcdfe6;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .mobile-radio-button {
@@ -68,9 +69,9 @@ const handleClick = (option: RadioOption) => {
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #606266;
-  background-color: #ffffff;
-  border-right: 1px solid #dcdfe6;
+  color: rgba(255, 255, 255, 0.8);
+  background-color: transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
@@ -83,23 +84,23 @@ const handleClick = (option: RadioOption) => {
 }
 
 .mobile-radio-button:hover:not(.mobile-radio-button--disabled) {
-  background-color: #f5f7fa;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .mobile-radio-button--active {
-  background-color: #409eff;
+  background-color: #64b5f6;
   color: #ffffff;
-  border-color: #409eff;
+  border-color: #64b5f6;
 }
 
 .mobile-radio-button--active + .mobile-radio-button {
-  border-left-color: #409eff;
+  border-left-color: #64b5f6;
 }
 
 .mobile-radio-button--disabled {
-  color: #c0c4cc;
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
-  background-color: #f5f7fa;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .mobile-radio-button:active:not(.mobile-radio-button--disabled) {
@@ -113,11 +114,11 @@ const handleClick = (option: RadioOption) => {
     font-size: 14px;
     min-height: 48px;
   }
-  
+
   .mobile-radio-group {
     width: 100%;
   }
-  
+
   .mobile-radio-button {
     flex: 1;
     text-align: center;
@@ -129,19 +130,19 @@ const handleClick = (option: RadioOption) => {
   .mobile-radio-group {
     flex-direction: column;
   }
-  
+
   .mobile-radio-button {
     border-right: none;
-    border-bottom: 1px solid #dcdfe6;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .mobile-radio-button:last-child {
     border-bottom: none;
   }
-  
+
   .mobile-radio-button--active + .mobile-radio-button {
-    border-left-color: #dcdfe6;
-    border-top-color: #409eff;
+    border-left-color: rgba(255, 255, 255, 0.2);
+    border-top-color: #64b5f6;
   }
 }
 </style>

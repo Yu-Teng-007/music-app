@@ -99,14 +99,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
 import type { PlayHistoryItem, Song } from '@/stores/music'
-import {
-  ChevronLeft,
-  Clock,
-  Search,
-  X,
-  Trash2,
-  Play,
-} from 'lucide-vue-next'
+import { ChevronLeft, Clock, Search, X, Trash2, Play } from 'lucide-vue-next'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -123,25 +116,26 @@ const filteredHistory = computed(() => {
   if (!searchQuery.value.trim()) {
     return historyList.value
   }
-  
+
   const query = searchQuery.value.toLowerCase()
-  return historyList.value.filter(item =>
-    item.song.title.toLowerCase().includes(query) ||
-    item.song.artist.toLowerCase().includes(query) ||
-    item.song.album.toLowerCase().includes(query)
+  return historyList.value.filter(
+    item =>
+      item.song.title.toLowerCase().includes(query) ||
+      item.song.artist.toLowerCase().includes(query) ||
+      item.song.album.toLowerCase().includes(query)
   )
 })
 
 // 按日期分组
 const groupedHistory = computed(() => {
   const groups: { [key: string]: PlayHistoryItem[] } = {}
-  
+
   filteredHistory.value.forEach(item => {
     const date = new Date(item.playedAt)
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
-    
+
     let groupKey: string
     if (isSameDay(date, today)) {
       groupKey = 'today'
@@ -150,32 +144,36 @@ const groupedHistory = computed(() => {
     } else {
       groupKey = formatDate(date)
     }
-    
+
     if (!groups[groupKey]) {
       groups[groupKey] = []
     }
     groups[groupKey].push(item)
   })
-  
+
   // 转换为数组并排序
-  return Object.entries(groups).map(([date, items]) => ({
-    date,
-    title: getGroupTitle(date),
-    items: items.sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime())
-  })).sort((a, b) => {
-    if (a.date === 'today') return -1
-    if (b.date === 'today') return 1
-    if (a.date === 'yesterday') return -1
-    if (b.date === 'yesterday') return 1
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
-  })
+  return Object.entries(groups)
+    .map(([date, items]) => ({
+      date,
+      title: getGroupTitle(date),
+      items: items.sort((a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()),
+    }))
+    .sort((a, b) => {
+      if (a.date === 'today') return -1
+      if (b.date === 'today') return 1
+      if (a.date === 'yesterday') return -1
+      if (b.date === 'yesterday') return 1
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
 })
 
 // 工具函数
 function isSameDay(date1: Date, date2: Date): boolean {
-  return date1.getFullYear() === date2.getFullYear() &&
-         date1.getMonth() === date2.getMonth() &&
-         date1.getDate() === date2.getDate()
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  )
 }
 
 function formatDate(date: Date): string {
@@ -185,27 +183,27 @@ function formatDate(date: Date): string {
 function getGroupTitle(dateKey: string): string {
   if (dateKey === 'today') return '今天'
   if (dateKey === 'yesterday') return '昨天'
-  
+
   const date = new Date(dateKey)
   const now = new Date()
   const diffTime = now.getTime() - date.getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  
+
   if (diffDays <= 7) {
     return `${diffDays} 天前`
   } else {
-    return date.toLocaleDateString('zh-CN', { 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('zh-CN', {
+      month: 'long',
+      day: 'numeric',
     })
   }
 }
 
 function formatPlayTime(playedAt: string): string {
   const date = new Date(playedAt)
-  return date.toLocaleTimeString('zh-CN', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  return date.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 
@@ -257,7 +255,7 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding-bottom: 100px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
 .header {
@@ -579,7 +577,7 @@ onMounted(() => {
   .modal-actions {
     flex-direction: column;
   }
-  
+
   .play-info {
     flex-direction: column;
     gap: 0.25rem;
