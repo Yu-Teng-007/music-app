@@ -1,33 +1,18 @@
 <template>
   <div class="social-view">
     <!-- 顶部导航 -->
-    <div class="social-header">
-      <h1 class="page-title">
-        <i class="el-icon-user-solid"></i>
-        社交动态
-      </h1>
-
-      <div class="header-actions">
-        <MobileButton
+    <TopNavigation title="社交动态" :icon="Users">
+      <template #actions>
+        <NavTextButton
           type="primary"
           @click="showCreateFeedDialog = true"
           :loading="socialStore.isLoading"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
+          <Edit :size="16" />
           发布动态
-        </MobileButton>
-      </div>
-    </div>
+        </NavTextButton>
+      </template>
+    </TopNavigation>
 
     <!-- 我的社交统计 -->
     <div class="social-stats" v-if="socialStats">
@@ -111,9 +96,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { MobileButton, MobileSkeleton, MobileEmpty, MobileMessage } from '@/components/ui'
+import { Users, Edit } from 'lucide-vue-next'
+import { MobileSkeleton, MobileEmpty, MobileMessage } from '@/components/ui'
 import { useSocialStore } from '@/stores/social'
 import { realtimeService } from '@/services'
+import TopNavigation from '@/components/TopNavigation.vue'
+import NavTextButton from '@/components/NavTextButton.vue'
 import FeedCard from '@/components/social/FeedCard.vue'
 import CreateFeedDialog from '@/components/social/CreateFeedDialog.vue'
 import type { UserFeed, FeedType } from '@/services/social-api'
@@ -262,26 +250,13 @@ onUnmounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding: 1.5rem;
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.social-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.social-view :deep(.top-navigation) {
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .social-stats {
@@ -349,15 +324,16 @@ onUnmounted(() => {
   }
 
   .social-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
   }
 
   .page-title {
     font-size: 1.5rem;
-    text-align: center;
+  }
+
+  .back-button {
+    padding: 0.375rem;
   }
 
   .header-actions {

@@ -1,5 +1,10 @@
 <template>
   <div class="playlist-detail-view">
+    <!-- 浮动返回按钮 -->
+    <button class="floating-back-btn" @click="goBack">
+      <ArrowLeft :size="20" />
+    </button>
+
     <!-- 加载状态 -->
     <div v-if="isLoading" class="loading-container">
       <div class="loading-spinner"></div>
@@ -218,6 +223,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { playlistApi } from '@/services/playlist-api'
 import {
+  ArrowLeft,
   Play,
   Edit,
   Heart,
@@ -392,6 +398,31 @@ onMounted(() => {
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+}
+
+.floating-back-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.floating-back-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.05);
 }
 
 .loading-container,

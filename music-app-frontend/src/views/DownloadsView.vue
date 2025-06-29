@@ -1,23 +1,18 @@
 <template>
   <div class="downloads-view">
     <!-- 顶部导航 -->
-    <div class="downloads-header">
-      <h1 class="page-title">
-        <MobileIcon name="download" :size="24" />
-        离线音乐
-      </h1>
-
-      <div class="header-actions">
-        <MobileButton
+    <TopNavigation title="离线音乐" :icon="Download">
+      <template #actions>
+        <NavTextButton
           @click="showCleanupDialog = true"
           type="warning"
           :loading="downloadStore.isLoading"
         >
-          <MobileIcon name="trash-2" :size="16" />
+          <Trash2 :size="16" />
           清理空间
-        </MobileButton>
-      </div>
-    </div>
+        </NavTextButton>
+      </template>
+    </TopNavigation>
 
     <!-- 存储统计 -->
     <div class="storage-stats" v-if="storageStats">
@@ -116,8 +111,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { Download, Trash2 } from 'lucide-vue-next'
 import {
-  MobileButton,
   MobileSkeleton,
   MobileEmpty,
   MobileSelect,
@@ -129,6 +124,8 @@ import {
 } from '@/components/ui'
 import { useDownloadStore } from '@/stores/download'
 import { downloadApi } from '@/services'
+import TopNavigation from '@/components/TopNavigation.vue'
+import NavTextButton from '@/components/NavTextButton.vue'
 import DownloadCard from '@/components/download/DownloadCard.vue'
 import CleanupDialog from '@/components/download/CleanupDialog.vue'
 import type { DownloadStatus, AudioQuality, CleanupOptions } from '@/services/download-api'
@@ -291,26 +288,13 @@ onMounted(async () => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding: 1.5rem;
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.downloads-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.downloads-view :deep(.top-navigation) {
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .storage-stats {
@@ -409,15 +393,16 @@ onMounted(async () => {
   }
 
   .downloads-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
   }
 
   .page-title {
     font-size: 1.5rem;
-    text-align: center;
+  }
+
+  .back-button {
+    padding: 0.375rem;
   }
 
   .header-actions {

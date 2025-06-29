@@ -1,17 +1,13 @@
 <template>
   <div class="charts-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="btn-circle back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1>{{ chartTitle }}</h1>
-      <div class="header-actions">
-        <button class="btn-circle refresh-button" @click="refreshChart">
+    <!-- 顶部导航 -->
+    <TopNavigation :title="chartTitle" :icon="TrendingUp">
+      <template #actions>
+        <button class="refresh-button" @click="refreshChart">
           <RotateCcw :size="20" />
         </button>
-      </div>
-    </div>
+      </template>
+    </TopNavigation>
 
     <!-- 排行榜信息 -->
     <div class="chart-info">
@@ -116,13 +112,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
 import { useFavoritesStore } from '@/stores/favorites'
 import { musicApi } from '@/services'
 import type { Song } from '@/stores/music'
 import {
-  ChevronLeft,
   RotateCcw,
   TrendingUp,
   TrendingDown,
@@ -133,9 +128,9 @@ import {
   Heart,
   MoreVertical,
 } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const route = useRoute()
-const router = useRouter()
 const musicStore = useMusicStore()
 const favoritesStore = useFavoritesStore()
 
@@ -330,10 +325,6 @@ function handleImageError(event: Event) {
   img.src = 'https://picsum.photos/300/300?random=' + Math.floor(Math.random() * 1000)
 }
 
-function goBack() {
-  router.go(-1)
-}
-
 // 监听路由变化
 watch(
   () => chartType.value,
@@ -356,19 +347,12 @@ onMounted(() => {
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  position: sticky;
-  top: 0;
+.charts-view :deep(.top-navigation) {
   background: rgba(26, 26, 46, 0.9);
   backdrop-filter: blur(10px);
-  z-index: 10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.back-button,
 .refresh-button {
   background: none;
   border: none;
@@ -381,7 +365,6 @@ onMounted(() => {
   -webkit-tap-highlight-color: transparent;
 }
 
-.back-button:hover,
 .refresh-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }

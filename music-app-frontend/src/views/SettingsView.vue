@@ -1,12 +1,7 @@
 <template>
   <div class="settings-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1>设置</h1>
-    </div>
+    <!-- 顶部导航 -->
+    <TopNavigation title="设置" :icon="Settings" />
 
     <!-- 播放设置 -->
     <div class="settings-section">
@@ -191,7 +186,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { ChevronLeft, ChevronRight, LogOut } from 'lucide-vue-next'
+import { ChevronRight, LogOut, Settings } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -233,10 +229,6 @@ const usedStoragePercentage = computed(() => {
 })
 
 // 方法
-const goBack = () => {
-  router.go(-1)
-}
-
 const toggleOfflineMode = () => {
   settings.offlineMode = !settings.offlineMode
 }
@@ -309,36 +301,10 @@ onMounted(() => {
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  gap: 1rem;
-  position: sticky;
-  top: 0;
+.settings-view :deep(.top-navigation) {
   background: rgba(26, 26, 46, 0.9);
   backdrop-filter: blur(10px);
-  z-index: 10;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .settings-section {

@@ -1,17 +1,13 @@
 <template>
   <div class="new-releases-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1>新歌首发</h1>
-      <div class="header-actions">
+    <!-- 顶部导航 -->
+    <TopNavigation title="新歌首发" :icon="Sparkles">
+      <template #actions>
         <button class="filter-button" @click="showFilterModal = true">
           <Filter :size="20" />
         </button>
-      </div>
-    </div>
+      </template>
+    </TopNavigation>
 
     <!-- 筛选标签 -->
     <div class="filter-tabs">
@@ -215,7 +211,6 @@ import { useFavoritesStore } from '@/stores/favorites'
 import { musicApi } from '@/services'
 import type { Song } from '@/stores/music'
 import {
-  ChevronLeft,
   Filter,
   Calendar,
   Clock,
@@ -225,6 +220,7 @@ import {
   Heart,
   MoreVertical,
 } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -454,10 +450,6 @@ function handleImageError(event: Event) {
   img.src = 'https://picsum.photos/300/300?random=' + Math.floor(Math.random() * 1000)
 }
 
-function goBack() {
-  router.go(-1)
-}
-
 onMounted(() => {
   loadNewReleases(true)
 })
@@ -471,19 +463,12 @@ onMounted(() => {
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  position: sticky;
-  top: 0;
+.new-releases-view :deep(.top-navigation) {
   background: rgba(26, 26, 46, 0.9);
   backdrop-filter: blur(10px);
-  z-index: 10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.back-button,
 .filter-button {
   background: none;
   border: none;
@@ -494,7 +479,6 @@ onMounted(() => {
   transition: background-color 0.2s;
 }
 
-.back-button:hover,
 .filter-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }

@@ -1,15 +1,14 @@
 <template>
   <div class="history-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1>播放历史</h1>
-      <button v-if="historyList.length > 0" class="clear-button" @click="showClearConfirm = true">
-        <Trash2 :size="20" />
-      </button>
-    </div>
+    <!-- 顶部导航 -->
+    <TopNavigation title="播放历史" :icon="Clock">
+      <template #actions>
+        <NavTextButton v-if="historyList.length > 0" type="danger" @click="showClearConfirm = true">
+          <Trash2 :size="16" />
+          清空历史
+        </NavTextButton>
+      </template>
+    </TopNavigation>
 
     <!-- 搜索栏 -->
     <div v-if="historyList.length > 0" class="search-section">
@@ -99,7 +98,9 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMusicStore } from '@/stores/music'
 import type { PlayHistoryItem, Song } from '@/stores/music'
-import { ChevronLeft, Clock, Search, X, Trash2, Play } from 'lucide-vue-next'
+import { Clock, Search, X, Trash2, Play } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
+import NavTextButton from '@/components/NavTextButton.vue'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -217,10 +218,6 @@ function formatDuration(seconds: number): string {
 }
 
 // 事件处理
-function goBack() {
-  router.go(-1)
-}
-
 function clearSearch() {
   searchQuery.value = ''
 }
@@ -256,40 +253,6 @@ onMounted(() => {
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  position: sticky;
-  top: 0;
-  background: rgba(26, 26, 46, 0.9);
-  backdrop-filter: blur(10px);
-  z-index: 10;
-}
-
-.back-button,
-.clear-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover,
-.clear-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
 }
 
 .search-section {

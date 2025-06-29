@@ -1,11 +1,11 @@
 <template>
   <div class="favorites-view">
-    <div class="header">
-      <h1>我的收藏</h1>
-      <div class="stats">
-        <span>共 {{ totalFavorites }} 首歌曲</span>
-      </div>
-    </div>
+    <!-- 顶部导航 -->
+    <TopNavigation title="我的收藏" :icon="Heart">
+      <template #actions>
+        <div class="stats">共 {{ totalFavorites }} 首歌曲</div>
+      </template>
+    </TopNavigation>
 
     <!-- 搜索框 -->
     <div class="search-section">
@@ -87,6 +87,7 @@ import { useMusicStore } from '@/stores/music'
 import { favoritesApi } from '@/services'
 import type { Song } from '@/stores/music'
 import { Search, X, Play, Heart } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -190,31 +191,24 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding: 1.5rem;
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-}
-
-.header h1 {
-  color: white;
-  font-size: 2rem;
-  font-weight: 700;
+.favorites-view :deep(.top-navigation) {
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stats {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .search-section {
   margin-bottom: 1.5rem;
+  padding: 0 1.5rem;
 }
 
 .search-bar {
@@ -270,6 +264,7 @@ onMounted(() => {
 
 .favorites-content {
   min-height: 400px;
+  padding: 0 1.5rem;
 }
 
 .loading {
