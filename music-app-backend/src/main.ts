@@ -15,9 +15,7 @@ async function bootstrap() {
   let SwaggerAddress = ''
 
   // 启用CORS
-  const frontendUrls = configService.get<string>('app.frontendUrl')?.split(',') || [
-    'http://localhost:5188',
-  ]
+  const frontendUrls = configService.get<string>('app.frontendUrl')?.split(',')
   app.enableCors({
     origin: (origin, callback) => {
       // 允许没有origin的请求（如移动应用、Postman等）
@@ -25,14 +23,6 @@ async function bootstrap() {
 
       // 检查origin是否在允许列表中
       if (frontendUrls.some(url => origin.startsWith(url.trim()))) {
-        return callback(null, true)
-      }
-
-      // 开发环境允许localhost和192.168.0.108的任何端口
-      if (
-        process.env.NODE_ENV === 'development' &&
-        (origin.includes('localhost') || origin.includes('192.168.0.108'))
-      ) {
         return callback(null, true)
       }
 
@@ -137,7 +127,7 @@ async function bootstrap() {
 
   console.log(`🚀 后端服务已启动:`)
   console.log(`   - 本地访问: http://localhost:${port}/api`)
-  console.log(`   - 网络访问: http://192.168.0.108:${port}/api`)
+  console.log(`   - 网络访问: http://127.0.0.1:${port}/api`)
   console.log(`🚀 Swagger文档已启用: ${SwaggerAddress}`)
 }
 
