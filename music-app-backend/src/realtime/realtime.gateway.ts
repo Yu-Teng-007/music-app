@@ -12,15 +12,9 @@ import { Logger } from '@nestjs/common'
 import { RealtimeService } from './realtime.service'
 import { JwtService } from '@nestjs/jwt'
 
-// 从环境变量读取 WebSocket CORS origin 配置
-const getWebSocketCorsOrigin = () => {
-  const corsOrigin = process.env.WEBSOCKET_CORS_ORIGIN
-  return corsOrigin.split(',').map(origin => origin.trim())
-}
-
 @WebSocketGateway({
   cors: {
-    origin: getWebSocketCorsOrigin(),
+    origin: ['http://localhost:5188', 'http://127.0.0.1:5188'],
     credentials: true,
   },
   transports: ['websocket', 'polling'],

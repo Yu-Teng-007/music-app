@@ -6,6 +6,4 @@ export default registerAs('app', () => ({
   frontendUrl: process.env.FRONTEND_URL || [],
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
   logDir: process.env.LOG_DIR || 'logs',
-  websocketCorsOrigin:
-    process.env.WEBSOCKET_CORS_ORIGIN.split(',').map(origin => origin.trim()) || [],
 }))
