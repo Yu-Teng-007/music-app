@@ -58,32 +58,35 @@ const isActive = (path: string) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* 导入设计系统变量 */
+@use '@/assets/styles/variables.scss' as *;
+
 .bottom-navigation {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(15, 23, 42, 0.95);
+  background: rgba($bg-primary, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: $border-width-thin solid $border-color-light;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
-  z-index: 1000;
+  padding: $spacing-3 0 calc(#{$spacing-3} + env(safe-area-inset-bottom));
+  z-index: $z-index-fixed;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
+  gap: $spacing-1;
+  padding: $spacing-2 $spacing-4;
+  border-radius: $border-radius-md;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.6);
-  transition: all 0.2s ease;
+  color: $text-tertiary;
+  transition: $transition-fast;
   min-width: 60px;
   /* 移除点击高亮效果 */
   -webkit-tap-highlight-color: transparent;
@@ -96,31 +99,31 @@ const isActive = (path: string) => {
 }
 
 .nav-item:hover {
-  color: rgba(255, 255, 255, 0.8);
-  background-color: rgba(255, 255, 255, 0.05);
+  color: $text-secondary;
+  background-color: $bg-surface;
 }
 
 .nav-item:active {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: $bg-surface-hover;
   transform: scale(0.98);
 }
 
 .nav-item:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 2px $primary-alpha-30;
 }
 
 .nav-item.active {
-  color: #007aff;
-  background-color: rgba(0, 122, 255, 0.1);
+  color: $primary;
+  background-color: $primary-alpha-10;
 }
 
 .nav-item.active:hover {
-  background-color: rgba(0, 122, 255, 0.15);
+  background-color: $primary-alpha-20;
 }
 
 .nav-item.active:focus {
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 0 0 2px $primary-alpha-30;
 }
 
 /* 移动端导航优化 */

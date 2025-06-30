@@ -1,9 +1,5 @@
 <template>
-  <button
-    :class="buttonClasses"
-    :disabled="disabled || loading"
-    @click="handleClick"
-  >
+  <button :class="buttonClasses" :disabled="disabled || loading" @click="handleClick">
     <div v-if="loading" class="loading-spinner">
       <div class="spinner"></div>
     </div>
@@ -29,7 +25,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   type: 'default',
   disabled: false,
-  loading: false
+  loading: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -38,9 +34,9 @@ const buttonClasses = computed(() => [
   'nav-text-button',
   props.type,
   {
-    'loading': props.loading,
-    'disabled': props.disabled
-  }
+    loading: props.loading,
+    disabled: props.disabled,
+  },
 ])
 
 const handleClick = (event: MouseEvent) => {
@@ -49,21 +45,24 @@ const handleClick = (event: MouseEvent) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* 导入设计系统变量 */
+@use '@/assets/styles/variables.scss' as *;
+
 .nav-text-button {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: $text-secondary;
   cursor: pointer;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $border-radius-base;
+  transition: $transition-fast;
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  min-height: 36px;
+  gap: $spacing-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  min-height: $component-height-sm;
   text-decoration: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -71,40 +70,40 @@ const handleClick = (event: MouseEvent) => {
 }
 
 .nav-text-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: $bg-surface-hover;
+  color: $text-primary;
 }
 
 .nav-text-button:active {
-  background: rgba(255, 255, 255, 0.15);
+  background: $bg-surface-active;
   transform: scale(0.98);
 }
 
 .nav-text-button.warning {
-  color: #fbbf24;
-}
+  color: $warning;
 
-.nav-text-button.warning:hover {
-  background: rgba(251, 191, 36, 0.1);
-  color: #fcd34d;
+  &:hover {
+    background: rgba($warning, 0.1);
+    color: $warning-light;
+  }
 }
 
 .nav-text-button.primary {
-  color: #60a5fa;
-}
+  color: $primary;
 
-.nav-text-button.primary:hover {
-  background: rgba(96, 165, 250, 0.1);
-  color: #93c5fd;
+  &:hover {
+    background: $primary-alpha-10;
+    color: $primary-light;
+  }
 }
 
 .nav-text-button.danger {
-  color: #f87171;
-}
+  color: $error;
 
-.nav-text-button.danger:hover {
-  background: rgba(248, 113, 113, 0.1);
-  color: #fca5a5;
+  &:hover {
+    background: rgba($error, 0.1);
+    color: $error-light;
+  }
 }
 
 .nav-text-button:disabled,
@@ -135,8 +134,12 @@ const handleClick = (event: MouseEvent) => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 移动端优化 */
@@ -155,7 +158,7 @@ const handleClick = (event: MouseEvent) => {
     font-size: 0.75rem;
     gap: 0.25rem;
   }
-  
+
   .spinner {
     width: 14px;
     height: 14px;

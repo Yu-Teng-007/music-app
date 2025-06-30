@@ -1,0 +1,422 @@
+// ===== 全局样式文件 =====
+// 导入设计令牌
+@use './variables.scss' as *;
+
+// ===== 全局重置和基础样式 =====
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; // 基础字体大小
+  line-height: $line-height-normal;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: $font-family-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-normal;
+  color: $text-primary;
+  background: $bg-primary;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  // 平滑过渡
+  transition:
+    color $duration-base $easing-ease-out,
+    background-color $duration-base $easing-ease-out;
+}
+
+// ===== 通用工具类 =====
+
+// 文本样式
+.text-xs {
+  font-size: $font-size-xs;
+}
+.text-sm {
+  font-size: $font-size-sm;
+}
+.text-base {
+  font-size: $font-size-base;
+}
+.text-lg {
+  font-size: $font-size-lg;
+}
+.text-xl {
+  font-size: $font-size-xl;
+}
+.text-2xl {
+  font-size: $font-size-2xl;
+}
+.text-3xl {
+  font-size: $font-size-3xl;
+}
+.text-4xl {
+  font-size: $font-size-4xl;
+}
+.text-5xl {
+  font-size: $font-size-5xl;
+}
+
+.font-light {
+  font-weight: $font-weight-light;
+}
+.font-normal {
+  font-weight: $font-weight-normal;
+}
+.font-medium {
+  font-weight: $font-weight-medium;
+}
+.font-semibold {
+  font-weight: $font-weight-semibold;
+}
+.font-bold {
+  font-weight: $font-weight-bold;
+}
+.font-extrabold {
+  font-weight: $font-weight-extrabold;
+}
+
+.text-primary {
+  color: $text-primary;
+}
+.text-secondary {
+  color: $text-secondary;
+}
+.text-tertiary {
+  color: $text-tertiary;
+}
+.text-disabled {
+  color: $text-disabled;
+}
+
+// 间距工具类
+.p-0 {
+  padding: $spacing-0;
+}
+.p-1 {
+  padding: $spacing-1;
+}
+.p-2 {
+  padding: $spacing-2;
+}
+.p-3 {
+  padding: $spacing-3;
+}
+.p-4 {
+  padding: $spacing-4;
+}
+.p-5 {
+  padding: $spacing-5;
+}
+.p-6 {
+  padding: $spacing-6;
+}
+.p-8 {
+  padding: $spacing-8;
+}
+
+.m-0 {
+  margin: $spacing-0;
+}
+.m-1 {
+  margin: $spacing-1;
+}
+.m-2 {
+  margin: $spacing-2;
+}
+.m-3 {
+  margin: $spacing-3;
+}
+.m-4 {
+  margin: $spacing-4;
+}
+.m-5 {
+  margin: $spacing-5;
+}
+.m-6 {
+  margin: $spacing-6;
+}
+.m-8 {
+  margin: $spacing-8;
+}
+
+// 边框圆角
+.rounded-none {
+  border-radius: $border-radius-none;
+}
+.rounded-sm {
+  border-radius: $border-radius-sm;
+}
+.rounded {
+  border-radius: $border-radius-base;
+}
+.rounded-md {
+  border-radius: $border-radius-md;
+}
+.rounded-lg {
+  border-radius: $border-radius-lg;
+}
+.rounded-xl {
+  border-radius: $border-radius-xl;
+}
+.rounded-2xl {
+  border-radius: $border-radius-2xl;
+}
+.rounded-full {
+  border-radius: $border-radius-full;
+}
+
+// 阴影
+.shadow-sm {
+  box-shadow: $shadow-sm;
+}
+.shadow {
+  box-shadow: $shadow-base;
+}
+.shadow-md {
+  box-shadow: $shadow-md;
+}
+.shadow-lg {
+  box-shadow: $shadow-lg;
+}
+.shadow-xl {
+  box-shadow: $shadow-xl;
+}
+.shadow-2xl {
+  box-shadow: $shadow-2xl;
+}
+
+// ===== 通用组件样式 =====
+
+// 按钮基础样式
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  padding: $spacing-3 $spacing-4;
+  border: none;
+  border-radius: $border-radius-base;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: $transition-fast;
+  min-height: $component-height-base;
+
+  // 移除移动端点击高亮
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px $primary-alpha-30;
+  }
+}
+
+// 按钮变体
+.btn-primary {
+  background: $primary;
+  color: $text-primary;
+
+  &:hover {
+    background: $primary-light;
+  }
+
+  &:active {
+    background: $primary-dark;
+    transform: scale(0.98);
+  }
+}
+
+.btn-secondary {
+  background: $bg-surface;
+  color: $text-primary;
+  border: $border-width-thin solid $border-color-light;
+
+  &:hover {
+    background: $bg-surface-hover;
+  }
+
+  &:active {
+    background: $bg-surface-active;
+    transform: scale(0.98);
+  }
+}
+
+// 输入框基础样式
+.input {
+  display: block;
+  width: 100%;
+  padding: $spacing-3 $spacing-4;
+  border: $border-width-thin solid $border-color-light;
+  border-radius: $border-radius-base;
+  background: $bg-surface;
+  color: $text-primary;
+  font-family: inherit;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  transition: $transition-fast;
+  min-height: $component-height-base;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px $primary-alpha-20;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 卡片样式
+.card {
+  background: $bg-surface;
+  border: $border-width-thin solid $border-color-light;
+  border-radius: $border-radius-lg;
+  padding: $spacing-6;
+  box-shadow: $shadow-sm;
+  transition: $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// ===== 布局工具类 =====
+.container {
+  width: 100%;
+  max-width: $container-xl;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+}
+
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.gap-1 {
+  gap: $spacing-1;
+}
+.gap-2 {
+  gap: $spacing-2;
+}
+.gap-3 {
+  gap: $spacing-3;
+}
+.gap-4 {
+  gap: $spacing-4;
+}
+.gap-6 {
+  gap: $spacing-6;
+}
+
+// ===== 响应式工具类 =====
+@media (max-width: $breakpoint-sm) {
+  .sm\:hidden {
+    display: none;
+  }
+  .sm\:block {
+    display: block;
+  }
+  .sm\:flex {
+    display: flex;
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .md\:hidden {
+    display: none;
+  }
+  .md\:block {
+    display: block;
+  }
+  .md\:flex {
+    display: flex;
+  }
+}
+
+// ===== 动画类 =====
+.fade-in {
+  animation: fadeIn $duration-base $easing-ease-out;
+}
+
+.slide-up {
+  animation: slideUp $duration-base $easing-ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===== 滚动条样式 =====
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color-base;
+  border-radius: $border-radius-full;
+
+  &:hover {
+    background: $border-color-dark;
+  }
+}

@@ -36,47 +36,60 @@ const handleBack = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* 导入设计系统变量 */
+@use '@/assets/styles/variables.scss' as *;
+
 .top-navigation {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: rgba(26, 26, 46, 0.9);
+  gap: $spacing-4;
+  padding: $spacing-4 $spacing-6;
+  background: rgba($bg-secondary, 0.9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: $border-width-thin solid $border-color-light;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: $z-index-sticky;
 }
 
 .back-button {
   background: none;
   border: none;
-  color: white;
+  color: $text-primary;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.2s;
+  padding: $spacing-2;
+  border-radius: $border-radius-circle;
+  transition: $transition-fast;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  min-height: 40px;
-}
+  min-width: $component-height-base;
+  min-height: $component-height-base;
 
-.back-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  &:hover {
+    background: $bg-surface-hover;
+  }
+
+  &:active {
+    background: $bg-surface-active;
+    transform: scale(0.95);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px $primary-alpha-30;
+  }
 }
 
 .nav-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: white;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: $spacing-3;
   flex: 1;
 }
 

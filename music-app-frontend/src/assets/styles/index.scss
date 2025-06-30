@@ -1,0 +1,105 @@
+// ===== 音乐应用样式系统入口文件 =====
+
+// 1. 设计系统变量 - 必须最先导入
+@import './variables.scss';
+
+// 2. 混入和工具函数
+@import './mixins.scss';
+
+// 3. 全局样式和重置
+@import './global.scss';
+
+// 4. 兼容性样式（可选）
+// @import '../base.css';
+
+// ===== 使用说明 =====
+/*
+在 Vue 组件中使用样式系统：
+
+1. 导入变量和混入：
+   @import '@/assets/styles/variables.scss';
+   @import '@/assets/styles/mixins.scss';
+
+2. 使用设计令牌：
+   color: $text-primary;
+   padding: $spacing-4;
+   border-radius: $border-radius-base;
+
+3. 使用混入：
+   @include button-base;
+   @include respond-to(md) {
+     // 移动端样式
+   }
+
+4. 使用工具类（在模板中）：
+   <div class="flex items-center gap-4 p-4 rounded-lg">
+
+5. 响应式设计：
+   @include respond-to(sm) {
+     // 小屏幕样式
+   }
+   
+   @include respond-from(lg) {
+     // 大屏幕样式
+   }
+*/
+
+// ===== 导出常用变量供 JavaScript 使用 =====
+:export {
+  // 颜色
+  primary: $primary;
+  primaryLight: $primary-light;
+  primaryDark: $primary-dark;
+  
+  bgPrimary: $bg-primary;
+  bgSecondary: $bg-secondary;
+  bgTertiary: $bg-tertiary;
+  
+  textPrimary: $text-primary;
+  textSecondary: $text-secondary;
+  textTertiary: $text-tertiary;
+  
+  success: $success;
+  warning: $warning;
+  error: $error;
+  info: $info;
+  
+  // 间距
+  spacingXs: $spacing-xs;
+  spacingSm: $spacing-sm;
+  spacingMd: $spacing-md;
+  spacingLg: $spacing-lg;
+  spacingXl: $spacing-xl;
+  
+  // 字体大小
+  fontSizeXs: $font-size-xs;
+  fontSizeSm: $font-size-sm;
+  fontSizeBase: $font-size-base;
+  fontSizeLg: $font-size-lg;
+  fontSizeXl: $font-size-xl;
+  fontSize2xl: $font-size-2xl;
+  
+  // 边框圆角
+  borderRadiusSm: $border-radius-sm;
+  borderRadiusBase: $border-radius-base;
+  borderRadiusLg: $border-radius-lg;
+  borderRadiusXl: $border-radius-xl;
+  
+  // 断点
+  breakpointXs: $breakpoint-xs;
+  breakpointSm: $breakpoint-sm;
+  breakpointMd: $breakpoint-md;
+  breakpointLg: $breakpoint-lg;
+  breakpointXl: $breakpoint-xl;
+  
+  // 动画时长
+  durationFast: $duration-fast;
+  durationBase: $duration-base;
+  durationSlow: $duration-slow;
+  
+  // Z-index
+  zIndexDropdown: $z-index-dropdown;
+  zIndexSticky: $z-index-sticky;
+  zIndexFixed: $z-index-fixed;
+  zIndexModal: $z-index-modal;
+}

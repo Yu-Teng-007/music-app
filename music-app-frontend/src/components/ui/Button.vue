@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
   plain: false,
   round: false,
   circle: false,
-  nativeType: 'button'
+  nativeType: 'button',
 })
 
 const emit = defineEmits<Emits>()
@@ -57,8 +57,8 @@ const buttonClasses = computed(() => [
     'mobile-btn--plain': props.plain,
     'mobile-btn--round': props.round,
     'mobile-btn--circle': props.circle,
-    'mobile-btn--pressed': isPressed.value
-  }
+    'mobile-btn--pressed': isPressed.value,
+  },
 ])
 
 const handleClick = (event: MouseEvent) => {
@@ -76,76 +76,141 @@ const handleTouchEnd = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+/* 导入设计系统变量 */
+@use '@/assets/styles/variables.scss' as *;
+
 .mobile-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.5;
+  gap: $spacing-2;
+  border: $border-width-thin solid transparent;
+  border-radius: $border-radius-base;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s ease;
+  transition: $transition-fast;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  min-height: 44px; /* 移动端最小触摸目标 */
-  padding: 8px 16px;
+  min-height: $component-height-base; /* 移动端最小触摸目标 */
+  padding: $spacing-3 $spacing-4;
 }
 
-/* 尺寸 */
+/* 尺寸变体 */
 .mobile-btn--large {
-  min-height: 48px;
-  padding: 12px 24px;
-  font-size: 16px;
+  min-height: $component-height-lg;
+  padding: $spacing-4 $spacing-6;
+  font-size: $font-size-base;
 }
 
 .mobile-btn--small {
-  min-height: 36px;
-  padding: 6px 12px;
-  font-size: 12px;
+  min-height: $component-height-sm;
+  padding: $spacing-2 $spacing-3;
+  font-size: $font-size-xs;
 }
 
-/* 类型样式 */
+/* 类型样式 - 使用设计系统颜色 */
 .mobile-btn--default {
-  background-color: #ffffff;
-  border-color: #dcdfe6;
-  color: #606266;
+  background-color: $bg-surface;
+  border-color: $border-color-light;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $bg-surface-hover;
+    border-color: $border-color-base;
+  }
+
+  &:active {
+    background-color: $bg-surface-active;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--primary {
-  background-color: #409eff;
-  border-color: #409eff;
-  color: #ffffff;
+  background-color: $primary;
+  border-color: $primary;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $primary-light;
+    border-color: $primary-light;
+  }
+
+  &:active {
+    background-color: $primary-dark;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--success {
-  background-color: #67c23a;
-  border-color: #67c23a;
-  color: #ffffff;
+  background-color: $success;
+  border-color: $success;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $success-light;
+    border-color: $success-light;
+  }
+
+  &:active {
+    background-color: $success-dark;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--warning {
-  background-color: #e6a23c;
-  border-color: #e6a23c;
-  color: #ffffff;
+  background-color: $warning;
+  border-color: $warning;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $warning-light;
+    border-color: $warning-light;
+  }
+
+  &:active {
+    background-color: $warning-dark;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--danger {
-  background-color: #f56c6c;
-  border-color: #f56c6c;
-  color: #ffffff;
+  background-color: $error;
+  border-color: $error;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $error-light;
+    border-color: $error-light;
+  }
+
+  &:active {
+    background-color: $error-dark;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--info {
-  background-color: #909399;
-  border-color: #909399;
-  color: #ffffff;
+  background-color: $info;
+  border-color: $info;
+  color: $text-primary;
+
+  &:hover {
+    background-color: $info-light;
+    border-color: $info-light;
+  }
+
+  &:active {
+    background-color: $info-dark;
+    transform: scale(0.98);
+  }
 }
 
 .mobile-btn--text {
@@ -235,8 +300,12 @@ const handleTouchEnd = () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 触摸反馈 */

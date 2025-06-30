@@ -1,73 +1,209 @@
-// 颜色变量
-$primary: #1db954;
-$primary-light: #1ed760;
-$primary-dark: #1aa34a;
+// ===== 音乐应用设计系统 =====
 
+// 主色调 - 基于音乐主题的蓝色系
+$primary: #007aff;
+$primary-light: #4da6ff;
+$primary-dark: #0056b3;
+$primary-alpha-10: rgba(0, 122, 255, 0.1);
+$primary-alpha-20: rgba(0, 122, 255, 0.2);
+$primary-alpha-30: rgba(0, 122, 255, 0.3);
+
+// 辅助色调
 $secondary: #535353;
 $secondary-light: #b3b3b3;
 $secondary-dark: #212121;
 
-$bg-primary: #121212;
-$bg-secondary: #181818;
-$bg-tertiary: #282828;
+// 背景色系 - 深色主题
+$bg-primary: #000000;
+$bg-secondary: #1a1a2e;
+$bg-tertiary: #16213e;
+$bg-quaternary: #0f3460;
+$bg-surface: rgba(255, 255, 255, 0.05);
+$bg-surface-hover: rgba(255, 255, 255, 0.1);
+$bg-surface-active: rgba(255, 255, 255, 0.15);
 
+// 文本色系
 $text-primary: #ffffff;
-$text-secondary: #b3b3b3;
-$text-tertiary: #a7a7a7;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$text-tertiary: rgba(255, 255, 255, 0.5);
+$text-disabled: rgba(255, 255, 255, 0.3);
 
-$error: #e61e32;
-$warning: #f59b23;
-$success: #1db954;
-$info: #2e77d0;
+// 状态色系
+$success: #34d399;
+$success-light: #6ee7b7;
+$success-dark: #059669;
+$warning: #fbbf24;
+$warning-light: #fcd34d;
+$warning-dark: #d97706;
+$error: #f87171;
+$error-light: #fca5a5;
+$error-dark: #dc2626;
+$info: #60a5fa;
+$info-light: #93c5fd;
+$info-dark: #2563eb;
 
-// 字体变量
-$font-family-base:
-  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-$font-size-base: 16px;
-$font-size-sm: 14px;
-$font-size-xs: 12px;
-$font-size-lg: 18px;
-$font-size-xl: 24px;
-$font-size-xxl: 32px;
+// 字体系统
+$font-family-primary:
+  'Inter',
+  -apple-system,
+  BlinkMacSystemFont,
+  'Segoe UI',
+  'Roboto',
+  'Oxygen',
+  'Ubuntu',
+  'Cantarell',
+  'Fira Sans',
+  'Droid Sans',
+  'Helvetica Neue',
+  sans-serif;
+$font-family-mono:
+  'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 
-// 间距变量
-$spacing-xs: 4px;
-$spacing-sm: 8px;
-$spacing-md: 16px;
-$spacing-lg: 24px;
-$spacing-xl: 32px;
-$spacing-xxl: 48px;
+// 字体大小层级系统 (基于 1.25 比例)
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+$font-size-5xl: 3rem; // 48px
 
-// 边框变量
-$border-radius-sm: 4px;
-$border-radius-md: 8px;
-$border-radius-lg: 16px;
-$border-radius-xl: 24px;
+// 字重系统
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// 行高系统
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// 间距系统 (基于 8px 网格)
+$spacing-0: 0;
+$spacing-1: 0.25rem; // 4px
+$spacing-2: 0.5rem; // 8px
+$spacing-3: 0.75rem; // 12px
+$spacing-4: 1rem; // 16px
+$spacing-5: 1.25rem; // 20px
+$spacing-6: 1.5rem; // 24px
+$spacing-8: 2rem; // 32px
+$spacing-10: 2.5rem; // 40px
+$spacing-12: 3rem; // 48px
+$spacing-16: 4rem; // 64px
+$spacing-20: 5rem; // 80px
+$spacing-24: 6rem; // 96px
+$spacing-32: 8rem; // 128px
+
+// 语义化间距别名
+$spacing-xs: $spacing-1;
+$spacing-sm: $spacing-2;
+$spacing-md: $spacing-4;
+$spacing-lg: $spacing-6;
+$spacing-xl: $spacing-8;
+$spacing-2xl: $spacing-12;
+$spacing-3xl: $spacing-16;
+
+// 边框系统
+$border-width-thin: 1px;
+$border-width-base: 2px;
+$border-width-thick: 4px;
+
+$border-radius-none: 0;
+$border-radius-sm: 0.25rem; // 4px
+$border-radius-base: 0.5rem; // 8px
+$border-radius-md: 0.75rem; // 12px
+$border-radius-lg: 1rem; // 16px
+$border-radius-xl: 1.5rem; // 24px
+$border-radius-2xl: 2rem; // 32px
+$border-radius-full: 9999px;
 $border-radius-circle: 50%;
 
-// 阴影变量
-$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
-$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.16);
+// 边框颜色
+$border-color-light: rgba(255, 255, 255, 0.1);
+$border-color-base: rgba(255, 255, 255, 0.2);
+$border-color-dark: rgba(255, 255, 255, 0.3);
 
-// 动画变量
-$transition-fast: 0.15s ease;
-$transition-base: 0.3s ease;
-$transition-slow: 0.5s ease;
+// 阴影系统
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base:
+  0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 
-// 断点变量
+// 动画系统
+$duration-fast: 150ms;
+$duration-base: 300ms;
+$duration-slow: 500ms;
+$duration-slower: 750ms;
+
+$easing-linear: linear;
+$easing-ease: ease;
+$easing-ease-in: ease-in;
+$easing-ease-out: ease-out;
+$easing-ease-in-out: ease-in-out;
+$easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+$transition-fast: all $duration-fast $easing-ease-out;
+$transition-base: all $duration-base $easing-ease-out;
+$transition-slow: all $duration-slow $easing-ease-out;
+
+// 响应式断点系统
 $breakpoint-xs: 480px;
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
 
-// 导出CSS变量，方便在普通CSS中使用
+// 容器最大宽度
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1536px;
+
+// Z-index 层级系统
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// 组件尺寸系统
+$component-height-sm: 2rem; // 32px
+$component-height-base: 2.5rem; // 40px
+$component-height-lg: 3rem; // 48px
+$component-height-xl: 3.5rem; // 56px
+
+// 导出CSS变量，方便在普通CSS和Vue组件中使用
 :root {
+  // 颜色系统
   --primary: #{$primary};
   --primary-light: #{$primary-light};
   --primary-dark: #{$primary-dark};
+  --primary-alpha-10: #{$primary-alpha-10};
+  --primary-alpha-20: #{$primary-alpha-20};
+  --primary-alpha-30: #{$primary-alpha-30};
 
   --secondary: #{$secondary};
   --secondary-light: #{$secondary-light};
@@ -76,19 +212,131 @@ $breakpoint-xl: 1280px;
   --bg-primary: #{$bg-primary};
   --bg-secondary: #{$bg-secondary};
   --bg-tertiary: #{$bg-tertiary};
+  --bg-quaternary: #{$bg-quaternary};
+  --bg-surface: #{$bg-surface};
+  --bg-surface-hover: #{$bg-surface-hover};
+  --bg-surface-active: #{$bg-surface-active};
 
   --text-primary: #{$text-primary};
   --text-secondary: #{$text-secondary};
   --text-tertiary: #{$text-tertiary};
+  --text-disabled: #{$text-disabled};
 
-  --error: #{$error};
-  --warning: #{$warning};
   --success: #{$success};
+  --success-light: #{$success-light};
+  --success-dark: #{$success-dark};
+  --warning: #{$warning};
+  --warning-light: #{$warning-light};
+  --warning-dark: #{$warning-dark};
+  --error: #{$error};
+  --error-light: #{$error-light};
+  --error-dark: #{$error-dark};
   --info: #{$info};
+  --info-light: #{$info-light};
+  --info-dark: #{$info-dark};
 
-  --font-family-base: #{$font-family-base};
+  // 字体系统
+  --font-family-primary: #{$font-family-primary};
+  --font-family-mono: #{$font-family-mono};
+
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-base: #{$font-size-base};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  --font-size-2xl: #{$font-size-2xl};
+  --font-size-3xl: #{$font-size-3xl};
+  --font-size-4xl: #{$font-size-4xl};
+  --font-size-5xl: #{$font-size-5xl};
+
+  --font-weight-light: #{$font-weight-light};
+  --font-weight-normal: #{$font-weight-normal};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+  --font-weight-extrabold: #{$font-weight-extrabold};
+
+  --line-height-tight: #{$line-height-tight};
+  --line-height-snug: #{$line-height-snug};
+  --line-height-normal: #{$line-height-normal};
+  --line-height-relaxed: #{$line-height-relaxed};
+  --line-height-loose: #{$line-height-loose};
+
+  // 间距系统
+  --spacing-0: #{$spacing-0};
+  --spacing-1: #{$spacing-1};
+  --spacing-2: #{$spacing-2};
+  --spacing-3: #{$spacing-3};
+  --spacing-4: #{$spacing-4};
+  --spacing-5: #{$spacing-5};
+  --spacing-6: #{$spacing-6};
+  --spacing-8: #{$spacing-8};
+  --spacing-10: #{$spacing-10};
+  --spacing-12: #{$spacing-12};
+  --spacing-16: #{$spacing-16};
+  --spacing-20: #{$spacing-20};
+  --spacing-24: #{$spacing-24};
+  --spacing-32: #{$spacing-32};
+
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+  --spacing-2xl: #{$spacing-2xl};
+  --spacing-3xl: #{$spacing-3xl};
+
+  // 边框系统
+  --border-width-thin: #{$border-width-thin};
+  --border-width-base: #{$border-width-base};
+  --border-width-thick: #{$border-width-thick};
+
+  --border-radius-none: #{$border-radius-none};
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-base: #{$border-radius-base};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+  --border-radius-xl: #{$border-radius-xl};
+  --border-radius-2xl: #{$border-radius-2xl};
+  --border-radius-full: #{$border-radius-full};
+  --border-radius-circle: #{$border-radius-circle};
+
+  --border-color-light: #{$border-color-light};
+  --border-color-base: #{$border-color-base};
+  --border-color-dark: #{$border-color-dark};
+
+  // 阴影系统
+  --shadow-sm: #{$shadow-sm};
+  --shadow-base: #{$shadow-base};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+  --shadow-2xl: #{$shadow-2xl};
+  --shadow-inner: #{$shadow-inner};
+
+  // 动画系统
+  --duration-fast: #{$duration-fast};
+  --duration-base: #{$duration-base};
+  --duration-slow: #{$duration-slow};
+  --duration-slower: #{$duration-slower};
 
   --transition-fast: #{$transition-fast};
   --transition-base: #{$transition-base};
   --transition-slow: #{$transition-slow};
+
+  // Z-index系统
+  --z-index-dropdown: #{$z-index-dropdown};
+  --z-index-sticky: #{$z-index-sticky};
+  --z-index-fixed: #{$z-index-fixed};
+  --z-index-modal-backdrop: #{$z-index-modal-backdrop};
+  --z-index-modal: #{$z-index-modal};
+  --z-index-popover: #{$z-index-popover};
+  --z-index-tooltip: #{$z-index-tooltip};
+  --z-index-toast: #{$z-index-toast};
+
+  // 组件尺寸
+  --component-height-sm: #{$component-height-sm};
+  --component-height-base: #{$component-height-base};
+  --component-height-lg: #{$component-height-lg};
+  --component-height-xl: #{$component-height-xl};
 }

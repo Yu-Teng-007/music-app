@@ -1,4 +1,9 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/*
+ * 基础样式文件 - 兼容旧的Vue主题变量
+ * 新项目建议直接使用 variables.scss 中的设计系统
+ */
+
+/* Vue主题颜色变量 - 保持向后兼容 */
 :root {
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
@@ -21,35 +26,42 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
-/* semantic color variables for this project */
+/* 语义化颜色变量 - 映射到新的设计系统 */
 :root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
+  /* 优先使用新的设计系统变量 */
+  --color-background: var(--bg-primary, var(--vt-c-black));
+  --color-background-soft: var(--bg-secondary, var(--vt-c-black-soft));
+  --color-background-mute: var(--bg-tertiary, var(--vt-c-black-mute));
 
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
+  --color-border: var(--border-color-light, var(--vt-c-divider-dark-2));
+  --color-border-hover: var(--border-color-base, var(--vt-c-divider-dark-1));
 
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
+  --color-heading: var(--text-primary, var(--vt-c-text-dark-1));
+  --color-text: var(--text-secondary, var(--vt-c-text-dark-2));
 
-  --section-gap: 160px;
+  /* 保持旧的section-gap变量 */
+  --section-gap: var(--spacing-32, 8rem);
 }
 
+/* 深色模式适配 - 音乐应用默认使用深色主题 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
+    --color-background: var(--bg-primary, var(--vt-c-black));
+    --color-background-soft: var(--bg-secondary, var(--vt-c-black-soft));
+    --color-background-mute: var(--bg-tertiary, var(--vt-c-black-mute));
 
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
+    --color-border: var(--border-color-light, var(--vt-c-divider-dark-2));
+    --color-border-hover: var(--border-color-base, var(--vt-c-divider-dark-1));
 
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
+    --color-heading: var(--text-primary, var(--vt-c-text-dark-1));
+    --color-text: var(--text-secondary, var(--vt-c-text-dark-2));
   }
 }
 
+/*
+ * 基础重置样式 - 已在 global.scss 中定义
+ * 这里保持最小化的兼容性样式
+ */
 *,
 *::before,
 *::after {
@@ -63,10 +75,11 @@ body {
   color: var(--color-text);
   background: var(--color-background);
   transition:
-    color 0.5s,
-    background-color 0.5s;
-  line-height: 1.6;
-  font-family:
+    color var(--duration-base, 0.3s),
+    background-color var(--duration-base, 0.3s);
+  line-height: var(--line-height-normal, 1.5);
+  font-family: var(
+    --font-family-primary,
     Inter,
     -apple-system,
     BlinkMacSystemFont,
@@ -78,8 +91,9 @@ body {
     'Fira Sans',
     'Droid Sans',
     'Helvetica Neue',
-    sans-serif;
-  font-size: 15px;
+    sans-serif
+  );
+  font-size: var(--font-size-base, 1rem);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

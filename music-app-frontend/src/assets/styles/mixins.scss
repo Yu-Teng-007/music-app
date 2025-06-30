@@ -1,0 +1,335 @@
+// ===== 样式混入文件 =====
+// 导入设计系统变量
+@use './variables.scss' as *;
+
+// ===== 响应式设计混入 =====
+
+// 媒体查询混入
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-xs) {
+      @content;
+    }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) {
+      @content;
+    }
+  } @else if $breakpoint == 2xl {
+    @media (max-width: $breakpoint-2xl) {
+      @content;
+    }
+  }
+}
+
+// 最小宽度媒体查询
+@mixin respond-from($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: 481px) {
+      @content;
+    }
+  } @else if $breakpoint == sm {
+    @media (min-width: 641px) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (min-width: 769px) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (min-width: 1025px) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (min-width: 1281px) {
+      @content;
+    }
+  }
+}
+
+// 范围媒体查询
+@mixin respond-between($min-breakpoint, $max-breakpoint) {
+  // 简化版本，使用固定值避免计算问题
+  @if $min-breakpoint == xs and $max-breakpoint == sm {
+    @media (min-width: 481px) and (max-width: 640px) {
+      @content;
+    }
+  } @else if $min-breakpoint == sm and $max-breakpoint == md {
+    @media (min-width: 641px) and (max-width: 768px) {
+      @content;
+    }
+  } @else if $min-breakpoint == md and $max-breakpoint == lg {
+    @media (min-width: 769px) and (max-width: 1024px) {
+      @content;
+    }
+  } @else if $min-breakpoint == lg and $max-breakpoint == xl {
+    @media (min-width: 1025px) and (max-width: 1280px) {
+      @content;
+    }
+  } @else if $min-breakpoint == xl and $max-breakpoint == 2xl {
+    @media (min-width: 1281px) and (max-width: 1536px) {
+      @content;
+    }
+  }
+}
+
+// ===== 布局混入 =====
+
+// Flexbox 居中
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Flexbox 垂直居中
+@mixin flex-center-vertical {
+  display: flex;
+  align-items: center;
+}
+
+// Flexbox 水平居中
+@mixin flex-center-horizontal {
+  display: flex;
+  justify-content: center;
+}
+
+// Flexbox 两端对齐
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// 绝对定位居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// 容器样式
+@mixin container($max-width: $container-xl) {
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-4;
+
+  @include respond-to(sm) {
+    padding: 0 $spacing-3;
+  }
+}
+
+// ===== 组件混入 =====
+
+// 按钮基础样式
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  border: none;
+  border-radius: $border-radius-base;
+  font-family: inherit;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: $transition-fast;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px $primary-alpha-30;
+  }
+}
+
+// 按钮尺寸
+@mixin button-size($size: base) {
+  @if $size == sm {
+    min-height: $component-height-sm;
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-xs;
+  } @else if $size == base {
+    min-height: $component-height-base;
+    padding: $spacing-3 $spacing-4;
+    font-size: $font-size-sm;
+  } @else if $size == lg {
+    min-height: $component-height-lg;
+    padding: $spacing-4 $spacing-6;
+    font-size: $font-size-base;
+  } @else if $size == xl {
+    min-height: $component-height-xl;
+    padding: $spacing-5 $spacing-8;
+    font-size: $font-size-lg;
+  }
+}
+
+// 输入框基础样式
+@mixin input-base {
+  display: block;
+  width: 100%;
+  border: $border-width-thin solid $border-color-light;
+  border-radius: $border-radius-base;
+  background: $bg-surface;
+  color: $text-primary;
+  font-family: inherit;
+  font-size: $font-size-base;
+  line-height: $line-height-normal;
+  transition: $transition-fast;
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 2px $primary-alpha-20;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 卡片样式
+@mixin card($padding: $spacing-6) {
+  background: $bg-surface;
+  border: $border-width-thin solid $border-color-light;
+  border-radius: $border-radius-lg;
+  padding: $padding;
+  box-shadow: $shadow-sm;
+  transition: $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// ===== 工具混入 =====
+
+// 文本截断
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 多行文本截断
+@mixin text-truncate-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// 清除浮动
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+// 隐藏滚动条
+@mixin hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// 自定义滚动条
+@mixin custom-scrollbar($width: 8px, $track-color: $bg-surface, $thumb-color: $border-color-base) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: $border-radius-full;
+
+    &:hover {
+      background: $border-color-dark;
+    }
+  }
+}
+
+// ===== 动画混入 =====
+
+// 淡入动画
+@mixin fade-in($duration: $duration-base) {
+  animation: fadeIn $duration $easing-ease-out;
+}
+
+// 滑入动画
+@mixin slide-up($duration: $duration-base) {
+  animation: slideUp $duration $easing-ease-out;
+}
+
+// 缩放动画
+@mixin scale-in($duration: $duration-base) {
+  animation: scaleIn $duration $easing-bounce;
+}
+
+// 动画关键帧
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

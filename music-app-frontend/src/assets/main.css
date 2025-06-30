@@ -1,11 +1,15 @@
+/* 所有@import必须在最前面 */
 @import './base.css';
+@import './styles/global.scss';
 
-a,
-.green {
+/* 链接样式优化 - 使用设计系统的颜色 */
+a {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+  color: var(--primary);
+  transition: var(--transition-fast);
+  padding: var(--spacing-1);
+  border-radius: var(--border-radius-sm);
+
   /* 移除移动端点击高亮 */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
@@ -19,28 +23,44 @@ a,
 /* 只在支持hover的设备上应用hover效果 */
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    background-color: var(--primary-alpha-10);
+    color: var(--primary-light);
   }
 }
 
 /* 确保链接的active和focus状态正确重置 */
 a:active {
-  background-color: hsla(160, 100%, 37%, 0.3);
-  transform: none;
+  background-color: var(--primary-alpha-20);
+  transform: scale(0.98);
 }
 
 a:focus {
   outline: none;
-  background-color: hsla(160, 100%, 37%, 0.2);
+  background-color: var(--primary-alpha-10);
+  box-shadow: 0 0 0 2px var(--primary-alpha-30);
 }
 
 /* 移动端触摸后立即清除状态 */
 @media (hover: none) {
   a:active {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    background-color: var(--primary-alpha-20);
+    transform: scale(0.95);
+    transition: all var(--duration-fast) var(--easing-ease-out);
   }
 
   a:focus {
     background-color: transparent;
+    box-shadow: none;
   }
+}
+
+/* 绿色主题类 - 保持向后兼容 */
+.green {
+  color: var(--success);
+}
+
+.green:hover {
+  color: var(--success-light);
+  background-color: var(--success-light);
+  background-color: rgba(52, 211, 153, 0.1);
 }

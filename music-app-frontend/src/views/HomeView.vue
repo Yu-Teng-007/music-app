@@ -353,17 +353,37 @@ onMounted(async () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+/* 导入设计系统 */
+@use '@/assets/styles/variables.scss' as *;
+@use '@/assets/styles/mixins.scss' as *;
+
 .home-view {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  color: white;
-  padding: 1.5rem;
+  background: linear-gradient(to bottom, $bg-secondary 0%, $bg-tertiary 50%, $bg-quaternary 100%);
+  color: $text-primary;
+  padding: $spacing-6;
   padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
+
+  @include respond-to(md) {
+    padding: $spacing-4;
+  }
+
+  @include respond-to(sm) {
+    padding: $spacing-3;
+  }
 }
 
 .header-section {
-  padding: 2rem 0 2rem;
+  padding: $spacing-8 0;
+
+  @include respond-to(md) {
+    padding: $spacing-6 0;
+  }
+
+  @include respond-to(sm) {
+    padding: $spacing-4 0;
+  }
 }
 
 .user-info {
