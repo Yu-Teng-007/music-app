@@ -1,12 +1,7 @@
 <template>
   <div class="settings-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1>设置</h1>
-    </div>
+    <!-- 顶部导航 -->
+    <TopNavigation title="设置" :icon="Settings" />
 
     <!-- 播放设置 -->
     <div class="settings-section">
@@ -191,7 +186,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { ChevronLeft, ChevronRight, LogOut } from 'lucide-vue-next'
+import { ChevronRight, LogOut, Settings } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -217,6 +213,8 @@ const storage = reactive({
 // 表单数据
 const profileForm = reactive({
   name: '',
+  username: '',
+  avatar: '',
 })
 
 const passwordForm = reactive({
@@ -231,10 +229,6 @@ const usedStoragePercentage = computed(() => {
 })
 
 // 方法
-const goBack = () => {
-  router.go(-1)
-}
-
 const toggleOfflineMode = () => {
   settings.offlineMode = !settings.offlineMode
 }
@@ -255,7 +249,10 @@ const clearCache = () => {
 // 处理个人资料更新
 const handleProfileUpdate = async () => {
   try {
-    await authStore.updateProfile(profileForm)
+    await authStore.updateProfile({
+      username: profileForm.username,
+      avatar: profileForm.avatar,
+    })
     showProfileEdit.value = false
     console.log('个人资料更新成功')
   } catch (error) {
@@ -289,7 +286,9 @@ const handleLogout = async () => {
 // 组件挂载时初始化数据
 onMounted(() => {
   if (authStore.user) {
-    profileForm.name = authStore.user.name
+    profileForm.name = (authStore.user as any).name || authStore.user.username || ''
+    profileForm.username = authStore.user.username || ''
+    profileForm.avatar = authStore.user.avatar || ''
   }
 })
 </script>
@@ -299,39 +298,13 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding-bottom: 100px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  gap: 1rem;
-  position: sticky;
-  top: 0;
+.settings-view :deep(.top-navigation) {
   background: rgba(26, 26, 46, 0.9);
   backdrop-filter: blur(10px);
-  z-index: 10;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .settings-section {

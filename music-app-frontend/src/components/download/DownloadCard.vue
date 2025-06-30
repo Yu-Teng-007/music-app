@@ -57,7 +57,8 @@
         <div class="progress-text">
           <span>{{ download.progress }}%</span>
           <span v-if="download.status === 'downloading'">
-            {{ formatFileSize(download.downloadedSize) }} / {{ formatFileSize(download.fileSize) }}
+            {{ formatFileSize(download.downloadedSize || 0) }} /
+            {{ formatFileSize(download.fileSize) }}
           </span>
         </div>
       </div>

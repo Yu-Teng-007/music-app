@@ -350,7 +350,7 @@ const showConfirmPassword = ref(false)
 
 // 短信验证码相关
 const smsCountdown = ref(0)
-const smsTimer = ref<NodeJS.Timeout | null>(null)
+const smsTimer = ref<number | null>(null)
 
 // 表单数据
 const loginForm = reactive<LoginCredentials>({

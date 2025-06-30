@@ -1,5 +1,13 @@
 <template>
   <div class="profile-view">
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+      <button class="download-btn" @click="goToDownloads">
+        <Download :size="20" />
+        <span>下载</span>
+      </button>
+    </div>
+
     <!-- 用户信息头部 -->
     <div class="profile-header">
       <div class="user-avatar">
@@ -64,6 +72,7 @@ import {
   LogOut,
   Clock,
   UserCog,
+  Download,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -111,6 +120,11 @@ const menuItems = computed(() => [
     icon: Clock,
   },
   {
+    id: 'social',
+    label: '社交动态',
+    icon: Users,
+  },
+  {
     id: 'account',
     label: '账户管理',
     icon: UserCog,
@@ -139,6 +153,9 @@ const handleMenuClick = async (item: any) => {
     case 'history':
       router.push('/history')
       break
+    case 'social':
+      router.push('/social')
+      break
     case 'account':
       router.push('/account')
       break
@@ -157,6 +174,10 @@ const handleMenuClick = async (item: any) => {
       await handleLogout()
       break
   }
+}
+
+const goToDownloads = () => {
+  router.push('/downloads')
 }
 
 const handleLogout = async () => {
@@ -186,7 +207,63 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #007aff 0%, #1a1a2e 40%, #16213e 100%);
   color: white;
-  padding-bottom: 100px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
+}
+
+.top-nav {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(10px);
+}
+
+.download-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.download-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(0);
+}
+
+.download-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* 移动端下载按钮优化 */
+@media (hover: none) {
+  .download-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  .download-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 .profile-header {

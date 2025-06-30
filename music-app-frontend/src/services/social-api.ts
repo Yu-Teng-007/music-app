@@ -7,8 +7,8 @@ export interface UserFollow {
   followerId: string
   followingId: string
   createdAt: string
-  follower?: User
-  following?: User
+  follower?: import('@/types').User
+  following?: import('@/types').User
 }
 
 export interface UserFeed {
@@ -26,10 +26,10 @@ export interface UserFeed {
   isVisible: boolean
   createdAt: string
   updatedAt: string
-  user?: User
-  song?: Song
-  playlist?: Playlist
-  targetUser?: User
+  user?: import('@/types').User
+  song?: import('@/types').Song
+  playlist?: import('@/types').Playlist
+  targetUser?: import('@/types').User
 }
 
 export interface FeedLike {
@@ -37,7 +37,7 @@ export interface FeedLike {
   userId: string
   feedId: string
   createdAt: string
-  user?: User
+  user?: import('@/types').User
   feed?: UserFeed
 }
 
@@ -51,7 +51,7 @@ export interface FeedComment {
   isVisible: boolean
   createdAt: string
   updatedAt: string
-  user?: User
+  user?: import('@/types').User
   feed?: UserFeed
   replyTo?: FeedComment
 }

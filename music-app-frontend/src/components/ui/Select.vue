@@ -5,15 +5,15 @@
         <span v-if="displayText" class="mobile-select__text">{{ displayText }}</span>
         <span v-else class="mobile-select__placeholder">{{ placeholder }}</span>
       </div>
-      
+
       <div class="mobile-select__suffix">
-        <svg 
+        <svg
           :class="['mobile-select__arrow', { 'mobile-select__arrow--reverse': visible }]"
-          width="16" 
-          height="16" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
           stroke-width="2"
         >
           <polyline points="6,9 12,15 18,9"></polyline>
@@ -32,20 +32,20 @@
               'mobile-select__option',
               {
                 'mobile-select__option--selected': option.value === modelValue,
-                'mobile-select__option--disabled': option.disabled
-              }
+                'mobile-select__option--disabled': option.disabled,
+              },
             ]"
             @click="handleOptionClick(option)"
           >
             <span class="mobile-select__option-text">{{ option.label }}</span>
-            <svg 
+            <svg
               v-if="option.value === modelValue"
               class="mobile-select__option-check"
-              width="16" 
-              height="16" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
               stroke-width="2"
             >
               <polyline points="20,6 9,17 4,12"></polyline>
@@ -85,7 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
   placeholder: '请选择',
   disabled: false,
   clearable: false,
-  size: 'default'
+  size: 'default',
 })
 
 const emit = defineEmits<Emits>()
@@ -97,8 +97,8 @@ const selectClasses = computed(() => [
   `mobile-select--${props.size}`,
   {
     'mobile-select--disabled': props.disabled,
-    'mobile-select--focus': visible.value
-  }
+    'mobile-select--focus': visible.value,
+  },
 ])
 
 const displayText = computed(() => {
@@ -108,14 +108,14 @@ const displayText = computed(() => {
 
 const toggleDropdown = () => {
   if (props.disabled) return
-  
+
   visible.value = !visible.value
   emit('visible-change', visible.value)
 }
 
 const handleOptionClick = (option: Option) => {
   if (option.disabled) return
-  
+
   emit('update:modelValue', option.value)
   emit('change', option.value)
   visible.value = false
@@ -156,9 +156,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #dcdfe6;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   transition: border-color 0.2s ease;
   min-height: 44px;
   padding: 0 16px;
@@ -175,8 +176,8 @@ onUnmounted(() => {
 }
 
 .mobile-select--focus .mobile-select__inner {
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+  border-color: #64b5f6;
+  box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
 }
 
 .mobile-select__display {
@@ -185,13 +186,13 @@ onUnmounted(() => {
 }
 
 .mobile-select__text {
-  color: #606266;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
   line-height: 1.5;
 }
 
 .mobile-select__placeholder {
-  color: #c0c4cc;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -209,7 +210,7 @@ onUnmounted(() => {
 .mobile-select__suffix {
   display: flex;
   align-items: center;
-  color: #c0c4cc;
+  color: rgba(255, 255, 255, 0.6);
   margin-left: 8px;
 }
 
@@ -227,10 +228,11 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: #ffffff;
-  border: 1px solid #e4e7ed;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   margin-top: 4px;
   max-height: 200px;
   overflow: hidden;
@@ -240,6 +242,14 @@ onUnmounted(() => {
   max-height: 200px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* 隐藏滚动条 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 和 Edge */
+}
+
+/* 隐藏 Webkit 浏览器的滚动条 */
+.mobile-select__options::-webkit-scrollbar {
+  display: none;
 }
 
 .mobile-select__option {
@@ -250,19 +260,20 @@ onUnmounted(() => {
   cursor: pointer;
   transition: background-color 0.2s ease;
   min-height: 44px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .mobile-select__option:hover {
-  background-color: #f5f7fa;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .mobile-select__option--selected {
-  background-color: #ecf5ff;
-  color: #409eff;
+  background-color: rgba(100, 181, 246, 0.2);
+  color: #64b5f6;
 }
 
 .mobile-select__option--disabled {
-  color: #c0c4cc;
+  color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
   background-color: transparent;
 }
@@ -274,7 +285,7 @@ onUnmounted(() => {
 }
 
 .mobile-select__option-check {
-  color: #409eff;
+  color: #64b5f6;
   margin-left: 8px;
 }
 
@@ -303,13 +314,13 @@ onUnmounted(() => {
     max-height: 50vh;
     margin-top: 0;
   }
-  
+
   .mobile-select__option {
     padding: 16px 20px;
     min-height: 48px;
     font-size: 16px;
   }
-  
+
   .select-dropdown-enter-from,
   .select-dropdown-leave-to {
     transform: translateY(100%);

@@ -1,33 +1,18 @@
 <template>
-  <div class="social-container">
+  <div class="social-view">
     <!-- 顶部导航 -->
-    <div class="social-header">
-      <h1 class="page-title">
-        <i class="el-icon-user-solid"></i>
-        社交动态
-      </h1>
-
-      <div class="header-actions">
-        <MobileButton
+    <TopNavigation title="社交动态" :icon="Users">
+      <template #actions>
+        <NavTextButton
           type="primary"
           @click="showCreateFeedDialog = true"
           :loading="socialStore.isLoading"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
+          <Edit :size="16" />
           发布动态
-        </MobileButton>
-      </div>
-    </div>
+        </NavTextButton>
+      </template>
+    </TopNavigation>
 
     <!-- 我的社交统计 -->
     <div class="social-stats" v-if="socialStats">
@@ -80,7 +65,13 @@
         <FeedCard
           v-for="feed in feeds"
           :key="feed.id"
-          :feed="feed"
+          :feed="{
+            ...feed,
+            likeCount: feed.likeCount || 0,
+            commentCount: feed.commentCount || 0,
+            shareCount: feed.shareCount || 0,
+            isVisible: feed.isVisible !== false,
+          }"
           @like="handleLikeFeed"
           @unlike="handleUnlikeFeed"
           @delete="handleDeleteFeed"
@@ -105,9 +96,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { MobileButton, MobileSkeleton, MobileEmpty, MobileMessage } from '@/components/ui'
+import { Users, Edit } from 'lucide-vue-next'
+import { MobileSkeleton, MobileEmpty, MobileMessage } from '@/components/ui'
 import { useSocialStore } from '@/stores/social'
 import { realtimeService } from '@/services'
+import TopNavigation from '@/components/TopNavigation.vue'
+import NavTextButton from '@/components/NavTextButton.vue'
 import FeedCard from '@/components/social/FeedCard.vue'
 import CreateFeedDialog from '@/components/social/CreateFeedDialog.vue'
 import type { UserFeed, FeedType } from '@/services/social-api'
@@ -252,41 +246,32 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.social-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+.social-view {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.social-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #303133;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.social-view :deep(.top-navigation) {
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .social-stats {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 1.25rem;
 }
 
 .stat-item {
@@ -294,19 +279,19 @@ onUnmounted(() => {
 }
 
 .stat-number {
-  font-size: 24px;
-  font-weight: 600;
-  color: #409eff;
-  margin-bottom: 4px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #64b5f6;
+  margin-bottom: 0.25rem;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #909399;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .feed-filters {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .feeds-container {
@@ -315,38 +300,40 @@ onUnmounted(() => {
 
 .loading-container,
 .empty-container {
-  padding: 40px 20px;
+  padding: 2.5rem 1.25rem;
   text-align: center;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .feeds-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .load-more {
   text-align: center;
-  padding: 20px;
+  padding: 1.25rem;
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
-  .social-container {
-    padding: 16px;
-    padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* 为底部导航留空间 */
+  .social-view {
+    padding: 1rem;
+    padding-bottom: calc(150px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
   }
 
   .social-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-    margin-bottom: 20px;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 
   .page-title {
-    font-size: 20px;
-    text-align: center;
+    font-size: 1.5rem;
+  }
+
+  .back-button {
+    padding: 0.375rem;
   }
 
   .header-actions {
@@ -359,92 +346,68 @@ onUnmounted(() => {
   }
 
   .social-stats {
-    padding: 16px;
-    margin-bottom: 20px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 1rem;
   }
 
   .stat-number {
-    font-size: 20px;
+    font-size: 1.5rem;
   }
 
   .stat-label {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .feed-filters {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 8px;
+    padding-bottom: 0.5rem;
   }
 
   .loading-container,
   .empty-container {
-    padding: 60px 20px;
+    padding: 3.75rem 1.25rem;
   }
 
   .feeds-list {
-    gap: 12px;
+    gap: 0.75rem;
   }
 }
 
 /* 超小屏幕优化 */
 @media (max-width: 480px) {
-  .social-container {
-    padding: 12px;
+  .social-view {
+    padding: 0.75rem;
   }
 
   .social-header {
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
   }
 
   .page-title {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   .social-stats {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .stats-grid {
-    gap: 12px;
+    gap: 0.75rem;
   }
 
   .stat-number {
-    font-size: 18px;
+    font-size: 1.125rem;
   }
 
   .stat-label {
-    font-size: 12px;
-  }
-}
-
-/* 暗色主题适配 */
-@media (prefers-color-scheme: dark) {
-  .social-container {
-    background-color: #1a1a1a;
-  }
-
-  .page-title {
-    color: #ffffff;
-  }
-
-  .social-stats {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
-  }
-
-  .stat-number {
-    color: #409eff;
-  }
-
-  .stat-label {
-    color: #999999;
+    font-size: 0.75rem;
   }
 }
 </style>

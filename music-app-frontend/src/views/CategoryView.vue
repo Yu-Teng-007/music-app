@@ -1,18 +1,13 @@
 <template>
   <div class="category-view">
-    <!-- 头部 -->
-    <div class="header">
-      <button class="back-button" @click="goBack">
-        <ChevronLeft :size="24" />
-      </button>
-      <h1 v-if="currentCategory">{{ currentCategory.name }}</h1>
-      <h1 v-else>音乐分类</h1>
-      <div class="header-actions">
+    <!-- 顶部导航 -->
+    <TopNavigation :title="currentCategory ? currentCategory.name : '音乐分类'" :icon="FolderOpen">
+      <template #actions>
         <button class="filter-button" @click="showFilterModal = true">
           <Filter :size="20" />
         </button>
-      </div>
-    </div>
+      </template>
+    </TopNavigation>
 
     <!-- 分类信息 -->
     <div v-if="currentCategory" class="category-info">
@@ -166,7 +161,8 @@ import { useFavoritesStore } from '@/stores/favorites'
 import { genreApi, musicApi } from '@/services'
 import type { Genre } from '@/services/genre-api'
 import type { Song } from '@/stores/music'
-import { ChevronLeft, Filter, Music, Play, Heart, MoreVertical } from 'lucide-vue-next'
+import { Filter, Music, Play, Heart, MoreVertical, FolderOpen } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -343,10 +339,6 @@ function handleImageError(event: Event) {
   img.src = 'https://picsum.photos/300/300?random=' + Math.floor(Math.random() * 1000)
 }
 
-function goBack() {
-  router.go(-1)
-}
-
 // 监听路由变化
 watch(
   () => categoryType.value,
@@ -376,23 +368,16 @@ onMounted(async () => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   color: white;
-  padding-bottom: 120px;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem;
-  position: sticky;
-  top: 0;
+.category-view :deep(.top-navigation) {
   background: rgba(26, 26, 46, 0.95);
   backdrop-filter: blur(20px);
-  z-index: 10;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-.back-button,
 .filter-button {
   background: rgba(255, 255, 255, 0.1);
   border: none;
@@ -403,7 +388,6 @@ onMounted(async () => {
   transition: all 0.3s ease;
 }
 
-.back-button:hover,
 .filter-button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);

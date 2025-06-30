@@ -24,24 +24,36 @@ export const realtimeService = {
 
     this.socket = io(baseUrl, {
       auth: { token },
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      timeout: 10000,
+      forceNew: true,
     })
 
     this.socket.on('connect', () => {
       this.isConnected.value = true
-      console.log('WebSocket连接已建立')
+      console.log('WebSocket连接已建立，Socket ID:', this.socket?.id)
     })
 
-    this.socket.on('disconnect', () => {
+    this.socket.on('disconnect', reason => {
       this.isConnected.value = false
-      console.log('WebSocket连接已断开')
+      console.log('WebSocket连接已断开，原因:', reason)
     })
 
     this.socket.on('connect_error', error => {
       console.error('WebSocket连接错误:', error)
+      console.error('错误详情:', {
+        message: error.message,
+        description: (error as any).description,
+        context: (error as any).context,
+        type: (error as any).type,
+      })
+    })
+
+    this.socket.on('error', error => {
+      console.error('WebSocket运行时错误:', error)
     })
 
     // 重新绑定所有事件监听器
@@ -145,11 +157,20 @@ export const realtimeService = {
 
   // 取消监听社交事件
   offSocialEvents() {
-    this.off('new_feed')
-    this.off('feed_update')
-    this.off('feed_liked')
-    this.off('new_follower')
-    this.off('new_comment')
+    // 移除所有监听器
+    if (this.socket) {
+      this.socket.off('new_feed')
+      this.socket.off('feed_update')
+      this.socket.off('feed_liked')
+      this.socket.off('new_follower')
+      this.socket.off('new_comment')
+    }
+    // 清除本地监听器缓存
+    this.listeners.delete('new_feed')
+    this.listeners.delete('feed_update')
+    this.listeners.delete('feed_liked')
+    this.listeners.delete('new_follower')
+    this.listeners.delete('new_comment')
   },
 
   // 重新绑定所有事件监听器

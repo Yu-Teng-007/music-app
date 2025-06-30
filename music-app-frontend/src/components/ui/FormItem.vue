@@ -4,10 +4,10 @@
       <span v-if="required && !hideRequiredAsterisk" class="mobile-form-item__asterisk">*</span>
       {{ label }}
     </label>
-    
+
     <div class="mobile-form-item__content">
       <slot></slot>
-      
+
       <Transition name="error-fade">
         <div v-if="errorMessage" class="mobile-form-item__error">
           {{ errorMessage }}
@@ -33,14 +33,28 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   showMessage: true,
-  inlineMessage: false
+  inlineMessage: false,
 })
 
 const errorMessage = ref('')
 const isValidating = ref(false)
 
 // 注入表单上下文
-const formContext = inject('mobileForm', null)
+interface FormContext {
+  props: {
+    size?: string
+    labelWidth?: string
+    labelPosition?: string
+    hideRequiredAsterisk?: boolean
+    rules?: Record<string, any>
+  }
+  validateField: (prop: string) => Promise<boolean>
+  addField: (field: any) => void
+  removeField: (prop: string) => void
+  errors?: Map<string, string>
+}
+
+const formContext = inject<FormContext | null>('mobileForm', null)
 
 const formItemClasses = computed(() => [
   'mobile-form-item',
@@ -48,15 +62,15 @@ const formItemClasses = computed(() => [
     'mobile-form-item--error': !!errorMessage.value,
     'mobile-form-item--validating': isValidating.value,
     'mobile-form-item--required': props.required,
-    [`mobile-form-item--${formContext?.props.size || props.size || 'default'}`]: true
-  }
+    [`mobile-form-item--${formContext?.props.size || props.size || 'default'}`]: true,
+  },
 ])
 
 const labelClasses = computed(() => [
   'mobile-form-item__label',
   {
-    'mobile-form-item__label--required': props.required && !hideRequiredAsterisk.value
-  }
+    'mobile-form-item__label--required': props.required && !hideRequiredAsterisk.value,
+  },
 ])
 
 const labelStyle = computed(() => {
@@ -75,26 +89,26 @@ const required = computed(() => {
   if (props.required !== undefined) {
     return props.required
   }
-  
+
   // 从规则中推断是否必填
   const rules = props.rules || formContext?.props.rules?.[props.prop!]
   if (rules) {
     const ruleArray = Array.isArray(rules) ? rules : [rules]
     return ruleArray.some(rule => rule.required)
   }
-  
+
   return false
 })
 
 // 验证方法
 const validate = async () => {
   if (!props.prop || !formContext) return true
-  
+
   isValidating.value = true
-  
+
   try {
     const isValid = await formContext.validateField(props.prop)
-    errorMessage.value = isValid ? '' : (formContext.errors?.get(props.prop) || '')
+    errorMessage.value = isValid ? '' : formContext.errors?.get(props.prop) || ''
     return isValid
   } finally {
     isValidating.value = false
@@ -113,9 +127,12 @@ const clearValidate = () => {
 }
 
 // 监听外部错误
-watch(() => props.error, (newError) => {
-  errorMessage.value = newError || ''
-})
+watch(
+  () => props.error,
+  newError => {
+    errorMessage.value = newError || ''
+  }
+)
 
 // 注册到表单
 onMounted(() => {
@@ -124,7 +141,7 @@ onMounted(() => {
       prop: props.prop,
       validate,
       reset,
-      clearValidate
+      clearValidate,
     })
   }
 })
@@ -139,7 +156,7 @@ onUnmounted(() => {
 defineExpose({
   validate,
   reset,
-  clearValidate
+  clearValidate,
 })
 </script>
 
@@ -249,7 +266,7 @@ defineExpose({
   .mobile-form--label-right .mobile-form-item {
     flex-direction: column;
   }
-  
+
   .mobile-form--label-left .mobile-form-item__label,
   .mobile-form--label-right .mobile-form-item__label {
     margin: 0 0 8px 0;

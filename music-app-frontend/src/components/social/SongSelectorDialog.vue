@@ -86,14 +86,7 @@ import {
   MobileButton,
 } from '@/components/ui'
 import { musicApi } from '@/services'
-
-// 临时类型定义
-interface Song {
-  id: string
-  title: string
-  artist: string
-  coverUrl?: string
-}
+import type { Song } from '@/types'
 
 interface Props {
   modelValue: boolean
@@ -146,8 +139,8 @@ const handleSearch = async () => {
 
   try {
     isLoading.value = true
-    const result = await musicApi.searchSongs(searchKeyword.value, { page: 1, limit: 50 })
-    songs.value = result.items
+    const result = await musicApi.searchSongs(searchKeyword.value, 50)
+    songs.value = result
   } catch (error) {
     console.error('搜索歌曲失败:', error)
   } finally {

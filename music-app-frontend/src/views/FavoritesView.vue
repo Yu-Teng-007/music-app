@@ -1,11 +1,11 @@
 <template>
   <div class="favorites-view">
-    <div class="header">
-      <h1>我的收藏</h1>
-      <div class="stats">
-        <span>共 {{ totalFavorites }} 首歌曲</span>
-      </div>
-    </div>
+    <!-- 顶部导航 -->
+    <TopNavigation title="我的收藏" :icon="Heart">
+      <template #actions>
+        <div class="stats">共 {{ totalFavorites }} 首歌曲</div>
+      </template>
+    </TopNavigation>
 
     <!-- 搜索框 -->
     <div class="search-section">
@@ -87,6 +87,7 @@ import { useMusicStore } from '@/stores/music'
 import { favoritesApi } from '@/services'
 import type { Song } from '@/stores/music'
 import { Search, X, Play, Heart } from 'lucide-vue-next'
+import TopNavigation from '@/components/TopNavigation.vue'
 
 const router = useRouter()
 const musicStore = useMusicStore()
@@ -187,53 +188,50 @@ onMounted(() => {
 
 <style scoped>
 .favorites-view {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: white;
+  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.header h1 {
-  color: var(--text-primary);
-  font-size: 28px;
-  font-weight: 700;
+.favorites-view :deep(.top-navigation) {
+  background: rgba(26, 26, 46, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stats {
-  color: var(--text-secondary);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .search-section {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
+  padding: 0 1.5rem;
 }
 
 .search-bar {
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 12px 16px;
-  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.2s ease;
   max-width: 400px;
 }
 
 .search-bar:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-alpha);
+  border-color: #64b5f6;
+  box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
 }
 
 .search-icon {
-  color: var(--text-secondary);
-  margin-right: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-right: 0.75rem;
 }
 
 .search-input {
@@ -241,31 +239,32 @@ onMounted(() => {
   background: none;
   border: none;
   outline: none;
-  font-size: 16px;
-  color: var(--text-primary);
+  font-size: 1rem;
+  color: white;
 }
 
 .search-input::placeholder {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .clear-btn {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
   transition: all 0.2s ease;
 }
 
 .clear-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .favorites-content {
   min-height: 400px;
+  padding: 0 1.5rem;
 }
 
 .loading {
@@ -273,18 +272,18 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
+  padding: 3.75rem 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--bg-tertiary);
-  border-top: 3px solid var(--primary);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #64b5f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 @keyframes spin {
@@ -298,63 +297,65 @@ onMounted(() => {
 
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: var(--text-secondary);
+  padding: 3.75rem 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .empty-icon {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   opacity: 0.5;
 }
 
 .empty-state h3 {
-  color: var(--text-primary);
-  margin-bottom: 8px;
+  color: white;
+  margin-bottom: 0.5rem;
 }
 
 .discover-btn {
-  background: var(--primary);
+  background: #64b5f6;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 16px;
+  margin-top: 1rem;
 }
 
 .discover-btn:hover {
-  background: var(--primary-dark);
+  background: #42a5f5;
   transform: translateY(-1px);
 }
 
 .favorites-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .song-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .song-item:hover {
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
 }
 
 .song-cover {
   width: 60px;
   height: 60px;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   object-fit: cover;
 }
 
@@ -363,33 +364,33 @@ onMounted(() => {
 }
 
 .song-title {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  color: white;
+  margin-bottom: 0.25rem;
 }
 
 .song-artist,
 .song-album {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 2px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.125rem;
 }
 
 .song-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .song-duration {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .play-btn,
 .remove-btn {
-  background: var(--primary);
+  background: #64b5f6;
   color: white;
   border: none;
   width: 36px;
@@ -403,16 +404,16 @@ onMounted(() => {
 }
 
 .remove-btn {
-  background: var(--danger, #ff4757);
+  background: #ff5252;
 }
 
 .play-btn:hover {
-  background: var(--primary-dark);
+  background: #42a5f5;
   transform: scale(1.1);
 }
 
 .remove-btn:hover {
-  background: var(--danger-dark, #ff3838);
+  background: #f44336;
   transform: scale(1.1);
 }
 
@@ -420,23 +421,23 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-top: 40px;
-  padding: 20px;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding: 1.25rem;
 }
 
 .page-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  padding: 8px 16px;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .page-btn:hover:not(:disabled) {
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .page-btn:disabled {
@@ -445,19 +446,24 @@ onMounted(() => {
 }
 
 .page-info {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .favorites-view {
-    padding: 16px;
+    padding: 1rem;
   }
 
   .header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
   }
 
   .search-bar {
@@ -465,12 +471,16 @@ onMounted(() => {
   }
 
   .song-item {
-    flex-direction: column;
-    text-align: center;
+    padding: 0.75rem;
   }
 
   .song-meta {
-    justify-content: center;
+    justify-content: space-between;
+  }
+
+  .pagination {
+    margin-top: 2rem;
+    padding: 1rem;
   }
 }
 </style>

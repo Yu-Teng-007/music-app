@@ -2,16 +2,15 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { downloadApi } from '@/services'
 import type {
-  Download,
   StorageStats,
   CreateDownloadDto,
   BatchDownloadDto,
   DownloadQueryParams,
   CleanupOptions,
   CleanupResult,
-  DownloadStatus,
-  AudioQuality,
 } from '@/services/download-api'
+import type { Download } from '@/types'
+import { DownloadStatus, AudioQuality } from '@/types'
 
 export const useDownloadStore = defineStore('download', () => {
   // 状态
@@ -38,9 +37,9 @@ export const useDownloadStore = defineStore('download', () => {
   })
 
   const downloadingCount = computed(() => {
-    return downloads.value.filter(download => 
-      download.status === DownloadStatus.DOWNLOADING || 
-      download.status === DownloadStatus.PENDING
+    return downloads.value.filter(
+      download =>
+        download.status === DownloadStatus.DOWNLOADING || download.status === DownloadStatus.PENDING
     ).length
   })
 
@@ -49,7 +48,7 @@ export const useDownloadStore = defineStore('download', () => {
   })
 
   const totalDownloadSize = computed(() => {
-    return completedDownloads.value.reduce((total, download) => total + download.fileSize, 0)
+    return completedDownloads.value.reduce((total, download) => total + (download.fileSize || 0), 0)
   })
 
   // 设置加载状态
@@ -72,15 +71,15 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const newDownload = await downloadApi.createDownload(downloadData)
-      
+
       // 添加到下载列表开头
       downloads.value.unshift(newDownload)
-      
+
       // 更新存储统计
       await getStorageStats()
-      
+
       return newDownload
     } catch (error: any) {
       setError(error.message)
@@ -95,15 +94,15 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const newDownloads = await downloadApi.createBatchDownload(batchData)
-      
+
       // 添加到下载列表开头
       downloads.value.unshift(...newDownloads)
-      
+
       // 更新存储统计
       await getStorageStats()
-      
+
       return newDownloads
     } catch (error: any) {
       setError(error.message)
@@ -118,17 +117,17 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await downloadApi.getDownloads(params)
-      
+
       if (append) {
         downloads.value.push(...result.items)
       } else {
         downloads.value = result.items
       }
-      
+
       downloadsMeta.value = result.meta
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -143,18 +142,18 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       await downloadApi.deleteDownload(downloadId)
-      
+
       // 从列表中移除
       const index = downloads.value.findIndex(download => download.id === downloadId)
       if (index > -1) {
         downloads.value.splice(index, 1)
       }
-      
+
       // 更新存储统计
       await getStorageStats()
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -168,13 +167,13 @@ export const useDownloadStore = defineStore('download', () => {
   const pauseDownload = async (downloadId: string) => {
     try {
       const updatedDownload = await downloadApi.pauseDownload(downloadId)
-      
+
       // 更新本地状态
       const index = downloads.value.findIndex(download => download.id === downloadId)
       if (index > -1) {
         downloads.value[index] = updatedDownload
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -186,13 +185,13 @@ export const useDownloadStore = defineStore('download', () => {
   const resumeDownload = async (downloadId: string) => {
     try {
       const updatedDownload = await downloadApi.resumeDownload(downloadId)
-      
+
       // 更新本地状态
       const index = downloads.value.findIndex(download => download.id === downloadId)
       if (index > -1) {
         downloads.value[index] = updatedDownload
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -204,13 +203,13 @@ export const useDownloadStore = defineStore('download', () => {
   const retryDownload = async (downloadId: string) => {
     try {
       const updatedDownload = await downloadApi.retryDownload(downloadId)
-      
+
       // 更新本地状态
       const index = downloads.value.findIndex(download => download.id === downloadId)
       if (index > -1) {
         downloads.value[index] = updatedDownload
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -235,15 +234,15 @@ export const useDownloadStore = defineStore('download', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await downloadApi.cleanupDownloads(options)
-      
+
       // 重新获取下载列表和存储统计
       await Promise.all([
         getDownloads({ page: 1, limit: downloadsMeta.value.limit }),
         getStorageStats(),
       ])
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -265,27 +264,26 @@ export const useDownloadStore = defineStore('download', () => {
 
   // 检查歌曲是否已下载
   const isSongDownloaded = (songId: string, quality?: AudioQuality): boolean => {
-    return downloads.value.some(download => 
-      download.songId === songId && 
-      download.status === DownloadStatus.COMPLETED &&
-      (!quality || download.quality === quality)
+    return downloads.value.some(
+      download =>
+        download.songId === songId &&
+        download.status === DownloadStatus.COMPLETED &&
+        (!quality || download.quality === quality)
     )
   }
 
   // 获取歌曲的下载状态
   const getSongDownloadStatus = (songId: string, quality?: AudioQuality): DownloadStatus | null => {
-    const download = downloads.value.find(download => 
-      download.songId === songId &&
-      (!quality || download.quality === quality)
+    const download = downloads.value.find(
+      download => download.songId === songId && (!quality || download.quality === quality)
     )
     return download?.status || null
   }
 
   // 获取歌曲的下载进度
   const getSongDownloadProgress = (songId: string, quality?: AudioQuality): number => {
-    const download = downloads.value.find(download => 
-      download.songId === songId &&
-      (!quality || download.quality === quality)
+    const download = downloads.value.find(
+      download => download.songId === songId && (!quality || download.quality === quality)
     )
     return download?.progress || 0
   }

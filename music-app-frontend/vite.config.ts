@@ -17,6 +17,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // GitHub Pages部署配置
+  base: process.env.NODE_ENV === 'production' ? '/music-app/' : '/',
   server: {
     port: 5188, // 固定前端端口为5188，避免与后端3000端口冲突
     host: true, // 允许外部访问
@@ -25,13 +27,11 @@ export default defineConfig({
     // 添加代理配置，当后端不可用时提供更好的错误处理
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://192.168.0.108:3000',
         changeOrigin: true,
         timeout: 5000,
-        // 当后端不可用时的错误处理
-        onError: (err, req, res) => {
-          console.warn('API代理错误:', err.message)
-        },
+        // 注意：onError 在新版本的 Vite 中已被移除
+        // 错误处理现在由 Vite 内部处理
       },
     },
   },
@@ -53,17 +53,18 @@ export default defineConfig({
         },
         // 静态资源文件名格式
         assetFileNames: assetInfo => {
-          const fileName = assetInfo.name || ''
-          const info = fileName.split('.')
-          let extType = info[info.length - 1]
-          if (/\.(mp3|wav|ogg|flac)$/i.test(fileName)) {
-            extType = 'audio'
-          } else if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(fileName)) {
-            extType = 'img'
-          } else if (/\.(woff2?|eot|ttf|otf)$/i.test(fileName)) {
-            extType = 'fonts'
+          // 使用文件扩展名来确定资源类型
+          const extType = assetInfo.names?.[0]?.split('.').pop() || 'misc'
+          if (/^(mp3|wav|ogg|flac)$/i.test(extType)) {
+            return 'assets/audio/[name]-[hash][extname]'
+          } else if (/^(png|jpe?g|gif|svg|webp|avif)$/i.test(extType)) {
+            return 'assets/img/[name]-[hash][extname]'
+          } else if (/^(woff2?|eot|ttf|otf)$/i.test(extType)) {
+            return 'assets/fonts/[name]-[hash][extname]'
+          } else if (/^(css)$/i.test(extType)) {
+            return 'assets/css/[name]-[hash][extname]'
           }
-          return `assets/${extType}/[name]-[hash][extname]`
+          return 'assets/misc/[name]-[hash][extname]'
         },
         // 入口文件名格式
         entryFileNames: 'assets/js/[name]-[hash].js',

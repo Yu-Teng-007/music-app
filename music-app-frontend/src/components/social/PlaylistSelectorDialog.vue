@@ -45,7 +45,7 @@
             <div class="playlist-cover">
               <img
                 :src="playlist.coverUrl"
-                :alt="playlist.title"
+                :alt="playlist.title || playlist.name"
                 class="cover-image"
                 @error="handleImageError"
               />
@@ -65,7 +65,7 @@
               </div>
             </div>
             <div class="playlist-info">
-              <div class="playlist-title">{{ playlist.title }}</div>
+              <div class="playlist-title">{{ playlist.title || playlist.name }}</div>
               <div class="playlist-desc">{{ playlist.description || '暂无描述' }}</div>
               <div class="playlist-count">{{ playlist.songCount || 0 }} 首歌曲</div>
             </div>
@@ -92,15 +92,7 @@ import {
   MobileButton,
 } from '@/components/ui'
 import { playlistApi } from '@/services'
-
-// 临时类型定义
-interface Playlist {
-  id: string
-  title: string
-  description?: string
-  coverUrl?: string
-  songCount?: number
-}
+import type { Playlist } from '@/types'
 
 interface Props {
   modelValue: boolean
@@ -136,8 +128,8 @@ watch(dialogVisible, visible => {
 const loadPlaylists = async () => {
   try {
     isLoading.value = true
-    const result = await playlistApi.getMyPlaylists({ page: 1, limit: 50 })
-    playlists.value = result.items
+    const result = await playlistApi.getMyPlaylists()
+    playlists.value = result
   } catch (error) {
     console.error('加载歌单失败:', error)
   } finally {
@@ -154,10 +146,10 @@ const handleSearch = async () => {
   try {
     isLoading.value = true
     // 简单的本地搜索
-    const allPlaylists = await playlistApi.getMyPlaylists({ page: 1, limit: 100 })
-    playlists.value = allPlaylists.items.filter(
-      playlist =>
-        playlist.title.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
+    const allPlaylists = await playlistApi.getMyPlaylists()
+    playlists.value = allPlaylists.filter(
+      (playlist: any) =>
+        playlist.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
         (playlist.description &&
           playlist.description.toLowerCase().includes(searchKeyword.value.toLowerCase()))
     )

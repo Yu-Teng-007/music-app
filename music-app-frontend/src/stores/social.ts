@@ -1,16 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { socialApi } from '@/services'
-import type {
-  UserFeed,
-  FeedLike,
-  SocialStats,
-  CreateFeedDto,
-  FeedQueryParams,
-  FollowQueryParams,
-  FeedType,
-} from '@/services/social-api'
-import type { User } from '@/types/user'
+import type { SocialStats, CreateFeedDto, FollowQueryParams } from '@/services/social-api'
+import type { User, UserFeed, FeedLike, FeedQueryParams } from '@/types'
+import { FeedType } from '@/types'
 
 export const useSocialStore = defineStore('social', () => {
   // 状态
@@ -76,14 +69,14 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       await socialApi.followUser(userId)
-      
+
       // 更新本地状态
       if (socialStats.value) {
         socialStats.value.followingCount++
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -98,20 +91,20 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       await socialApi.unfollowUser(userId)
-      
+
       // 更新本地状态
       if (socialStats.value) {
         socialStats.value.followingCount--
       }
-      
+
       // 从关注列表中移除
       const index = following.value.findIndex(user => user.id === userId)
       if (index > -1) {
         following.value.splice(index, 1)
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -137,17 +130,17 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await socialApi.getFollowing(userId, params)
-      
+
       if (append) {
         following.value.push(...result.items)
       } else {
         following.value = result.items
       }
-      
+
       followingMeta.value = result.meta
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -162,17 +155,17 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await socialApi.getFollowers(userId, params)
-      
+
       if (append) {
         followers.value.push(...result.items)
       } else {
         followers.value = result.items
       }
-      
+
       followersMeta.value = result.meta
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -187,17 +180,17 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const newFeed = await socialApi.createFeed(feedData)
-      
+
       // 添加到动态列表开头
       feeds.value.unshift(newFeed)
-      
+
       // 更新统计
       if (socialStats.value) {
         socialStats.value.feedCount++
       }
-      
+
       return newFeed
     } catch (error: any) {
       setError(error.message)
@@ -212,17 +205,17 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await socialApi.getFeeds(params)
-      
+
       if (append) {
         feeds.value.push(...result.items)
       } else {
         feeds.value = result.items
       }
-      
+
       feedsMeta.value = result.meta
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -237,17 +230,17 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       const result = await socialApi.getUserFeeds(userId, params)
-      
+
       if (append) {
         feeds.value.push(...result.items)
       } else {
         feeds.value = result.items
       }
-      
+
       feedsMeta.value = result.meta
-      
+
       return result
     } catch (error: any) {
       setError(error.message)
@@ -262,20 +255,20 @@ export const useSocialStore = defineStore('social', () => {
     try {
       setLoading(true)
       clearError()
-      
+
       await socialApi.deleteFeed(feedId)
-      
+
       // 从列表中移除
       const index = feeds.value.findIndex(feed => feed.id === feedId)
       if (index > -1) {
         feeds.value.splice(index, 1)
       }
-      
+
       // 更新统计
       if (socialStats.value) {
         socialStats.value.feedCount--
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -289,13 +282,13 @@ export const useSocialStore = defineStore('social', () => {
   const likeFeed = async (feedId: string) => {
     try {
       await socialApi.likeFeed(feedId)
-      
+
       // 更新本地状态
       const feed = feeds.value.find(f => f.id === feedId)
       if (feed) {
-        feed.likeCount++
+        feed.likeCount = (feed.likeCount || 0) + 1
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
@@ -307,13 +300,13 @@ export const useSocialStore = defineStore('social', () => {
   const unlikeFeed = async (feedId: string) => {
     try {
       await socialApi.unlikeFeed(feedId)
-      
+
       // 更新本地状态
       const feed = feeds.value.find(f => f.id === feedId)
       if (feed) {
-        feed.likeCount--
+        feed.likeCount = Math.max((feed.likeCount || 0) - 1, 0)
       }
-      
+
       return true
     } catch (error: any) {
       setError(error.message)
