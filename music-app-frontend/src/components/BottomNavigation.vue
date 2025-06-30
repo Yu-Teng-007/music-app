@@ -60,7 +60,7 @@ const isActive = (path: string) => {
 
 <style scoped lang="scss">
 /* 导入设计系统变量 */
-@use '@/assets/styles/variables.scss' as *;
+@use '@/styles/variables.scss' as *;
 
 .bottom-navigation {
   position: fixed;

@@ -96,7 +96,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         // 移除全局导入，避免与组件中的导入冲突
-        // additionalData: `@import "@/assets/styles/variables.scss";`,
+        // additionalData: `@import "@/styles/variables.scss";`,
       },
     },
   },

@@ -355,8 +355,8 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 /* 导入设计系统 */
-@use '@/assets/styles/variables.scss' as *;
-@use '@/assets/styles/mixins.scss' as *;
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
 
 .home-view {
   min-height: 100vh;

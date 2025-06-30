@@ -340,3 +340,63 @@ $component-height-xl: 3.5rem; // 56px
   --component-height-lg: #{$component-height-lg};
   --component-height-xl: #{$component-height-xl};
 }
+
+// ===== 导出常用变量供 JavaScript 使用 =====
+:export {
+  // 颜色
+  primary: $primary;
+  primaryLight: $primary-light;
+  primaryDark: $primary-dark;
+
+  bgPrimary: $bg-primary;
+  bgSecondary: $bg-secondary;
+  bgTertiary: $bg-tertiary;
+
+  textPrimary: $text-primary;
+  textSecondary: $text-secondary;
+  textTertiary: $text-tertiary;
+
+  success: $success;
+  warning: $warning;
+  error: $error;
+  info: $info;
+
+  // 间距
+  spacingXs: $spacing-xs;
+  spacingSm: $spacing-sm;
+  spacingMd: $spacing-md;
+  spacingLg: $spacing-lg;
+  spacingXl: $spacing-xl;
+
+  // 字体大小
+  fontSizeXs: $font-size-xs;
+  fontSizeSm: $font-size-sm;
+  fontSizeBase: $font-size-base;
+  fontSizeLg: $font-size-lg;
+  fontSizeXl: $font-size-xl;
+  fontSize2xl: $font-size-2xl;
+
+  // 边框圆角
+  borderRadiusSm: $border-radius-sm;
+  borderRadiusBase: $border-radius-base;
+  borderRadiusLg: $border-radius-lg;
+  borderRadiusXl: $border-radius-xl;
+
+  // 断点
+  breakpointXs: $breakpoint-xs;
+  breakpointSm: $breakpoint-sm;
+  breakpointMd: $breakpoint-md;
+  breakpointLg: $breakpoint-lg;
+  breakpointXl: $breakpoint-xl;
+
+  // 动画时长
+  durationFast: $duration-fast;
+  durationBase: $duration-base;
+  durationSlow: $duration-slow;
+
+  // Z-index
+  zIndexDropdown: $z-index-dropdown;
+  zIndexSticky: $z-index-sticky;
+  zIndexFixed: $z-index-fixed;
+  zIndexModal: $z-index-modal;
+}
