@@ -1,5 +1,5 @@
 <template>
-  <!-- 纯逻辑组件，不需要模板 -->
+  <div style="display: none"></div>
 </template>
 
 <script setup lang="ts">
