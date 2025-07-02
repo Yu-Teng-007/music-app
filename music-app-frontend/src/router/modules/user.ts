@@ -12,11 +12,11 @@ export const userRoutes: RouteModule = {
       path: '/playlist',
       name: 'playlist',
       component: () => import('../../views/PlaylistView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '我的歌单',
         showInMenu: true,
-        menuOrder: 4
+        menuOrder: 4,
       },
     },
     // 歌单详情页路由
@@ -25,19 +25,43 @@ export const userRoutes: RouteModule = {
       name: 'playlist-detail',
       component: () => import('../../views/PlaylistDetailView.vue'),
       meta: {
-        title: '歌单详情'
-      }
+        title: '歌单详情',
+      },
+    },
+    // 音乐上传
+    {
+      path: '/upload-music',
+      name: 'upload-music',
+      component: () => import('../../views/UploadMusicView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: '上传音乐',
+        showInMenu: true,
+        menuOrder: 5,
+      },
+    },
+    // 我的音乐
+    {
+      path: '/my-music',
+      name: 'my-music',
+      component: () => import('../../views/MyMusicView.vue'),
+      meta: {
+        requiresAuth: true,
+        title: '我的音乐',
+        showInMenu: true,
+        menuOrder: 6,
+      },
     },
     // 个人中心
     {
       path: '/profile',
       name: 'profile',
       component: () => import('../../views/ProfileView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '个人中心',
         showInMenu: true,
-        menuOrder: 8
+        menuOrder: 7,
       },
     },
     // 收藏页面
@@ -45,11 +69,11 @@ export const userRoutes: RouteModule = {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../../views/FavoritesView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '我的收藏',
         showInMenu: true,
-        menuOrder: 5
+        menuOrder: 8,
       },
     },
     // 播放历史页面
@@ -57,11 +81,11 @@ export const userRoutes: RouteModule = {
       path: '/history',
       name: 'history',
       component: () => import('../../views/HistoryView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '播放历史',
         showInMenu: true,
-        menuOrder: 6
+        menuOrder: 9,
       },
     },
     // 设置页面
@@ -69,11 +93,11 @@ export const userRoutes: RouteModule = {
       path: '/settings',
       name: 'settings',
       component: () => import('../../views/SettingsView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '设置',
         showInMenu: true,
-        menuOrder: 9
+        menuOrder: 10,
       },
     },
     // 账户管理页面
@@ -81,9 +105,9 @@ export const userRoutes: RouteModule = {
       path: '/account',
       name: 'account',
       component: () => import('../../views/AccountView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
-        title: '账户管理'
+        title: '账户管理',
       },
     },
     // 下载管理页面
@@ -91,12 +115,12 @@ export const userRoutes: RouteModule = {
       path: '/downloads',
       name: 'downloads',
       component: () => import('../../views/DownloadsView.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
         title: '下载管理',
         showInMenu: true,
-        menuOrder: 7
+        menuOrder: 11,
       },
     },
-  ]
+  ],
 }

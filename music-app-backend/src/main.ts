@@ -48,14 +48,6 @@ async function bootstrap() {
     })
   )
 
-  // 设置静态文件目录
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  })
-  app.useStaticAssets(join(__dirname, 'static'), {
-    prefix: '/static/',
-  })
-
   // 添加Chrome开发者工具端点处理（在设置全局前缀之前）
   app.use('/.well-known/appspecific/com.chrome.devtools.json', (_req: any, res: any) => {
     res.json({

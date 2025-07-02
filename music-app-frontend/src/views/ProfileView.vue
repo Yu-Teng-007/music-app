@@ -73,6 +73,8 @@ import {
   Clock,
   UserCog,
   Download,
+  Upload,
+  Music,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -110,6 +112,16 @@ const user = computed(() => {
 
 const menuItems = computed(() => [
   {
+    id: 'upload-music',
+    label: '上传音乐',
+    icon: Upload,
+  },
+  {
+    id: 'my-music',
+    label: '我的音乐',
+    icon: Music,
+  },
+  {
     id: 'favorites',
     label: '收藏歌曲',
     icon: Heart,
@@ -118,6 +130,11 @@ const menuItems = computed(() => [
     id: 'history',
     label: '播放历史',
     icon: Clock,
+  },
+  {
+    id: 'downloads',
+    label: '下载管理',
+    icon: Download,
   },
   {
     id: 'social',
@@ -147,11 +164,20 @@ const menuItems = computed(() => [
 
 const handleMenuClick = async (item: any) => {
   switch (item.id) {
+    case 'upload-music':
+      router.push('/upload-music')
+      break
+    case 'my-music':
+      router.push('/my-music')
+      break
     case 'favorites':
       router.push('/favorites')
       break
     case 'history':
       router.push('/history')
+      break
+    case 'downloads':
+      router.push('/downloads')
       break
     case 'social':
       router.push('/social')

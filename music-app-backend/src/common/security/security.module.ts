@@ -70,12 +70,7 @@ export class SecurityModule implements NestModule {
 
           // 检查是否为排除的路径
 
-          if (
-            excludedPaths.includes(req.originalUrl) ||
-            req.method === 'GET' ||
-            req.originalUrl.startsWith('/uploads/') ||
-            req.originalUrl.startsWith('/static/')
-          ) {
+          if (excludedPaths.includes(req.originalUrl) || req.method === 'GET') {
             return next()
           }
 
