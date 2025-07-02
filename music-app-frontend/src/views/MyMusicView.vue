@@ -357,6 +357,11 @@ const visiblePages = computed(() => {
 
 // 方法
 const loadSongs = async () => {
+  // 防止重复请求
+  if (loading.value) {
+    return
+  }
+
   try {
     loading.value = true
     const params = {
@@ -389,18 +394,16 @@ const loadStats = async () => {
 }
 
 const handleSearch = () => {
-  currentPage.value = 1
-  // loadSongs() 会通过 watch 自动调用
+  // currentPage 重置和 loadSongs() 会通过 watch 自动调用
 }
 
 const handleSort = () => {
-  currentPage.value = 1
-  // loadSongs() 会通过 watch 自动调用
+  // currentPage 重置和 loadSongs() 会通过 watch 自动调用
 }
 
 const toggleSortOrder = () => {
   sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
-  currentPage.value = 1
+  // currentPage 重置和 loadSongs() 会通过 watch 自动调用
 }
 
 const formatDate = (date: string | Date) => {
@@ -458,14 +461,31 @@ const handleSongUpdated = async () => {
   await loadSongs()
 }
 
+// 防抖函数
+let loadSongsTimer: number | null = null
+const debouncedLoadSongs = () => {
+  if (loadSongsTimer) {
+    clearTimeout(loadSongsTimer)
+  }
+  loadSongsTimer = setTimeout(() => {
+    loadSongs()
+  }, 300) // 300ms 防抖
+}
+
 // 监听搜索、排序、分页变化
 watch(
-  [searchQuery, sortBy, sortOrder, currentPage],
+  [searchQuery, sortBy, sortOrder],
   () => {
-    loadSongs()
+    currentPage.value = 1 // 重置到第一页
+    debouncedLoadSongs()
   },
   { deep: true }
 )
+
+// 单独监听分页变化（不需要防抖）
+watch(currentPage, () => {
+  loadSongs()
+})
 
 // 组件挂载时加载数据
 onMounted(async () => {
