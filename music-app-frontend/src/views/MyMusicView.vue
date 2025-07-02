@@ -296,9 +296,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ConfirmDialog } from '@/components/ui'
+import { musicApi } from '@/services/music-api'
 import type { Song } from '@/types'
 
 // 组件引入（需要创建）
@@ -315,61 +316,32 @@ const sortBy = ref('createdAt')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 const currentPage = ref(1)
 const pageSize = 10
+const totalCount = ref(0)
+
+// 统计数据
+const stats = ref({
+  totalSongs: 0,
+  totalPlays: 0,
+  totalLikes: 0,
+})
 
 // 编辑和删除状态
 const editingSong = ref<Song | null>(null)
 const deletingSong = ref<Song | null>(null)
 
-// 统计数据
-const totalSongs = computed(() => songs.value.length)
-const totalPlays = computed(() => songs.value.reduce((sum, song) => sum + (song.playCount || 0), 0))
-const totalLikes = computed(() =>
-  songs.value.reduce((sum, song) => sum + ((song as any).likes || 0), 0)
-)
+// 统计数据计算属性
+const totalSongs = computed(() => stats.value.totalSongs)
+const totalPlays = computed(() => stats.value.totalPlays)
+const totalLikes = computed(() => stats.value.totalLikes)
 
-// 筛选和排序
-const filteredSongs = computed(() => {
-  let filtered = songs.value
+// 筛选和排序现在由后端处理，直接返回歌曲列表
+const filteredSongs = computed(() => songs.value)
 
-  // 搜索过滤
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(
-      song =>
-        song.title.toLowerCase().includes(query) ||
-        song.artist.toLowerCase().includes(query) ||
-        (song.album && song.album.toLowerCase().includes(query))
-    )
-  }
+// 分页（现在由后端处理）
+const totalPages = computed(() => Math.ceil(totalCount.value / pageSize))
 
-  // 排序
-  filtered.sort((a, b) => {
-    let aValue: any = a[sortBy.value as keyof Song]
-    let bValue: any = b[sortBy.value as keyof Song]
-
-    if (typeof aValue === 'string') {
-      aValue = aValue.toLowerCase()
-      bValue = bValue.toLowerCase()
-    }
-
-    if (sortOrder.value === 'asc') {
-      return aValue > bValue ? 1 : -1
-    } else {
-      return aValue < bValue ? 1 : -1
-    }
-  })
-
-  return filtered
-})
-
-// 分页
-const totalPages = computed(() => Math.ceil(filteredSongs.value.length / pageSize))
-
-const paginatedSongs = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredSongs.value.slice(start, end)
-})
+// 直接使用从API获取的歌曲数据，不需要前端分页
+const paginatedSongs = computed(() => songs.value)
 
 const visiblePages = computed(() => {
   const pages = []
@@ -387,24 +359,43 @@ const visiblePages = computed(() => {
 const loadSongs = async () => {
   try {
     loading.value = true
-    // TODO: 调用API获取用户上传的歌曲
-    // songs.value = await musicApi.getUserSongs()
+    const params = {
+      page: currentPage.value,
+      limit: pageSize,
+      search: searchQuery.value || undefined,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value.toUpperCase() as 'ASC' | 'DESC',
+    }
 
-    // 模拟数据
-    songs.value = []
+    const result = await musicApi.getMySongs(params)
+    songs.value = result.data
+    totalCount.value = result.pagination.total
   } catch (error) {
     console.error('加载歌曲失败:', error)
+    // 可以添加错误提示
   } finally {
     loading.value = false
   }
 }
 
+// 加载统计数据
+const loadStats = async () => {
+  try {
+    const result = await musicApi.getMyStats()
+    stats.value = result
+  } catch (error) {
+    console.error('加载统计数据失败:', error)
+  }
+}
+
 const handleSearch = () => {
   currentPage.value = 1
+  // loadSongs() 会通过 watch 自动调用
 }
 
 const handleSort = () => {
   currentPage.value = 1
+  // loadSongs() 会通过 watch 自动调用
 }
 
 const toggleSortOrder = () => {
@@ -443,33 +434,42 @@ const confirmDelete = async () => {
   if (!deletingSong.value) return
 
   try {
-    // TODO: 调用API删除歌曲
-    // await musicApi.deleteSong(deletingSong.value.id)
-
-    // 从列表中移除
-    songs.value = songs.value.filter(song => song.id !== deletingSong.value!.id)
+    await musicApi.deleteSong(deletingSong.value.id)
     deletingSong.value = null
 
-    // 重新计算分页
-    if (paginatedSongs.value.length === 0 && currentPage.value > 1) {
+    // 重新加载数据
+    await loadSongs()
+    await loadStats()
+
+    // 如果当前页没有数据且不是第一页，回到上一页
+    if (songs.value.length === 0 && currentPage.value > 1) {
       currentPage.value--
+      await loadSongs()
     }
   } catch (error) {
     console.error('删除歌曲失败:', error)
+    // 可以添加错误提示
   }
 }
 
-const handleSongUpdated = (updatedSong: Song) => {
-  const index = songs.value.findIndex(song => song.id === updatedSong.id)
-  if (index !== -1) {
-    songs.value[index] = updatedSong
-  }
+const handleSongUpdated = async () => {
   editingSong.value = null
+  // 重新加载数据以确保数据一致性
+  await loadSongs()
 }
+
+// 监听搜索、排序、分页变化
+watch(
+  [searchQuery, sortBy, sortOrder, currentPage],
+  () => {
+    loadSongs()
+  },
+  { deep: true }
+)
 
 // 组件挂载时加载数据
-onMounted(() => {
-  loadSongs()
+onMounted(async () => {
+  await Promise.all([loadSongs(), loadStats()])
 })
 </script>
 

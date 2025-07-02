@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   ParseUUIDPipe,
+  Request,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -22,6 +23,14 @@ import {
 import { SongsService } from './songs.service'
 import { CreateSongDto, UpdateSongDto, QuerySongsDto } from '../dto/song.dto'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: string
+    phone: string
+    username: string
+  }
+}
 
 @ApiTags('songs')
 @Controller('songs')
@@ -61,8 +70,13 @@ export class SongsController {
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 401, description: '未授权，请先登录' })
-  async create(@Body() createSongDto: CreateSongDto) {
-    const result = await this.songsService.create(createSongDto)
+  async create(@Request() req: AuthenticatedRequest, @Body() createSongDto: CreateSongDto) {
+    // 自动设置上传者ID为当前用户
+    const songData = {
+      ...createSongDto,
+      uploaderId: req.user.id,
+    }
+    const result = await this.songsService.create(songData)
     return {
       success: true,
       data: result,
@@ -354,6 +368,113 @@ export class SongsController {
       success: true,
       data: result,
       message: '获取艺术家歌曲成功',
+    }
+  }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '获取我的歌曲', description: '获取当前用户上传的歌曲列表' })
+  @ApiQuery({ name: 'page', required: false, description: '页码', example: 1, type: Number })
+  @ApiQuery({ name: 'limit', required: false, description: '每页数量', example: 20, type: Number })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: '搜索关键词',
+    example: '歌曲名',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: '排序字段',
+    example: 'createdAt',
+    enum: ['createdAt', 'title', 'artist', 'playCount', 'duration'],
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: '排序方向',
+    example: 'DESC',
+    enum: ['ASC', 'DESC'],
+  })
+  @ApiResponse({
+    status: 200,
+    description: '获取我的歌曲成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', description: '歌曲ID' },
+              title: { type: 'string', description: '歌曲标题' },
+              artist: { type: 'string', description: '艺术家' },
+              album: { type: 'string', description: '专辑名称' },
+              duration: { type: 'number', description: '时长（秒）' },
+              coverUrl: { type: 'string', description: '封面图片URL' },
+              audioUrl: { type: 'string', description: '音频文件URL' },
+              playCount: { type: 'number', description: '播放次数' },
+              createdAt: { type: 'string', description: '创建时间' },
+            },
+          },
+        },
+        pagination: {
+          type: 'object',
+          properties: {
+            page: { type: 'number', description: '当前页码' },
+            limit: { type: 'number', description: '每页数量' },
+            total: { type: 'number', description: '总数量' },
+            totalPages: { type: 'number', description: '总页数' },
+          },
+        },
+        message: { type: 'string', example: '获取我的歌曲成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
+  async getMySongs(@Request() req: AuthenticatedRequest, @Query() queryDto: QuerySongsDto) {
+    const result = await this.songsService.getUserSongs(req.user.id, queryDto)
+    return {
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+      message: '获取我的歌曲成功',
+    }
+  }
+
+  @Get('my/stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: '获取我的歌曲统计', description: '获取当前用户上传歌曲的统计信息' })
+  @ApiResponse({
+    status: 200,
+    description: '获取统计信息成功',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            totalSongs: { type: 'number', description: '总歌曲数' },
+            totalPlays: { type: 'number', description: '总播放量' },
+            totalLikes: { type: 'number', description: '总收藏数' },
+          },
+        },
+        message: { type: 'string', example: '获取统计信息成功' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: '未授权，请先登录' })
+  async getMyStats(@Request() req: AuthenticatedRequest) {
+    const result = await this.songsService.getUserSongStats(req.user.id)
+    return {
+      success: true,
+      data: result,
+      message: '获取统计信息成功',
     }
   }
 

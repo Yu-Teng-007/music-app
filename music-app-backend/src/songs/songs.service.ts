@@ -21,6 +21,7 @@ export class SongsService {
       search,
       genre,
       artist,
+      uploaderId,
       page = 1,
       limit = 20,
       sortBy = 'createdAt',
@@ -46,6 +47,11 @@ export class SongsService {
       queryBuilder.andWhere('song.artist LIKE :artist', {
         artist: `%${artist}%`,
       })
+    }
+
+    // 上传者筛选
+    if (uploaderId) {
+      queryBuilder.andWhere('song.uploaderId = :uploaderId', { uploaderId })
     }
 
     // 排序
@@ -182,6 +188,69 @@ export class SongsService {
       totalPlays: totalPlaysResult?.total || 0,
       topGenres,
       topArtists,
+    }
+  }
+
+  // 获取用户上传的歌曲
+  async getUserSongs(userId: string, queryDto: Partial<QuerySongsDto> = {}) {
+    const { search, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'DESC' } = queryDto
+
+    const queryBuilder = this.songRepository
+      .createQueryBuilder('song')
+      .where('song.uploaderId = :userId', { userId })
+
+    // 搜索条件
+    if (search) {
+      queryBuilder.andWhere(
+        '(song.title LIKE :search OR song.artist LIKE :search OR song.album LIKE :search)',
+        { search: `%${search}%` }
+      )
+    }
+
+    // 排序
+    queryBuilder.orderBy(`song.${sortBy}`, sortOrder)
+
+    // 分页
+    const skip = (page - 1) * limit
+    queryBuilder.skip(skip).take(limit)
+
+    const [songs, total] = await queryBuilder.getManyAndCount()
+
+    return {
+      data: songs,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    }
+  }
+
+  // 获取用户歌曲统计信息
+  async getUserSongStats(userId: string) {
+    const totalSongs = await this.songRepository.count({
+      where: { uploaderId: userId },
+    })
+
+    const totalPlaysResult = await this.songRepository
+      .createQueryBuilder('song')
+      .select('SUM(song.playCount)', 'total')
+      .where('song.uploaderId = :userId', { userId })
+      .getRawOne()
+
+    // 获取收藏数（需要关联Favorite表）
+    const totalLikesResult = await this.songRepository
+      .createQueryBuilder('song')
+      .leftJoin('favorites', 'favorite', 'favorite.songId = song.id')
+      .select('COUNT(favorite.id)', 'total')
+      .where('song.uploaderId = :userId', { userId })
+      .getRawOne()
+
+    return {
+      totalSongs,
+      totalPlays: Number(totalPlaysResult?.total || 0),
+      totalLikes: Number(totalLikesResult?.total || 0),
     }
   }
 }

@@ -206,6 +206,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { uploadApi } from '@/services'
 import { genreApi } from '@/services'
+import { musicApi } from '@/services/music-api'
 import { MobileMessage } from '@/components/ui'
 
 // 路由
@@ -380,18 +381,21 @@ const handleUpload = async () => {
       uploadProgress.value = 30 + Math.floor(progress * 0.7) // 音乐上传占70%进度
     })
 
-    // TODO: 调用创建歌曲的API，保存歌曲信息到数据库
-    // const songData = {
-    //   title: songInfo.title,
-    //   artist: songInfo.artist,
-    //   album: songInfo.album,
-    //   genre: songInfo.genre,
-    //   year: songInfo.year ? parseInt(songInfo.year) : undefined,
-    //   description: songInfo.description,
-    //   audioUrl: musicResult.url,
-    //   coverUrl: coverUrl || undefined
-    // }
-    // await musicApi.createSong(songData)
+    // 创建歌曲记录到数据库
+    const songData = {
+      title: songInfo.title,
+      artist: songInfo.artist,
+      album: songInfo.album,
+      genre: songInfo.genre,
+      year: songInfo.year ? parseInt(songInfo.year) : undefined,
+      duration: 240, // TODO: 从音频文件中获取实际时长
+      audioUrl: musicResult.url,
+      coverUrl: coverUrl || 'https://via.placeholder.com/300x300?text=No+Cover',
+      lyrics: songInfo.description, // 将描述作为歌词
+      originalFileName: selectedFile.value.name,
+      fileSize: selectedFile.value.size,
+    }
+    await musicApi.createSong(songData)
 
     uploadProgress.value = 100
 

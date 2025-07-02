@@ -15,6 +15,7 @@ export interface Song {
   originalFileName?: string
   sourceId?: string
   sourceUrl?: string
+  uploaderId?: string
   createdAt: string
   updatedAt: string
 }

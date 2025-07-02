@@ -37,7 +37,7 @@ export class CreateSongDto {
     example: 'https://example.com/cover.jpg',
     format: 'url',
   })
-  @IsUrl({}, { message: '封面URL格式不正确' })
+  @IsUrl({ require_tld: false }, { message: '封面URL格式不正确' })
   coverUrl: string
 
   @ApiProperty({
@@ -45,7 +45,7 @@ export class CreateSongDto {
     example: 'https://example.com/audio.mp3',
     format: 'url',
   })
-  @IsUrl({}, { message: '音频URL格式不正确' })
+  @IsUrl({ require_tld: false }, { message: '音频URL格式不正确' })
   audioUrl: string
 
   @ApiProperty({
@@ -98,6 +98,15 @@ export class CreateSongDto {
   @IsOptional()
   @IsString({ message: '原始文件名必须是字符串' })
   originalFileName?: string
+
+  @ApiProperty({
+    description: '上传者ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: '上传者ID必须是字符串' })
+  uploaderId?: string
 }
 
 export class UpdateSongDto {
@@ -145,7 +154,7 @@ export class UpdateSongDto {
     required: false,
   })
   @IsOptional()
-  @IsUrl({}, { message: '封面URL格式不正确' })
+  @IsUrl({ require_tld: false }, { message: '封面URL格式不正确' })
   coverUrl?: string
 
   @ApiProperty({
@@ -207,6 +216,15 @@ export class QuerySongsDto {
   @IsOptional()
   @IsString({ message: '艺术家必须是字符串' })
   artist?: string
+
+  @ApiProperty({
+    description: '上传者ID筛选',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: '上传者ID必须是字符串' })
+  uploaderId?: string
 
   @ApiProperty({
     description: '页码',

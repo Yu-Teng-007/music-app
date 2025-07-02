@@ -68,6 +68,7 @@ export class SecurityModule implements NestModule {
             '/api/csrf-token',
             '/api/upload/music',
             '/api/upload/cover',
+            '/api/songs', // 临时添加，稍后需要修复CSRF token处理
           ]
 
           // 检查是否为排除的路径

@@ -5,8 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm'
 import { Playlist } from './playlist.entity'
+import { User } from './user.entity'
 
 @Entity('songs')
 export class Song {
@@ -55,11 +58,20 @@ export class Song {
   @Column({ nullable: true })
   sourceUrl: string
 
+  // 添加上传者字段
+  @Column({ nullable: true })
+  uploaderId: string
+
   @CreateDateColumn()
   createdAt: Date
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  // 关联关系
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'uploaderId' })
+  uploader: User
 
   @ManyToMany(() => Playlist, playlist => playlist.songs)
   playlists: Playlist[]

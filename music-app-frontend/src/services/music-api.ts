@@ -3,11 +3,24 @@ import type { SongQueryParams } from '@/types/api'
 
 // 音乐相关API
 export const musicApi = {
+  // 创建歌曲
+  async createSong(songData: any) {
+    try {
+      const response = await apiClient.post('/songs', songData)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '创建歌曲失败')
+    }
+  },
+
   // 获取歌曲列表
   async getSongs(params?: SongQueryParams) {
     try {
       const response = await apiClient.get('/songs', { params })
-      return response.data.data
+      return {
+        data: response.data.data,
+        pagination: response.data.pagination,
+      }
     } catch (error: any) {
       throw new Error(error.response?.data?.message || '获取歌曲列表失败')
     }
@@ -90,6 +103,48 @@ export const musicApi = {
       return response.data.data
     } catch (error: any) {
       throw new Error(error.response?.data?.message || '获取艺术家歌曲失败')
+    }
+  },
+
+  // 获取我的歌曲
+  async getMySongs(params?: SongQueryParams) {
+    try {
+      const response = await apiClient.get('/songs/my', { params })
+      return {
+        data: response.data.data,
+        pagination: response.data.pagination,
+      }
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '获取我的歌曲失败')
+    }
+  },
+
+  // 获取我的歌曲统计
+  async getMyStats() {
+    try {
+      const response = await apiClient.get('/songs/my/stats')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '获取统计信息失败')
+    }
+  },
+
+  // 更新歌曲信息
+  async updateSong(id: string, data: any) {
+    try {
+      const response = await apiClient.patch(`/songs/${id}`, data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '更新歌曲失败')
+    }
+  },
+
+  // 删除歌曲
+  async deleteSong(id: string) {
+    try {
+      await apiClient.delete(`/songs/${id}`)
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || '删除歌曲失败')
     }
   },
 }
