@@ -29,6 +29,13 @@ import {
   Download,
   DownloadCache,
   UserStorage,
+  AdminUser,
+  AdminRole,
+  AdminPermission,
+  AdminRolePermission,
+  AdminUserRole,
+  SystemConfig,
+  AdminLog,
 } from './entities'
 import { SmsModule } from './sms/sms.module'
 import { HistoryModule } from './history/history.module'
@@ -39,6 +46,7 @@ import { SocialModule } from './social/social.module'
 
 import { AppThrottlerModule } from './common/throttler/throttler.module'
 import { SecurityModule } from './common/security/security.module'
+import { AdminModule } from './admin/admin.module'
 import { LoggerModule } from './common/logger/logger.module'
 
 @Module({
@@ -82,6 +90,13 @@ import { LoggerModule } from './common/logger/logger.module'
       Download,
       DownloadCache,
       UserStorage,
+      AdminUser,
+      AdminRole,
+      AdminPermission,
+      AdminRolePermission,
+      AdminUserRole,
+      SystemConfig,
+      AdminLog,
     ]),
 
     // 安全模块
@@ -108,6 +123,9 @@ import { LoggerModule } from './common/logger/logger.module'
     UsersModule,
     RealtimeModule,
     SocialModule,
+
+    // 管理后台模块
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

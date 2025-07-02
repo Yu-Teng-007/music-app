@@ -80,6 +80,10 @@ async function bootstrap() {
       .addTag('realtime', '🔄 实时通信模块 - WebSocket消息推送')
       .addTag('sms', '📱 短信服务模块 - 验证码发送')
       .addTag('user-preferences', '⚙️ 用户偏好设置 - 个性化配置')
+      .addTag('admin-auth', '🔐 管理后台认证 - 管理员登录和权限验证')
+      .addTag('admin-users', '👥 管理员用户管理 - 管理员账户管理')
+      .addTag('admin-songs', '🎵 歌曲管理 - 歌曲内容管理')
+      .addTag('admin-analytics', '📊 数据统计 - 运营数据分析')
       .addBearerAuth(
         {
           type: 'http',
