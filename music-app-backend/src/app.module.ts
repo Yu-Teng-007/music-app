@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { ServeStaticModule } from '@nestjs/serve-static'
-import { join } from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig } from './config'
+import { fileServiceConfig } from './config/app.config'
 import { AuthModule } from './auth/auth.module'
 import { SongsModule } from './songs/songs.module'
 import { PlaylistsModule } from './playlists/playlists.module'
@@ -47,7 +46,7 @@ import { LoggerModule } from './common/logger/logger.module'
     // 配置模块
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig],
+      load: [databaseConfig, jwtConfig, appConfig, throttleConfig, cacheConfig, fileServiceConfig],
       envFilePath: ['.env.local', '.env'],
     }),
 
@@ -84,22 +83,6 @@ import { LoggerModule } from './common/logger/logger.module'
       DownloadCache,
       UserStorage,
     ]),
-
-    // 静态文件服务
-    ServeStaticModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => [
-        {
-          rootPath: join(__dirname, '..', configService.get('app.uploadDir') || 'uploads'),
-          serveRoot: '/uploads',
-        },
-        {
-          rootPath: join(__dirname, 'static'),
-          serveRoot: '/static',
-        },
-      ],
-      inject: [ConfigService],
-    }),
 
     // 安全模块
     SecurityModule,

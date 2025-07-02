@@ -1,15 +1,22 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { extname } from 'path'
-import { v4 as uuidv4 } from 'uuid'
-import * as fs from 'fs'
-import * as path from 'path'
+import { HttpService } from '@nestjs/axios'
+import { firstValueFrom } from 'rxjs'
+import FormData from 'form-data'
 
 @Injectable()
 export class UploadService {
-  constructor(private configService: ConfigService) {}
+  private readonly fileServiceUrl: string
 
-  uploadMusic(file: any): { url: string; filename: string } {
+  constructor(
+    private configService: ConfigService,
+    private httpService: HttpService
+  ) {
+    this.fileServiceUrl =
+      this.configService.get<string>('fileService.url') || 'http://localhost:3001'
+  }
+
+  async uploadMusic(file: any): Promise<{ url: string; filename: string }> {
     if (!file) {
       throw new BadRequestException('请选择要上传的音乐文件')
     }
@@ -26,29 +33,38 @@ export class UploadService {
       throw new BadRequestException('音乐文件大小不能超过50MB')
     }
 
-    const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
-    const musicDir = path.join(uploadDir, 'music')
+    try {
+      // 创建FormData
+      const formData = new FormData()
+      formData.append('file', file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+      })
+      formData.append('category', 'music')
+      formData.append('accessLevel', 'public')
 
-    // 确保目录存在
-    if (!fs.existsSync(musicDir)) {
-      fs.mkdirSync(musicDir, { recursive: true })
-    }
+      // 调用file-service API
+      const response = await firstValueFrom(
+        this.httpService.post(`${this.fileServiceUrl}/files/upload`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            'X-API-Key': this.configService.get<string>('fileService.apiKey'),
+          },
+        })
+      )
 
-    // 生成唯一文件名
-    const fileExtension = extname(file.originalname)
-    const filename = `${uuidv4()}${fileExtension}`
-    const filePath = path.join(musicDir, filename)
-
-    // 保存文件
-    fs.writeFileSync(filePath, file.buffer)
-
-    return {
-      url: `/uploads/music/${filename}`,
-      filename,
+      const fileInfo = response.data.data
+      return {
+        url: `${this.fileServiceUrl}/files/${fileInfo.id}/preview`,
+        filename: fileInfo.filename,
+      }
+    } catch (error) {
+      console.error('上传音乐文件失败:', error)
+      throw new BadRequestException('上传音乐文件失败，请重试')
     }
   }
 
-  uploadCover(file: any): { url: string; filename: string } {
+  async uploadCover(file: any): Promise<{ url: string; filename: string }> {
     if (!file) {
       throw new BadRequestException('请选择要上传的封面图片')
     }
@@ -65,59 +81,99 @@ export class UploadService {
       throw new BadRequestException('图片文件大小不能超过5MB')
     }
 
-    const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
-    const coversDir = path.join(uploadDir, 'covers')
+    try {
+      // 创建FormData
+      const formData = new FormData()
+      formData.append('file', file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+      })
+      formData.append('category', 'images')
+      formData.append('accessLevel', 'public')
 
-    // 确保目录存在
-    if (!fs.existsSync(coversDir)) {
-      fs.mkdirSync(coversDir, { recursive: true })
-    }
+      // 调用file-service API
+      const response = await firstValueFrom(
+        this.httpService.post(`${this.fileServiceUrl}/files/upload`, formData, {
+          headers: {
+            ...formData.getHeaders(),
+            'X-API-Key': this.configService.get<string>('fileService.apiKey'),
+          },
+        })
+      )
 
-    // 生成唯一文件名
-    const fileExtension = extname(file.originalname)
-    const filename = `${uuidv4()}${fileExtension}`
-    const filePath = path.join(coversDir, filename)
-
-    // 保存文件
-    fs.writeFileSync(filePath, file.buffer)
-
-    return {
-      url: `/uploads/covers/${filename}`,
-      filename,
+      const fileInfo = response.data.data
+      return {
+        url: `${this.fileServiceUrl}/files/${fileInfo.id}/preview`,
+        filename: fileInfo.filename,
+      }
+    } catch (error) {
+      console.error('上传封面图片失败:', error)
+      throw new BadRequestException('上传封面图片失败，请重试')
     }
   }
 
-  deleteFile(filePath: string): void {
+  async deleteFile(fileUrl: string): Promise<void> {
     try {
-      const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
-      const fullPath = path.join(uploadDir, filePath.replace('/uploads/', ''))
-
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath)
+      // 从URL中提取文件ID
+      const fileId = this.extractFileIdFromUrl(fileUrl)
+      if (!fileId) {
+        console.warn('无法从URL中提取文件ID:', fileUrl)
+        return
       }
+
+      // 调用file-service API删除文件
+      await firstValueFrom(
+        this.httpService.delete(`${this.fileServiceUrl}/files/${fileId}`, {
+          headers: {
+            'X-API-Key': this.configService.get<string>('fileService.apiKey'),
+          },
+        })
+      )
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('删除文件失败:', error)
     }
   }
 
-  getFileInfo(filePath: string) {
+  async getFileInfo(fileUrl: string) {
     try {
-      const uploadDir = this.configService.get<string>('app.uploadDir') || './uploads'
-      const fullPath = path.join(uploadDir, filePath.replace('/uploads/', ''))
-
-      if (fs.existsSync(fullPath)) {
-        const stats = fs.statSync(fullPath)
-        return {
-          size: stats.size,
-          createdAt: stats.birthtime,
-          modifiedAt: stats.mtime,
-        }
+      // 从URL中提取文件ID
+      const fileId = this.extractFileIdFromUrl(fileUrl)
+      if (!fileId) {
+        console.warn('无法从URL中提取文件ID:', fileUrl)
+        return null
       }
-      return null
+
+      // 调用file-service API获取文件信息
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.fileServiceUrl}/files/${fileId}`, {
+          headers: {
+            'X-API-Key': this.configService.get<string>('fileService.apiKey'),
+          },
+        })
+      )
+
+      const fileInfo = response.data.data
+      return {
+        size: fileInfo.size,
+        createdAt: fileInfo.createdAt,
+        modifiedAt: fileInfo.updatedAt,
+      }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('获取文件信息失败:', error)
+      return null
+    }
+  }
+
+  /**
+   * 从文件URL中提取文件ID
+   */
+  private extractFileIdFromUrl(url: string): string | null {
+    try {
+      // 匹配 /files/{id}/preview 或 /files/{id}/download 格式
+      const match = url.match(/\/files\/([a-f0-9-]{36})\/(preview|download)/)
+      return match ? match[1] : null
+    } catch (error) {
+      console.error('提取文件ID失败:', error)
       return null
     }
   }
