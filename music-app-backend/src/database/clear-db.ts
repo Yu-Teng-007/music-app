@@ -8,26 +8,38 @@ async function bootstrap() {
   const dataSource = app.get(DataSource)
 
   try {
-    const entities = dataSource.entityMetadatas
-
-    console.log('开始清空数据库...')
+    console.log('🗑️  开始清理数据库...')
 
     // 禁用外键约束
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 0')
 
-    // 清空所有表
-    for (const entity of entities) {
-      const repository = dataSource.getRepository(entity.name)
-      await repository.query(`TRUNCATE TABLE ${entity.tableName}`)
-      console.log(`已清空表: ${entity.tableName}`)
+    // 获取所有表名
+    const result = await dataSource.query(`
+      SELECT table_name as tableName
+      FROM information_schema.tables
+      WHERE table_schema = DATABASE()
+    `)
+
+    if (result.length === 0) {
+      console.log('📭 数据库中没有表需要清理')
+      return
+    }
+
+    console.log(`🔍 发现 ${result.length} 个表:`)
+    result.forEach((table: any) => console.log(`  - ${table.tableName}`))
+
+    // 删除所有表
+    for (const table of result) {
+      console.log(`🗑️  删除表: ${table.tableName}`)
+      await dataSource.query(`DROP TABLE IF EXISTS \`${table.tableName}\``)
     }
 
     // 重新启用外键约束
     await dataSource.query('SET FOREIGN_KEY_CHECKS = 1')
 
-    console.log('数据库清空完成！')
+    console.log('✅ 数据库清理完成！')
   } catch (error) {
-    console.error('清空数据库时出错:', error)
+    console.error('❌ 数据库清理失败:', error)
   } finally {
     await app.close()
   }

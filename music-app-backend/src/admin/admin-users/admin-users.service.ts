@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, Like } from 'typeorm'
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 import { AdminUser, AdminRole } from '../../entities'
 import { CreateAdminUserDto, UpdateAdminUserDto, AdminQueryDto } from '../../dto'
 

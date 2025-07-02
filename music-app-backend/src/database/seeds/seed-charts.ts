@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { NestFactory } from '@nestjs/core'
-import { AppModule } from '../../../src/app.module'
+import { AppModule } from '../../app.module'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Chart } from '../../../src/entities/chart.entity'
-import { Song } from '../../../src/entities/song.entity'
+import { Chart } from '../../entities/chart.entity'
+import { Song } from '../../entities/song.entity'
 import { Repository } from 'typeorm'
 
 interface ChartData {

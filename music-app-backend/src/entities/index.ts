@@ -19,7 +19,7 @@ export { FeedComment } from './feed-comment.entity'
 // 管理后台实体
 export { AdminUser } from './admin-user.entity'
 export { AdminRole } from './admin-role.entity'
-export { AdminPermission } from './admin-permission.entity'
+export { AdminPermission, PermissionType } from './admin-permission.entity'
 export { AdminRolePermission } from './admin-role-permission.entity'
 export { AdminUserRole } from './admin-user-role.entity'
 export { SystemConfig } from './system-config.entity'

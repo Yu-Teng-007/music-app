@@ -60,7 +60,11 @@ async function seedDatabase(options: Partial<SeedOptions> = {}) {
       const { default: databaseConfig } = await import('../../config/database.config')
 
       // 创建临时数据源连接
-      const dataSource = new DataSource(databaseConfig())
+      const config = databaseConfig()
+      const dataSource = new DataSource({
+        ...config,
+        type: config.type as any, // 确保类型兼容
+      })
       if (!dataSource.isInitialized) {
         await dataSource.initialize()
       }

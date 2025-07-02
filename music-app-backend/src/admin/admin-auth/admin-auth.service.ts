@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 import { AdminUser, AdminRole, AdminPermission } from '../../entities'
 import { AdminLoginDto } from '../../dto'
 
@@ -94,7 +94,7 @@ export class AdminAuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken)
-      
+
       const adminUser = await this.adminUserRepository.findOne({
         where: { id: payload.sub, isActive: true },
         relations: ['roles', 'roles.permissions'],
@@ -148,7 +148,7 @@ export class AdminAuthService {
    */
   private extractPermissions(roles: AdminRole[]): string[] {
     const permissions = new Set<string>()
-    
+
     roles.forEach(role => {
       if (role.isActive) {
         role.permissions?.forEach(permission => {
@@ -176,7 +176,7 @@ export class AdminAuthService {
   async validateToken(token: string) {
     try {
       const payload = this.jwtService.verify(token)
-      
+
       if (payload.type !== 'admin') {
         throw new UnauthorizedException('无效的令牌类型')
       }

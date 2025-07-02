@@ -1,18 +1,27 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   Column,
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from 'typeorm'
 import { AdminRole } from './admin-role.entity'
 import { AdminPermission } from './admin-permission.entity'
+import { v4 as uuidv4 } from 'uuid'
 
 @Entity('admin_role_permissions')
 export class AdminRolePermission {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('varchar', { length: 36 })
   id: string
+
+  @BeforeInsert()
+  generateId() {
+    if (!this.id) {
+      this.id = uuidv4()
+    }
+  }
 
   @Column()
   roleId: string

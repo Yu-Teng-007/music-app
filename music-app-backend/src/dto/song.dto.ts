@@ -218,6 +218,28 @@ export class QuerySongsDto {
   artist?: string
 
   @ApiProperty({
+    description: '专辑筛选',
+    example: '我很忙',
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ message: '专辑必须是字符串' })
+  album?: string
+
+  @ApiProperty({
+    description: '年份筛选',
+    example: 2007,
+    minimum: 1900,
+    maximum: new Date().getFullYear(),
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber({}, { message: '年份必须是数字' })
+  @Min(1900, { message: '年份不能早于1900年' })
+  @Max(new Date().getFullYear(), { message: '年份不能超过当前年份' })
+  year?: number
+
+  @ApiProperty({
     description: '上传者ID筛选',
     example: '123e4567-e89b-12d3-a456-426614174000',
     required: false,
@@ -274,3 +296,6 @@ export class QuerySongsDto {
   @IsString({ message: '排序方向必须是字符串' })
   sortOrder?: 'ASC' | 'DESC' = 'DESC'
 }
+
+// 为了向后兼容，添加别名
+export { QuerySongsDto as SongQueryParams }

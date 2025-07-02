@@ -47,7 +47,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
         SystemConfig,
         AdminLog,
       ],
-      synchronize: process.env.NODE_ENV === 'development',
+      synchronize: false, // 暂时禁用自动同步，避免表结构冲突
       logging: process.env.NODE_ENV === 'development',
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }
@@ -88,7 +88,7 @@ export default registerAs('database', (): TypeOrmModuleOptions => {
       SystemConfig,
       AdminLog,
     ],
-    synchronize: process.env.NODE_ENV === 'development',
+    synchronize: false, // 暂时禁用自动同步，避免表结构冲突
     logging: process.env.NODE_ENV === 'development',
   }
 

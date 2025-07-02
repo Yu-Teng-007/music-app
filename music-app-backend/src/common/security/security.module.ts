@@ -65,6 +65,8 @@ export class SecurityModule implements NestModule {
             '/api/auth/login',
             '/api/auth/register',
             '/api/auth/send-sms',
+            '/api/admin/auth/login',
+            '/api/admin/auth/refresh',
             '/api/csrf-token',
             '/api/upload/music',
             '/api/upload/cover',
