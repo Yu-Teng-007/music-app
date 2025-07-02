@@ -9,9 +9,30 @@ const request: AxiosInstance = axios.create({
   },
 })
 
+// 用于跟踪是否正在刷新令牌
+let isRefreshing = false
+// 存储等待刷新完成的请求
+let failedQueue: Array<{
+  resolve: (value: any) => void
+  reject: (error: any) => void
+}> = []
+
+// 处理等待队列
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error)
+    } else {
+      resolve(token)
+    }
+  })
+
+  failedQueue = []
+}
+
 // 请求拦截器
 request.interceptors.request.use(
-  (config) => {
+  async (config) => {
     // 添加认证token
     const token = localStorage.getItem('admin_token')
     if (token) {
@@ -37,18 +58,75 @@ request.interceptors.response.use(
     // 如果是错误响应，抛出错误
     return Promise.reject(new Error(data.message || '请求失败'))
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
     // 处理HTTP错误状态码
     if (error.response) {
       const { status, data } = error.response
 
-      switch (status) {
-        case 401:
-          // 未授权，清除token并跳转到登录页
+      // 处理401未授权错误
+      if (status === 401 && !originalRequest._retry) {
+        if (isRefreshing) {
+          // 如果正在刷新令牌，将请求加入等待队列
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject })
+          })
+            .then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`
+              return request(originalRequest)
+            })
+            .catch((err) => {
+              return Promise.reject(err)
+            })
+        }
+
+        originalRequest._retry = true
+        isRefreshing = true
+
+        try {
+          // 尝试刷新令牌
+          const refreshTokenValue = localStorage.getItem('admin_refresh_token')
+          if (!refreshTokenValue) {
+            throw new Error('没有刷新令牌')
+          }
+
+          // 动态导入认证API以避免循环依赖
+          const { authApi } = await import('@/api/auth')
+          const response = await authApi.refreshToken(refreshTokenValue)
+
+          // 更新本地存储
+          localStorage.setItem('admin_token', response.accessToken)
+          localStorage.setItem('admin_user', JSON.stringify(response.user))
+          localStorage.setItem('admin_permissions', JSON.stringify(response.permissions))
+          localStorage.setItem('admin_refresh_token', response.refreshToken)
+
+          // 更新原始请求的Authorization头
+          originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
+
+          // 处理等待队列
+          processQueue(null, response.accessToken)
+
+          // 重试原始请求
+          return request(originalRequest)
+        } catch (refreshError) {
+          // 刷新失败，清除所有认证信息
+          processQueue(refreshError, null)
           localStorage.removeItem('admin_token')
           localStorage.removeItem('admin_user')
+          localStorage.removeItem('admin_permissions')
+          localStorage.removeItem('admin_refresh_token')
+
+          // 跳转到登录页
           window.location.href = '/login'
-          break
+          return Promise.reject(refreshError)
+        } finally {
+          isRefreshing = false
+        }
+      }
+
+      // 处理其他错误状态码
+      switch (status) {
         case 403:
           // 权限不足
           console.error('权限不足:', data.message)

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT令牌调试工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .token-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JWT令牌调试工具</h1>
+        
+        <div id="tokenStatus"></div>
+        
+        <button onclick="checkToken()">检查当前令牌</button>
+        <button onclick="clearTokens()">清除所有令牌</button>
+        <button onclick="testAPI()">测试API调用</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function displayResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `token-info ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function checkToken() {
+            clearResults();
+            
+            const token = localStorage.getItem('admin_token');
+            const refreshToken = localStorage.getItem('admin_refresh_token');
+            const user = localStorage.getItem('admin_user');
+            
+            if (!token) {
+                displayResult('❌ 没有找到访问令牌', 'error');
+                return;
+            }
+            
+            try {
+                // 解析JWT令牌
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    displayResult('❌ 令牌格式无效', 'error');
+                    return;
+                }
+                
+                const header = JSON.parse(atob(parts[0]));
+                const payload = JSON.parse(atob(parts[1]));
+                
+                displayResult(`✅ 令牌格式正确`, 'success');
+                displayResult(`<strong>令牌头部:</strong><pre>${JSON.stringify(header, null, 2)}</pre>`);
+                displayResult(`<strong>令牌载荷:</strong><pre>${JSON.stringify(payload, null, 2)}</pre>`);
+                
+                // 检查过期时间
+                const now = Math.floor(Date.now() / 1000);
+                const exp = payload.exp;
+                
+                if (exp) {
+                    const expirationDate = new Date(exp * 1000);
+                    const timeLeft = exp - now;
+                    
+                    if (timeLeft > 0) {
+                        const hours = Math.floor(timeLeft / 3600);
+                        const minutes = Math.floor((timeLeft % 3600) / 60);
+                        displayResult(`✅ 令牌有效，剩余时间: ${hours}小时${minutes}分钟`, 'success');
+                        displayResult(`过期时间: ${expirationDate.toLocaleString()}`);
+                    } else {
+                        displayResult(`❌ 令牌已过期`, 'error');
+                        displayResult(`过期时间: ${expirationDate.toLocaleString()}`);
+                    }
+                } else {
+                    displayResult(`⚠️ 令牌没有过期时间`, 'warning');
+                }
+                
+                // 检查令牌类型
+                if (payload.type === 'admin') {
+                    displayResult(`✅ 令牌类型正确: ${payload.type}`, 'success');
+                } else {
+                    displayResult(`❌ 令牌类型错误: ${payload.type || '未设置'}`, 'error');
+                }
+                
+                // 显示用户信息
+                if (user) {
+                    const userInfo = JSON.parse(user);
+                    displayResult(`<strong>用户信息:</strong><pre>${JSON.stringify(userInfo, null, 2)}</pre>`);
+                }
+                
+                // 显示刷新令牌状态
+                if (refreshToken) {
+                    displayResult(`✅ 刷新令牌存在`, 'success');
+                } else {
+                    displayResult(`❌ 没有刷新令牌`, 'error');
+                }
+                
+            } catch (error) {
+                displayResult(`❌ 解析令牌失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearTokens() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_refresh_token');
+            localStorage.removeItem('admin_user');
+            localStorage.removeItem('admin_permissions');
+            
+            clearResults();
+            displayResult('✅ 所有令牌已清除', 'success');
+        }
+
+        async function testAPI() {
+            clearResults();
+            
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                displayResult('❌ 没有令牌，无法测试API', 'error');
+                return;
+            }
+            
+            try {
+                displayResult('🔄 正在测试API调用...', 'info');
+                
+                const response = await fetch('http://localhost:3000/api/admin/analytics/overview', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayResult('✅ API调用成功', 'success');
+                    displayResult(`<strong>响应数据:</strong><pre>${JSON.stringify(data, null, 2)}</pre>`);
+                } else {
+                    const errorData = await response.text();
+                    displayResult(`❌ API调用失败 (${response.status}): ${errorData}`, 'error');
+                }
+            } catch (error) {
+                displayResult(`❌ API调用异常: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时自动检查令牌
+        window.onload = function() {
+            checkToken();
+        };
+    </script>
+</body>
+</html>
