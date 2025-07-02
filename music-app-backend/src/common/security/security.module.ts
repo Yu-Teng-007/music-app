@@ -66,6 +66,8 @@ export class SecurityModule implements NestModule {
             '/api/auth/register',
             '/api/auth/send-sms',
             '/api/csrf-token',
+            '/api/upload/music',
+            '/api/upload/cover',
           ]
 
           // 检查是否为排除的路径
