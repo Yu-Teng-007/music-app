@@ -903,7 +903,6 @@ onUnmounted(() => {
 
 .input-wrapper .form-input {
   flex: 1;
-  padding-right: 2.5rem;
 }
 
 /* 当有密码切换按钮时，为清除按钮留出空间 */
