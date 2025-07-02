@@ -1,6 +1,7 @@
 // 移动端原生UI组件库
 export { default as MobileButton } from './Button.vue'
 export { default as MobileDialog } from './Dialog.vue'
+export { default as ConfirmDialog } from './ConfirmDialog.vue'
 export { default as MobileInput } from './Input.vue'
 export { default as MobileSelect } from './Select.vue'
 export { default as MobileSkeleton } from './Skeleton.vue'

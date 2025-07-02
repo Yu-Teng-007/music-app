@@ -111,7 +111,7 @@
         <select v-model="sortBy" @change="handleSort">
           <option value="createdAt">按上传时间</option>
           <option value="title">按歌曲名称</option>
-          <option value="plays">按播放量</option>
+          <option value="playCount">按播放量</option>
           <option value="likes">按收藏数</option>
         </select>
 
@@ -192,9 +192,9 @@
             <div class="song-meta">
               <span class="upload-date">{{ formatDate(song.createdAt) }}</span>
               <span class="separator">•</span>
-              <span class="plays">{{ song.plays || 0 }} 播放</span>
+              <span class="plays">{{ song.playCount || 0 }} 播放</span>
               <span class="separator">•</span>
-              <span class="likes">{{ song.likes || 0 }} 收藏</span>
+              <span class="likes">{{ (song as any).likes || 0 }} 收藏</span>
             </div>
           </div>
 
@@ -296,13 +296,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { ConfirmDialog } from '@/components/ui'
 import type { Song } from '@/types'
 
 // 组件引入（需要创建）
 // import EditSongDialog from '@/components/music/EditSongDialog.vue'
-// import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 // 路由
 const router = useRouter()
@@ -322,8 +322,10 @@ const deletingSong = ref<Song | null>(null)
 
 // 统计数据
 const totalSongs = computed(() => songs.value.length)
-const totalPlays = computed(() => songs.value.reduce((sum, song) => sum + (song.plays || 0), 0))
-const totalLikes = computed(() => songs.value.reduce((sum, song) => sum + (song.likes || 0), 0))
+const totalPlays = computed(() => songs.value.reduce((sum, song) => sum + (song.playCount || 0), 0))
+const totalLikes = computed(() =>
+  songs.value.reduce((sum, song) => sum + ((song as any).likes || 0), 0)
+)
 
 // 筛选和排序
 const filteredSongs = computed(() => {

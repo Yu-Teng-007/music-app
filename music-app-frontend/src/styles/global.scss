@@ -9,6 +9,52 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+
+  /* 移除点击高亮效果 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+/* 全局按钮样式重置 */
+button {
+  /* 重置浏览器默认样式 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* 移除默认的点击高亮 */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  /* 确保按钮状态正确重置 */
+  outline: none;
+  border: none;
+  background: none;
+
+  /* 防止点击状态保留 */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* 移除所有按钮的focus状态默认样式 */
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 确保按钮active状态不会保留 */
+button:active {
+  transform: none;
+  outline: none;
 }
 
 html {
@@ -30,10 +76,21 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 
+  /* 禁止双击缩放 */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+
   // 平滑过渡
   transition:
     color $duration-base $easing-ease-out,
     background-color $duration-base $easing-ease-out;
+}
+
+#app {
+  min-height: 100vh;
+  position: relative;
 }
 
 // ===== 通用工具类 =====
@@ -316,6 +373,9 @@ body {
   margin: 0 auto;
   padding: 0 $spacing-4;
 }
+
+// 注意：页面底部安全区域现在由 AppLayout 组件统一处理
+// 如果需要自定义底部间距，请使用 AppLayout 组件的 props
 
 .flex {
   display: flex;

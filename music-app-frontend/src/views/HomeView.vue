@@ -8,35 +8,6 @@ import type { Song } from '@/stores/music'
 import type { Genre } from '@/services/genre-api'
 import { Play, ChevronRight } from 'lucide-vue-next'
 
-// 调整颜色深浅的辅助函数
-const adjustColor = (color: string, amount: number): string => {
-  // 如果颜色是十六进制格式
-  if (color.startsWith('#')) {
-    let hex = color.substring(1)
-
-    // 将3位颜色扩展为6位
-    if (hex.length === 3) {
-      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
-    }
-
-    // 转换为RGB
-    const r = parseInt(hex.substring(0, 2), 16)
-    const g = parseInt(hex.substring(2, 4), 16)
-    const b = parseInt(hex.substring(4, 6), 16)
-
-    // 调整颜色
-    const newR = Math.max(0, Math.min(255, r + amount))
-    const newG = Math.max(0, Math.min(255, g + amount))
-    const newB = Math.max(0, Math.min(255, b + amount))
-
-    // 转回十六进制
-    return `#${Math.round(newR).toString(16).padStart(2, '0')}${Math.round(newG).toString(16).padStart(2, '0')}${Math.round(newB).toString(16).padStart(2, '0')}`
-  }
-
-  // 如果是其他格式，返回原色
-  return color
-}
-
 const router = useRouter()
 const musicStore = useMusicStore()
 const authStore = useAuthStore()
@@ -331,7 +302,7 @@ onMounted(async () => {
     </div>
 
     <!-- 快捷入口 -->
-    <div class="section">
+    <div class="section" style="margin-bottom: 0">
       <div class="section-header">
         <h2>发现更多</h2>
       </div>
@@ -362,16 +333,7 @@ onMounted(async () => {
   min-height: 100vh;
   background: linear-gradient(to bottom, $bg-secondary 0%, $bg-tertiary 50%, $bg-quaternary 100%);
   color: $text-primary;
-  padding: $spacing-6;
-  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
-
-  @include respond-to(md) {
-    padding: $spacing-4;
-  }
-
-  @include respond-to(sm) {
-    padding: $spacing-3;
-  }
+  padding: 1rem;
 }
 
 .header-section {
@@ -914,11 +876,6 @@ onMounted(async () => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .home-view {
-    padding: 1.5rem;
-    padding-bottom: calc(150px + env(safe-area-inset-bottom));
-  }
-
   .user-text h1 {
     font-size: 2rem;
   }

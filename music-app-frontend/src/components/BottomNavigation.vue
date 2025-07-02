@@ -63,18 +63,19 @@ const isActive = (path: string) => {
 @use '@/styles/variables.scss' as *;
 
 .bottom-navigation {
+  height: 65px;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   background: rgba($bg-primary, 0.95);
   backdrop-filter: blur(20px);
-  border-top: $border-width-thin solid $border-color-light;
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: $spacing-3 0 calc(#{$spacing-3} + env(safe-area-inset-bottom));
   z-index: $z-index-fixed;
+  box-sizing: border-box;
 }
 
 .nav-item {
@@ -88,14 +89,7 @@ const isActive = (path: string) => {
   color: $text-tertiary;
   transition: $transition-fast;
   min-width: 60px;
-  /* 移除点击高亮效果 */
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  outline: none;
+  
 }
 
 .nav-item:hover {

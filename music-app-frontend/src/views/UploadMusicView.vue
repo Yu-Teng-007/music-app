@@ -206,7 +206,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { uploadApi } from '@/services'
 import { genreApi } from '@/services'
-import type { Genre } from '@/types'
+import { MobileMessage } from '@/components/ui'
 
 // 路由
 const router = useRouter()
@@ -218,7 +218,7 @@ const coverPreview = ref<string>('')
 const isUploading = ref(false)
 const uploadProgress = ref(0)
 const isDragOver = ref(false)
-const genres = ref<Genre[]>([])
+const genres = ref<any[]>([])
 
 // 歌曲信息
 const songInfo = reactive({
@@ -270,14 +270,14 @@ const validateAndSetFile = (file: File) => {
   // 验证文件类型
   const allowedTypes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/flac', 'audio/ogg']
   if (!allowedTypes.includes(file.type)) {
-    alert('不支持的文件格式，请选择 MP3、WAV、FLAC 格式的音频文件')
+    MobileMessage.error('不支持的文件格式，请选择 MP3、WAV、FLAC 格式的音频文件')
     return
   }
 
   // 验证文件大小 (50MB)
   const maxSize = 50 * 1024 * 1024
   if (file.size > maxSize) {
-    alert('文件大小不能超过 50MB')
+    MobileMessage.error('文件大小不能超过 50MB')
     return
   }
 
@@ -396,13 +396,13 @@ const handleUpload = async () => {
     uploadProgress.value = 100
 
     // 显示成功消息
-    alert('歌曲上传成功！')
+    MobileMessage.success('歌曲上传成功！')
 
     // 跳转到歌曲管理页面
     router.push('/my-music')
   } catch (error) {
     console.error('上传失败:', error)
-    alert('上传失败，请重试')
+    MobileMessage.error('上传失败，请重试')
   } finally {
     isUploading.value = false
     uploadProgress.value = 0
@@ -733,6 +733,7 @@ const coverInput = ref<HTMLInputElement>()
 @media (max-width: 768px) {
   .upload-music-view {
     padding: 16px;
+    padding-bottom: 120px;
   }
 
   .song-form {

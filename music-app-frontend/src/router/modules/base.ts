@@ -13,10 +13,10 @@ export const baseRoutes: RouteModule = {
       path: '/onboarding',
       name: 'onboarding',
       component: () => import('../../views/OnboardingView.vue'),
-      meta: { 
-        requiresGuest: true, 
+      meta: {
+        requiresGuest: true,
         hideNavigation: true,
-        title: '欢迎使用'
+        title: '欢迎使用',
       },
     },
     // 首页
@@ -27,8 +27,8 @@ export const baseRoutes: RouteModule = {
       meta: {
         title: '首页',
         showInMenu: true,
-        menuOrder: 1
-      }
+        menuOrder: 1,
+      },
     },
     // 关于页面
     {
@@ -38,8 +38,8 @@ export const baseRoutes: RouteModule = {
       meta: {
         title: '关于',
         showInMenu: true,
-        menuOrder: 99
-      }
+        menuOrder: 99,
+      },
     },
     // 404页面 - 必须放在最后
     {
@@ -47,8 +47,8 @@ export const baseRoutes: RouteModule = {
       name: 'not-found',
       component: () => import('../../views/NotFoundView.vue'),
       meta: {
-        title: '页面未找到'
-      }
+        title: '页面未找到',
+      },
     },
-  ]
+  ],
 }

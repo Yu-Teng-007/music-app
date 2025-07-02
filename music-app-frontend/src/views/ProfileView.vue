@@ -233,7 +233,7 @@ onMounted(() => {
   min-height: 100vh;
   background: linear-gradient(to bottom, #007aff 0%, #1a1a2e 40%, #16213e 100%);
   color: white;
-  padding-bottom: calc(140px + env(safe-area-inset-bottom)); /* 为底部导航栏和mini播放器留空间 */
+  padding: 1rem 0;
 }
 
 .top-nav {
@@ -398,7 +398,7 @@ onMounted(() => {
 
 .menu-section {
   background: rgba(255, 255, 255, 0.1);
-  margin: 1rem;
+  margin: 0 1rem;
   border-radius: 1rem;
   overflow: hidden;
 }

@@ -72,20 +72,17 @@ const handleImageError = (event: Event) => {
 
 <style scoped>
 .mini-player {
+  height: 50px;
   position: fixed;
-  bottom: 65px; /* 在底部导航栏上方 */
+  bottom: 65px;
   left: 0;
   right: 0;
   background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   z-index: 999;
   transition: all 0.3s ease;
-}
-
-.mini-player:hover {
-  background: rgba(15, 23, 42, 0.98);
+  box-sizing: border-box;
 }
 
 .progress-bar {
